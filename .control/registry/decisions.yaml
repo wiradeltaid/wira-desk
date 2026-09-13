@@ -671,6 +671,28 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-028.md
 
+  - id: DEC-029
+    title: Autopilot mandate for SPEC-15 delivery
+    status: accepted
+    file: decisions/DEC-029-autopilot-mandate-for-spec-15-delivery.md
+    created: '2026-09-13'
+    touches:
+      - .control/decisions/DEC-029-autopilot-mandate-for-spec-15-delivery.md
+      - .control/memlog/autopilot-DEC-029.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-20'
+      run_branch: autopilot/DEC-029
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-029.md
+
 
 
 
