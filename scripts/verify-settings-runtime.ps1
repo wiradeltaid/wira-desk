@@ -264,8 +264,8 @@ Record 'focusable-controls-exist' ($focusable -gt 0) "$focusable focusable"
 
 # Expected accessible names come from theme.rs / app.rs.
 $expected = @(
-    'General', 'Shortcuts', 'Layout', 'About',
-    'Save', 'Revert',
+    'General', 'Shortcuts', 'About',
+    'Save Changes', 'Revert',
     'Start Wira Desk with Windows'
 )
 $present = $all | ForEach-Object { $_.Current.Name }
