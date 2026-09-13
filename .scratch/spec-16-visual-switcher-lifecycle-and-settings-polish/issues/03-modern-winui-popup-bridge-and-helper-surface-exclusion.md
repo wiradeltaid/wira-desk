@@ -74,16 +74,16 @@ without touching them.
 
 **Blocked by:** None
 
-**Status:** ready-for-agent
+**Status:** closed
 
-- [ ] `CLASS_POPUP_WINDOW_SITE_BRIDGE` exists and is in `HELPER_SURFACE_CLASSES`.
-- [ ] A window with that class is `Excluded(ExclusionReason::HelperSurface)` in both the production
+- [x] `CLASS_POPUP_WINDOW_SITE_BRIDGE` exists and is in `HELPER_SURFACE_CLASSES`.
+- [x] A window with that class is `Excluded(ExclusionReason::HelperSurface)` in both the production
       policy and `ReferencePolicy`.
-- [ ] The live Notepad popup-bridge profile is excluded; a real Notepad document window is not.
-- [ ] `every_helper_surface_class_has_a_fixture` was seen red before the fixture landed, and is green
+- [x] The live Notepad popup-bridge profile is excluded; a real Notepad document window is not.
+- [x] `every_helper_surface_class_has_a_fixture` was seen red before the fixture landed, and is green
       after.
-- [ ] `agrees_with_reference_policy_on_every_fixture` is green.
-- [ ] `empty_title_window_is_still_eligible`, `zero_extent_window_is_still_eligible` and
+- [x] `agrees_with_reference_policy_on_every_fixture` is green.
+- [x] `empty_title_window_is_still_eligible`, `zero_extent_window_is_still_eligible` and
       `owned_window_is_still_eligible` pass unmodified.
-- [ ] No title-based and no owner-based exclusion was added.
-- [ ] Manual: holding the cycle chord over modern Notepad shows document windows only.
+- [x] No title-based and no owner-based exclusion was added.
+- [x] Manual: holding the cycle chord over modern Notepad shows document windows only.
