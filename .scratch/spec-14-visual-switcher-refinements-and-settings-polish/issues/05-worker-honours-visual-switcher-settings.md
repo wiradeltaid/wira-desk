@@ -55,18 +55,24 @@ is green **right now**, against the bug the owner reported — a test that asser
 `rt.switcher_armed` proves nothing about whether the overlay opens. Run the suite with
 `--no-fail-fast`.
 
+**Resolution of in-flight delay changes:**
+When `visual_hold_delay_ms` is updated while `TIMER_SWITCHER_HOLD` is already armed, the in-flight timer keeps its original delay without disruption; the new threshold applies to subsequent cycle chords (asserted via `changing_hold_delay_while_timer_armed_keeps_in_flight_delay`). If `visual_enabled` is changed to `false`, `install_config_snapshot` immediately disarms the timer and clears in-flight state.
+
+**Observed red verification:**
+`worker::tests::disabled_visual_switcher_never_arms_the_hold_timer` was observed failing against the pre-fix code where `execute_cycle` unconditionally armed `TIMER_SWITCHER_HOLD` at 150 ms with no `visual_enabled` check.
+
 **Blocked by:** None
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] `WorkerSnapshot` carries `visual_enabled: bool` and `visual_hold_delay_ms: u32`, and its doc-comment describes what it now holds.
-- [ ] `worker_snapshot()`'s cold-start fallback populates both fields from the on-disk config.
-- [ ] With `visual_enabled == false`, `execute_cycle` arms no hold timer and stores no switcher origin; blind cycling is byte-for-byte unchanged.
-- [ ] With `visual_enabled == true`, the hold timer uses the configured `visual_hold_delay_ms`, clamped to `100..=500`.
-- [ ] Saving `visual_enabled = false` from Settings stops the overlay opening without a daemon restart and without re-registering the keyboard hook.
-- [ ] A reload arriving **between** arming and the hold timer firing does not open the overlay — asserted against the timer arm, not only against `execute_cycle`.
-- [ ] Changing `visual_hold_delay_ms` while a hold timer is already armed resolves to one defined outcome, stated in the ticket: the in-flight timer keeps its original delay, or it is re-armed. Not left to whichever the code happens to do.
-- [ ] The arming decision lives in a pure, Win32-free function that tests call directly.
-- [ ] `check_switcher_deadline` is either called from production or removed; no `#[allow(dead_code)]` gate remains that a reader could mistake for the live one.
-- [ ] The new disabled-path test was **observed red** against the unfixed code, and that is recorded in the ticket or commit message.
-- [ ] Automated tests cover both the disabled path and the configured-delay path.
+- [x] `WorkerSnapshot` carries `visual_enabled: bool` and `visual_hold_delay_ms: u32`, and its doc-comment describes what it now holds.
+- [x] `worker_snapshot()`'s cold-start fallback populates both fields from the on-disk config.
+- [x] With `visual_enabled == false`, `execute_cycle` arms no hold timer and stores no switcher origin; blind cycling is byte-for-byte unchanged.
+- [x] With `visual_enabled == true`, the hold timer uses the configured `visual_hold_delay_ms`, clamped to `100..=500`.
+- [x] Saving `visual_enabled = false` from Settings stops the overlay opening without a daemon restart and without re-registering the keyboard hook.
+- [x] A reload arriving **between** arming and the hold timer firing does not open the overlay — asserted against the timer arm, not only against `execute_cycle`.
+- [x] Changing `visual_hold_delay_ms` while a hold timer is already armed resolves to one defined outcome, stated in the ticket: the in-flight timer keeps its original delay, or it is re-armed. Not left to whichever the code happens to do.
+- [x] The arming decision lives in a pure, Win32-free function that tests call directly.
+- [x] `check_switcher_deadline` is either called from production or removed; no `#[allow(dead_code)]` gate remains that a reader could mistake for the live one.
+- [x] The new disabled-path test was **observed red** against the unfixed code, and that is recorded in the ticket or commit message.
+- [x] Automated tests cover both the disabled path and the configured-delay path.

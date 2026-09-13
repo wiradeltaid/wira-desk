@@ -137,6 +137,9 @@ pub struct SwitcherOverlay {
     candidates: Vec<WindowId>,
     thumbnails: Vec<DwmThumbnailHandle>,
     thumbnail_sink: Arc<Mutex<dyn ThumbnailSink>>,
+    work_area: Rect,
+    aspects: Vec<f32>,
+    dpi: u32,
 }
 
 impl SwitcherOverlay {
@@ -150,12 +153,16 @@ impl SwitcherOverlay {
                 cards: Vec::new(),
                 total_pages: 0,
                 current_page: 0,
+                page_start: 0,
                 page_indicator_rect: None,
             },
             selected_index: 0,
             candidates: Vec::new(),
             thumbnails: Vec::new(),
             thumbnail_sink,
+            work_area: Rect::default(),
+            aspects: Vec::new(),
+            dpi: 96,
         }
     }
 
@@ -167,28 +174,55 @@ impl SwitcherOverlay {
         self.hwnd
     }
 
+    pub fn layout(&self) -> &SwitcherLayout {
+        &self.layout
+    }
+
     pub fn per_page(&self) -> usize {
-        self.layout.cols * self.layout.rows
+        self.layout.cards.len().max(1)
     }
 
     pub fn cols(&self) -> usize {
         self.layout.cols
     }
 
-    /// Show the switcher overlay for the given candidates and selected index.
-    pub fn show(&mut self, work_area: Rect, candidates: Vec<WindowId>, selected_index: usize) {
+    pub fn page_start(&self) -> usize {
+        self.layout.page_start
+    }
+
+    /// Show the switcher overlay for the given candidates, aspects, dpi, and selected index.
+    pub fn show(
+        &mut self,
+        work_area: Rect,
+        candidates: Vec<WindowId>,
+        aspects: &[f32],
+        dpi: u32,
+        selected_index: usize,
+    ) {
+        self.work_area = work_area;
         self.candidates = candidates;
         self.selected_index = selected_index;
-
-        let per_page = if self.candidates.is_empty() {
-            1
+        self.dpi = if dpi == 0 { 96 } else { dpi };
+        if aspects.is_empty() {
+            self.aspects = vec![super::layout::DEFAULT_ASPECT; self.candidates.len()];
         } else {
-            let (_, _, p) = super::layout::compute_grid(work_area.width, self.candidates.len());
-            p.max(1)
-        };
-        let page = self.selected_index / per_page;
+            self.aspects = aspects.to_vec();
+        }
 
-        self.layout = compute_layout(work_area, self.candidates.len(), page);
+        // Find which page contains selected_index
+        let temp_layout = compute_layout(work_area, &self.aspects, 0, self.dpi);
+        let mut page = 0;
+        let mut running = 0;
+        for p in 0..temp_layout.total_pages {
+            let p_layout = compute_layout(work_area, &self.aspects, p, self.dpi);
+            if selected_index < running + p_layout.cards.len() {
+                page = p;
+                break;
+            }
+            running += p_layout.cards.len();
+        }
+
+        self.layout = compute_layout(work_area, &self.aspects, page, self.dpi);
         self.ensure_window();
 
         if self.hwnd != 0 {
@@ -226,13 +260,21 @@ impl SwitcherOverlay {
         if self.candidates.is_empty() {
             return;
         }
-        let per_page = self.layout.cols * self.layout.rows;
-        let old_page = self.selected_index.checked_div(per_page).unwrap_or(0);
-        let new_page = new_index.checked_div(per_page).unwrap_or(0);
+        let old_page = self.layout.current_page;
+        let mut new_page = 0;
+        let mut running = 0;
+        for p in 0..self.layout.total_pages {
+            let p_layout = compute_layout(self.work_area, &self.aspects, p, self.dpi);
+            if new_index < running + p_layout.cards.len() {
+                new_page = p;
+                break;
+            }
+            running += p_layout.cards.len();
+        }
 
         self.selected_index = new_index;
         if new_page != old_page {
-            self.layout = compute_layout(self.layout.overlay_rect, self.candidates.len(), new_page);
+            self.layout = compute_layout(self.work_area, &self.aspects, new_page, self.dpi);
             self.update_thumbnails();
         }
 
@@ -294,8 +336,7 @@ impl SwitcherOverlay {
             return;
         }
 
-        let per_page = self.layout.cols * self.layout.rows;
-        let page_start = self.layout.current_page * per_page;
+        let page_start = self.layout.page_start;
 
         for (card_idx, card) in self.layout.cards.iter().enumerate() {
             let candidate_idx = page_start + card_idx;
@@ -400,8 +441,7 @@ unsafe extern "system" fn switcher_wnd_proc(
                 let mut pt: POINT = std::mem::zeroed();
                 if GetCursorPos(&mut pt) != 0 {
                     ScreenToClient(hwnd, &mut pt);
-                    let per_page = overlay.layout.cols * overlay.layout.rows;
-                    let page_start = overlay.layout.current_page * per_page;
+                    let page_start = overlay.layout.page_start;
 
                     for (card_idx, card) in overlay.layout.cards.iter().enumerate() {
                         let local_x = card.chrome_rect.x - overlay.layout.overlay_rect.x;
@@ -432,8 +472,7 @@ unsafe extern "system" fn switcher_wnd_proc(
                 let mut pt: POINT = std::mem::zeroed();
                 if GetCursorPos(&mut pt) != 0 {
                     ScreenToClient(hwnd, &mut pt);
-                    let per_page = overlay.layout.cols * overlay.layout.rows;
-                    let page_start = overlay.layout.current_page * per_page;
+                    let page_start = overlay.layout.page_start;
 
                     for (card_idx, card) in overlay.layout.cards.iter().enumerate() {
                         let local_x = card.chrome_rect.x - overlay.layout.overlay_rect.x;
@@ -491,8 +530,7 @@ unsafe extern "system" fn switcher_wnd_proc(
                 let overlay_ptr = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *const SwitcherOverlay;
                 if !overlay_ptr.is_null() {
                     let overlay = &*overlay_ptr;
-                    let per_page = overlay.layout.cols * overlay.layout.rows;
-                    let page_start = overlay.layout.current_page * per_page;
+                    let page_start = overlay.layout.page_start;
 
                     // Query monitor DPI for text/icon scaling (96 is 100% standard baseline)
                     // SAFETY: `GetDpiForWindow` safely queries the per-monitor DPI for the overlay HWND.
@@ -684,12 +722,14 @@ unsafe extern "system" fn switcher_wnd_proc(
 
 #[cfg(test)]
 pub mod tests {
+    use super::super::layout::DEFAULT_ASPECT;
     use super::*;
 
     #[test]
     fn chrome_never_overlaps_the_preview_rectangle() {
         let work_area = Rect::new(0, 0, 1920, 1080);
-        let layout = compute_layout(work_area, 6, 0);
+        let aspects = vec![DEFAULT_ASPECT; 6];
+        let layout = compute_layout(work_area, &aspects, 0, 96);
 
         for card in &layout.cards {
             // Preview rectangle is strictly contained within the chrome rectangle
@@ -722,6 +762,8 @@ pub mod tests {
         overlay.show(
             Rect::new(0, 0, 1920, 1080),
             vec![WindowId(1), WindowId(2)],
+            &[DEFAULT_ASPECT, DEFAULT_ASPECT],
+            96,
             0,
         );
         // Even when thumbnail registration fails, the overlay state remains valid and dismisses cleanly

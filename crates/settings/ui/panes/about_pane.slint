@@ -238,19 +238,24 @@ export component AboutPane inherits VerticalLayout {
         }
     }
 
-    // Publisher, Source Code, and Licensing Card (SPEC-11-03, SPEC-12-01)
+    // Publisher, Source Code, and Licensing Card (SPEC-11-03, SPEC-12-01, SPEC-14-01)
     Card {
         VerticalLayout {
-            padding: 16px;
-            spacing: 12px;
+            padding: 0px;
+            spacing: 0px;
 
             // 1. GitHub Repository & Issues Link
             HorizontalLayout {
+                padding-left: 16px;
+                padding-right: 16px;
+                padding-top: 14px;
+                padding-bottom: 14px;
                 alignment: start;
 
                 repo_touch := TouchArea {
                     accessible-role: button;
                     accessible-label: "Source code & issue tracker on GitHub";
+                    mouse-cursor: pointer;
                     clicked => { root.open_source_url(); }
 
                     HorizontalLayout {
@@ -277,41 +282,12 @@ export component AboutPane inherits VerticalLayout {
 
             CardDivider {}
 
-            // 2. Publisher Website Link
+            // 2. Support Development Action
             HorizontalLayout {
-                alignment: start;
-
-                publisher_touch := TouchArea {
-                    accessible-role: button;
-                    accessible-label: "Publisher website (wiradigital.id)";
-                    clicked => { root.open_publisher_url(); }
-
-                    HorizontalLayout {
-                        spacing: 6px;
-                        alignment: start;
-
-                        Text {
-                            text: "Publisher website (wiradigital.id)";
-                            font-family: Typography.font_family;
-                            font-size: Typography.size_body;
-                            color: publisher_touch.has_hover ? Palette.accent_hover : Palette.text_primary;
-                            vertical-alignment: center;
-                        }
-
-                        VerticalLayout {
-                            alignment: center;
-                            OpenLinkIcon {
-                                icon_color: publisher_touch.has_hover ? Palette.accent_hover : Palette.text_primary;
-                            }
-                        }
-                    }
-                }
-            }
-
-            CardDivider {}
-
-            // 3. Support Development Action
-            HorizontalLayout {
+                padding-left: 16px;
+                padding-right: 16px;
+                padding-top: 14px;
+                padding-bottom: 14px;
                 alignment: start;
 
                 Rectangle {
@@ -335,6 +311,7 @@ export component AboutPane inherits VerticalLayout {
                     support_touch := TouchArea {
                         accessible-role: button;
                         accessible-label: "Support development";
+                        mouse-cursor: pointer;
                         clicked => { root.open_support_url(); }
                     }
                 }
@@ -342,16 +319,65 @@ export component AboutPane inherits VerticalLayout {
 
             CardDivider {}
 
-            // 4. Foundational Base: Attribution, License & In-Process Disclosure
+            // 3. Foundational Base: Attribution, License & In-Process Disclosure
             VerticalLayout {
-                spacing: 4px;
-                Text {
-                    text: "An open-source utility by Wira Digital Indonesia • Licensed under GPL-3.0";
-                    font-family: Typography.font_family;
-                    font-size: Typography.size_caption;
-                    font-weight: 600;
-                    color: Palette.text_secondary;
+                padding-left: 16px;
+                padding-right: 16px;
+                padding-top: 14px;
+                padding-bottom: 16px;
+                spacing: 6px;
+
+                HorizontalLayout {
+                    alignment: start;
+                    spacing: 0px;
+
+                    Text {
+                        text: "An open-source utility by ";
+                        font-family: Typography.font_family;
+                        font-size: Typography.size_caption;
+                        font-weight: 600;
+                        color: Palette.text_secondary;
+                        vertical-alignment: center;
+                    }
+
+                    inline_pub_touch := TouchArea {
+                        accessible-role: button;
+                        accessible-label: "Publisher website (wiradigital.id)";
+                        mouse-cursor: pointer;
+                        clicked => { root.open_publisher_url(); }
+
+                        HorizontalLayout {
+                            spacing: 4px;
+                            alignment: start;
+
+                            Text {
+                                text: "Wira Digital Indonesia";
+                                font-family: Typography.font_family;
+                                font-size: Typography.size_caption;
+                                font-weight: 600;
+                                color: inline_pub_touch.has_hover ? Palette.accent_hover : Palette.text_primary;
+                                vertical-alignment: center;
+                            }
+
+                            VerticalLayout {
+                                alignment: center;
+                                OpenLinkIcon {
+                                    icon_color: inline_pub_touch.has_hover ? Palette.accent_hover : Palette.text_primary;
+                                }
+                            }
+                        }
+                    }
+
+                    Text {
+                        text: " • Licensed under GPL-3.0";
+                        font-family: Typography.font_family;
+                        font-size: Typography.size_caption;
+                        font-weight: 600;
+                        color: Palette.text_secondary;
+                        vertical-alignment: center;
+                    }
                 }
+
                 Text {
                     text: "No telemetry, no account, no separate background service — update checks run entirely in-process against GitHub Releases, which you can switch off.";
                     font-family: Typography.font_family;

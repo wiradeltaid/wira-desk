@@ -69,14 +69,21 @@ impl SwitcherController {
         origin: WindowId,
         work_area: Rect,
         candidates: Vec<WindowId>,
+        aspects: &[f32],
+        dpi: u32,
         selected_index: usize,
     ) {
         self.origin_foreground = origin;
         self.candidates = candidates;
         self.selected_index = selected_index;
         self.open_time_ms = crate::hook::tick_ms();
-        self.overlay
-            .show(work_area, self.candidates.clone(), selected_index);
+        self.overlay.show(
+            work_area,
+            self.candidates.clone(),
+            aspects,
+            dpi,
+            selected_index,
+        );
     }
 
     pub fn next(&mut self) {
@@ -109,11 +116,11 @@ impl SwitcherController {
         if self.candidates.is_empty() {
             return;
         }
-        let (idx, _) = selection::select_up(
+        let idx = selection::select_up(
             self.candidates.len(),
             self.selected_index,
-            self.overlay.cols(),
-            self.overlay.per_page(),
+            &self.overlay.layout().cards,
+            self.overlay.page_start(),
         );
         self.selected_index = idx;
         self.overlay.set_selected_index(idx);
@@ -123,11 +130,11 @@ impl SwitcherController {
         if self.candidates.is_empty() {
             return;
         }
-        let (idx, _) = selection::select_down(
+        let idx = selection::select_down(
             self.candidates.len(),
             self.selected_index,
-            self.overlay.cols(),
-            self.overlay.per_page(),
+            &self.overlay.layout().cards,
+            self.overlay.page_start(),
         );
         self.selected_index = idx;
         self.overlay.set_selected_index(idx);
@@ -182,7 +189,7 @@ pub mod tests {
     use crate::worker::collect_eligible_candidates;
 
     #[test]
-    fn switcher_candidate_set_equals_blind_cycle_eligible_set() {
+    fn switcher_candidate_set_diverges_from_blind_cycle_on_monitor_boundary() {
         let candidates = ordered(vec![normal(1), normal(2), normal(3), normal(4)]);
         let monitors = FakeMonitors(vec![
             (WindowId(1), Some(MONITOR_A)),
@@ -201,26 +208,45 @@ pub mod tests {
         };
         let active = active(1);
 
-        let (blind_candidates, blind_eligible) = collect_eligible_candidates(
+        let (_blind_candidates, blind_eligible) = collect_eligible_candidates(
             &StaticSource(candidates.clone()),
             &WindowEligibility,
             &active,
             &monitors,
             Some(&desktops),
             &spatial,
+            crate::context::SpatialScope::SameMonitor,
         );
 
-        let (switcher_candidates, switcher_eligible) = collect_eligible_candidates(
+        let (_switcher_candidates, switcher_eligible) = collect_eligible_candidates(
             &StaticSource(candidates),
             &WindowEligibility,
             &active,
             &monitors,
             Some(&desktops),
             &spatial,
+            crate::context::SpatialScope::AnyMonitorOnCurrentDesktop,
         );
 
-        assert_eq!(blind_candidates, switcher_candidates);
-        assert_eq!(blind_eligible, switcher_eligible);
+        // Under DEC-026, WindowId(3) on MONITOR_B is absent from blind cycle but present in switcher
+        assert!(
+            !blind_eligible.contains(&WindowId(3)),
+            "Window on secondary monitor must be absent from blind cycle"
+        );
+        assert!(
+            switcher_eligible.contains(&WindowId(3)),
+            "Window on secondary monitor must be present in visual switcher (DEC-026)"
+        );
+
+        // WindowId(2) (on another virtual desktop) is absent from BOTH
+        assert!(
+            !blind_eligible.contains(&WindowId(2)),
+            "Window on another virtual desktop must be absent from blind cycle"
+        );
+        assert!(
+            !switcher_eligible.contains(&WindowId(2)),
+            "Window on another virtual desktop must be absent from visual switcher"
+        );
     }
 
     #[test]

@@ -39,6 +39,8 @@ pub enum ShortcutError {
     InvalidMousePreset(String),
     /// An invalid visual switcher hold delay (valid 100..=500 ms).
     InvalidHoldDelay(u32),
+    /// A cycle chord may not contain Shift (reserved for backward cycling, DEC-026).
+    CycleContainsShift,
 }
 
 /// Validate a submitted shortcut **before** any active configuration is
@@ -194,6 +196,20 @@ pub fn validate_config(cfg: &Config) -> Result<(), (&'static str, ShortcutError)
     for &name in &SHORTCUT_DECLARED_ORDER {
         let (value, enabled) = field_for(cfg, name);
         let canonical = validate_shortcut(value).map_err(|e| (name, e))?;
+
+        if name == "switcher.shortcut" || name == "switcher.fallback_shortcut" {
+            let sc = Shortcut::parse(&canonical).expect("validated above");
+            if sc.shift {
+                return Err((name, ShortcutError::CycleContainsShift));
+            }
+            // Check derived Shift variant reservation (DEC-026 §B-2)
+            let mut shift_variant = sc;
+            shift_variant.shift = true;
+            if let Some(info) = reservation(&shift_variant) {
+                return Err((name, ShortcutError::Reserved(info)));
+            }
+        }
+
         if enabled {
             if let Some((first_name, _)) = seen.iter().find(|(_, s)| *s == canonical) {
                 return Err((name, ShortcutError::DuplicateShortcut(first_name)));
@@ -1006,5 +1022,35 @@ mod tests {
     #[test]
     fn reload_uses_the_frozen_message_identifier() {
         assert_eq!(WM_APP_RELOAD_CONFIG, 0x8000 + 1);
+    }
+
+    #[test]
+    fn a_cycle_chord_containing_shift_is_refused_at_save() {
+        let mut cfg = Config::default();
+        cfg.switcher.shortcut = "ctrl+shift+backtick".to_string();
+        let res = validate_config(&cfg);
+        assert_eq!(
+            res,
+            Err(("switcher.shortcut", ShortcutError::CycleContainsShift))
+        );
+    }
+
+    #[test]
+    fn a_cycle_chord_whose_shift_variant_is_reserved_is_refused() {
+        let mut cfg = Config::default();
+        // Ctrl+Escape is valid by itself, but Ctrl+Shift+Escape is reserved for Task Manager
+        cfg.switcher.shortcut = "ctrl+escape".to_string();
+        let res = validate_config(&cfg);
+        assert!(matches!(
+            res,
+            Err(("switcher.shortcut", ShortcutError::Reserved(info))) if info.owner == "Task Manager"
+        ));
+        if let Err((field, err)) = res {
+            let msg = crate::app::describe(field, err);
+            assert!(
+                msg.contains("Task Manager"),
+                "Validation message must name the reservation owner (Task Manager), got: {msg}"
+            );
+        }
     }
 }

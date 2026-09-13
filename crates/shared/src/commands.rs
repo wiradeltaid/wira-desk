@@ -62,6 +62,8 @@ pub enum Command {
     SwitcherCommit = 25,
     /// Cancel switcher and dismiss overlay (Escape or watchdog).
     SwitcherCancel = 26,
+    /// Rotate focus backward among same-app windows (Shift + Win+Backtick).
+    CyclePrev = 27,
 }
 
 impl Command {
@@ -95,6 +97,7 @@ impl Command {
             24 => Command::SwitcherDown,
             25 => Command::SwitcherCommit,
             26 => Command::SwitcherCancel,
+            27 => Command::CyclePrev,
             _ => Command::Nop,
         }
     }
@@ -156,14 +159,24 @@ mod tests {
             Command::SwitcherDown,
             Command::SwitcherCommit,
             Command::SwitcherCancel,
+            Command::CyclePrev,
         ] {
             assert_eq!(Command::from_u8(cmd.as_u8()), cmd);
         }
     }
 
     #[test]
+    fn cycle_prev_is_throttled_exactly_as_cycle_is() {
+        assert_eq!(
+            Command::Cycle.is_exempt_from_throttle(),
+            Command::CyclePrev.is_exempt_from_throttle()
+        );
+        assert!(!Command::CyclePrev.is_exempt_from_throttle());
+    }
+
+    #[test]
     fn unknown_values_map_to_nop() {
-        assert_eq!(Command::from_u8(27), Command::Nop);
+        assert_eq!(Command::from_u8(28), Command::Nop);
         assert_eq!(Command::from_u8(255), Command::Nop);
     }
 

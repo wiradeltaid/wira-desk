@@ -17,11 +17,11 @@ with this change.
 
 **Blocked by:** None
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] `general_pane.slint:80`'s caption sets `wrap: word-wrap`.
-- [ ] Toggling "Enable Visual Switcher Overlay" on and off produces no horizontal scrollbar on the General pane at the window's minimum width.
-- [ ] The minus/value/plus spinner group stays right-aligned and keeps its 30×30 hit targets once the caption wraps to two lines.
-- [ ] An automated test asserts the caption's wrap mode, so the regression cannot return unnoticed.
-- [ ] That test reads the actual `.slint` source or the rendered element — not a Rust-side constant that can agree with a broken UI.
-- [ ] The same check covers **every** caption in `general_pane.slint`, not only this one. One caption was missed because nothing enumerated them; fixing the instance and leaving the enumeration undone invites the next miss.
+- [x] `general_pane.slint:80`'s caption sets `wrap: word-wrap`.
+- [x] Toggling "Enable Visual Switcher Overlay" on and off produces no horizontal scrollbar on the General pane at the window's minimum width.
+- [x] The minus/value/plus spinner group stays right-aligned and keeps its 30×30 hit targets once the caption wraps to two lines.
+- [x] An automated test asserts the caption's wrap mode, so the regression cannot return unnoticed.
+- [x] That test reads the actual `.slint` source or the rendered element — not a Rust-side constant that can agree with a broken UI.
+- [x] The same check covers **every** caption in `general_pane.slint`, not only this one. One caption was missed because nothing enumerated them; fixing the instance and leaving the enumeration undone invites the next miss.

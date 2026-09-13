@@ -241,7 +241,7 @@ mod tests {
 
     use super::super::{
         evaluate_spatial, MonitorId, SpatialContext, SpatialDecision, SpatialFacts,
-        SpatialRejection,
+        SpatialRejection, SpatialScope,
     };
     use super::*;
 
@@ -264,7 +264,7 @@ mod tests {
                 .is_on_current_desktop(WindowId(1)),
         };
         assert_eq!(
-            evaluate_spatial(&ctx, &facts),
+            evaluate_spatial(SpatialScope::SameMonitor, &ctx, &facts),
             SpatialDecision::Ineligible(SpatialRejection::VirtualDesktopUnavailable)
         );
     }

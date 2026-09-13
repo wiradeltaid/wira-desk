@@ -3,7 +3,7 @@ spec: SPEC-14
 release: "0.4.0"
 prd: wira-desk
 fr: []
-status: open
+status: closed
 ---
 
 # SPEC-14 — Visual Switcher Refinements, Cross-Monitor Candidates, Shift-Cycle Parity, and Settings Polish
