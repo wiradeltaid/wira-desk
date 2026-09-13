@@ -3042,13 +3042,16 @@ mod tests {
                 "Support development button found in About pane"
             );
 
-            let legal_line = find_about_element(
-                &window,
-                "An open-source utility by Wira Digital Indonesia • Licensed under GPL-3.0",
-            );
+            let legal_prefix = find_about_element(&window, "An open-source utility by ");
             assert!(
-                legal_line.is_some(),
-                "Attribution and licensing line found in About pane"
+                legal_prefix.is_some(),
+                "Attribution prefix found in About pane"
+            );
+
+            let legal_link = find_about_element(&window, "Wira Digital Indonesia");
+            assert!(
+                legal_link.is_some(),
+                "Inline publisher link text found in About pane"
             );
 
             // Verify callbacks can be invoked safely
@@ -3058,6 +3061,189 @@ mod tests {
 
             let _ = std::fs::remove_file(&save_path);
         });
+    }
+
+    #[test]
+    fn about_pane_renders_inline_publisher_link_with_open_icon() {
+        crate::shortcut_row_slint_snapshot::tests::run_on_ui_thread(|| {
+            let (window, model, save_path) =
+                crate::shortcut_row_slint_snapshot::tests::setup_shortcuts_window();
+
+            model.borrow_mut().set_pane(Pane::About);
+            crate::sync_model_to_ui(&window, &model.borrow());
+            assert_eq!(window.get_current_pane(), 4);
+
+            let inline_link = find_about_element(&window, "Publisher website (wiradigital.id)");
+            assert!(
+                inline_link.is_some(),
+                "Inline publisher link with accessible-label found in About pane"
+            );
+            let inline_text = find_about_element(&window, "Wira Digital Indonesia");
+            assert!(
+                inline_text.is_some(),
+                "Inline publisher link text found in About pane"
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn about_pane_clicking_inline_publisher_opens_url() {
+        crate::shortcut_row_slint_snapshot::tests::run_on_ui_thread(|| {
+            let (window, model, save_path) =
+                crate::shortcut_row_slint_snapshot::tests::setup_shortcuts_window();
+
+            model.borrow_mut().set_pane(Pane::About);
+            crate::sync_model_to_ui(&window, &model.borrow());
+
+            let clicked = std::rc::Rc::new(std::cell::Cell::new(false));
+            let clicked_clone = clicked.clone();
+            window.on_open_publisher_url(move || {
+                clicked_clone.set(true);
+            });
+
+            window.invoke_open_publisher_url();
+            assert!(
+                clicked.get(),
+                "open_publisher_url callback invoked successfully"
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn about_pane_standalone_publisher_row_is_gone() {
+        crate::shortcut_row_slint_snapshot::tests::run_on_ui_thread(|| {
+            let (window, model, save_path) =
+                crate::shortcut_row_slint_snapshot::tests::setup_shortcuts_window();
+
+            model.borrow_mut().set_pane(Pane::About);
+            crate::sync_model_to_ui(&window, &model.borrow());
+
+            let source = include_str!("../ui/panes/about_pane.slint");
+            assert!(
+                !source.contains("text: \"Publisher website (wiradigital.id)\";"),
+                "Standalone 'Publisher website (wiradigital.id)' Text element must be removed from Card 3"
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn about_pane_card_dividers_span_the_card() {
+        let source = include_str!("../ui/panes/about_pane.slint").replace("\r\n", "\n");
+        assert!(
+            source.contains("Card {\n        VerticalLayout {\n            padding: 0px;\n            spacing: 0px;\n\n            // 1. GitHub Repository"),
+            "Card 3 must declare padding: 0px and spacing: 0px for full-bleed dividers"
+        );
+    }
+
+    #[test]
+    fn about_pane_attribution_line_wraps_without_horizontal_overflow() {
+        crate::shortcut_row_slint_snapshot::tests::run_on_ui_thread(|| {
+            let (window, model, save_path) =
+                crate::shortcut_row_slint_snapshot::tests::setup_shortcuts_window();
+
+            model.borrow_mut().set_pane(Pane::About);
+            crate::sync_model_to_ui(&window, &model.borrow());
+
+            let window_width = window.get_normal_width();
+            let window_height = window.get_normal_height();
+            window
+                .window()
+                .set_size(slint::LogicalSize::new(window_width, window_height));
+
+            // In main_window.slint: window normal_width = 760px.
+            // ScrollView padding-right = 20px, Card 3 horizontal padding = 16px.
+            // Absolute content right-edge bound = 760 - 20 - 16 = 724px.
+            let card_content_right_bound = window_width - 20.0 - 16.0;
+
+            let link_el = find_about_element(&window, "Publisher website (wiradigital.id)")
+                .expect("Inline publisher link must be instantiated in accessible tree");
+            let link_right = link_el.absolute_position().x + link_el.size().width;
+            assert!(
+                link_right <= card_content_right_bound,
+                "Inline link right edge ({link_right}) must not exceed card content boundary ({card_content_right_bound})"
+            );
+
+            let suffix_el = find_about_element(&window, " • Licensed under GPL-3.0")
+                .expect("Attribution suffix text must be instantiated in accessible tree");
+            let suffix_right = suffix_el.absolute_position().x + suffix_el.size().width;
+            assert!(
+                suffix_right <= card_content_right_bound,
+                "Attribution suffix right edge ({suffix_right}) must not exceed card content boundary ({card_content_right_bound})"
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn about_pane_focus_order_survives_the_removed_publisher_row() {
+        for pane in Pane::ALL {
+            let order = focus_order(pane);
+            for (i, a) in order.iter().enumerate() {
+                for b in order.iter().skip(i + 1) {
+                    assert_ne!(a, b, "duplicate focus stop {a} in {pane:?}");
+                }
+            }
+        }
+        let about_order = focus_order(Pane::About);
+        assert_eq!(about_order.len(), Pane::ALL.len() + 2); // 5 panes + Save + Revert
+    }
+
+    #[test]
+    fn visual_hold_delay_description_wraps_without_horizontal_scroll() {
+        crate::shortcut_row_slint_snapshot::tests::run_on_ui_thread(|| {
+            let (window, model, save_path) =
+                crate::shortcut_row_slint_snapshot::tests::setup_shortcuts_window();
+
+            model.borrow_mut().set_pane(Pane::General);
+            crate::sync_model_to_ui(&window, &model.borrow());
+
+            let window_width = window.get_normal_width();
+            let window_height = window.get_normal_height();
+            window
+                .window()
+                .set_size(slint::LogicalSize::new(window_width, window_height));
+
+            let source = include_str!("../ui/panes/general_pane.slint");
+            assert!(
+                source.contains("wrap: word-wrap;"),
+                "Hold delay caption must have wrap: word-wrap"
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn every_caption_in_the_general_pane_sets_a_wrap_mode() {
+        let source = include_str!("../ui/panes/general_pane.slint");
+        let mut in_caption_text = false;
+        let mut has_wrap = false;
+        for line in source.lines() {
+            let trimmed = line.trim();
+            if trimmed.contains("size_caption") {
+                in_caption_text = true;
+                has_wrap = false;
+            }
+            if in_caption_text {
+                if trimmed.contains("wrap: word-wrap") {
+                    has_wrap = true;
+                }
+                if trimmed == "}" {
+                    assert!(
+                        has_wrap,
+                        "Every caption Text block in general_pane.slint must set wrap: word-wrap"
+                    );
+                    in_caption_text = false;
+                }
+            }
+        }
     }
 
     #[test]
