@@ -3008,7 +3008,7 @@ mod tests {
 
             let disclosure = find_about_element(
                 &window,
-                "No telemetry, no account, no separate background service —\nupdate checks run entirely in-process against GitHub Releases, which you can switch off.",
+                "No telemetry, no account, no separate background service.\nUpdate checks run entirely in-process against GitHub Releases, which you can switch off.",
             );
             assert!(
                 disclosure.is_some(),
@@ -3280,5 +3280,77 @@ mod tests {
 
             let _ = std::fs::remove_file(&save_path);
         });
+    }
+
+    #[test]
+    fn general_pane_stepper_is_vertically_centered() {
+        // Assert the structural hierarchy that produces vertical centering:
+        // Stepper cluster sits in VerticalLayout { alignment: center; } with padding 12px/12px,
+        // while the inner HorizontalLayout maintains alignment: end for main-axis right pinning.
+        let source = include_str!("../ui/panes/general_pane.slint");
+        assert!(
+            source.contains("padding-top: 12px;"),
+            "Hold delay row must specify padding-top: 12px"
+        );
+        assert!(
+            source.contains("padding-bottom: 12px;"),
+            "Hold delay row must specify balanced padding-bottom: 12px"
+        );
+        assert!(
+            source.contains("alignment: center;"),
+            "Stepper controls must be wrapped in layout with alignment: center"
+        );
+        assert!(
+            source.contains("alignment: end;"),
+            "Inner stepper controls must maintain alignment: end"
+        );
+        assert!(
+            source.lines().any(|l| l.trim() == "VerticalLayout {")
+                && source.lines().any(|l| l.trim() == "alignment: center;"),
+            "Stepper controls must be wrapped in VerticalLayout with alignment: center"
+        );
+    }
+
+    #[test]
+    fn all_visible_slint_strings_have_zero_em_dashes() {
+        // Assert that zero U+2014 em dashes exist within user-visible string literals in .slint files.
+        // Comments and U+2013 en dashes remain untouched and exempt.
+        let slint_sources = [
+            include_str!("../ui/panes/about_pane.slint"),
+            include_str!("../ui/panes/general_pane.slint"),
+            include_str!("../ui/panes/shortcuts_pane.slint"),
+            include_str!("../ui/components/key_check.slint"),
+            include_str!("../ui/components/shortcut_row.slint"),
+            include_str!("../ui/components/scroll_hint.slint"),
+            include_str!("../ui/main_window.slint"),
+            include_str!("../ui/onboarding.slint"),
+        ];
+
+        for (idx, source) in slint_sources.iter().enumerate() {
+            for (line_num, line) in source.lines().enumerate() {
+                // Parse string literals on this line (excluding comments //)
+                let code_part = if let Some(comment_idx) = line.find("//") {
+                    &line[..comment_idx]
+                } else {
+                    line
+                };
+
+                let mut in_string = false;
+                let mut prev_char = ' ';
+                for c in code_part.chars() {
+                    if c == '"' && prev_char != '\\' {
+                        in_string = !in_string;
+                    } else if in_string && c == '—' {
+                        panic!(
+                            "Found em dash U+2014 in string literal at slint file #{} line {}: {}",
+                            idx,
+                            line_num + 1,
+                            line
+                        );
+                    }
+                    prev_char = c;
+                }
+            }
+        }
     }
 }
