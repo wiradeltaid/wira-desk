@@ -324,6 +324,8 @@ fn open_visual_switcher(hwnd: windows_sys::Win32::Foundation::HWND) {
     let is_backward = SWITCHER_BACKWARD_ENTRY.get();
     let initial_index = if is_backward && !eligible_ordered.is_empty() {
         eligible_ordered.len() - 1
+    } else if eligible_ordered.len() > 1 {
+        1
     } else {
         0
     };
@@ -548,9 +550,10 @@ pub fn switcher_hold_delay_ms(configured_ms: u32) -> u32 {
 
 /// Decide whether to arm the visual switcher hold timer and with what delay.
 ///
-/// Pure, Win32-free decision function extracted for testability (SPEC-14-05).
-/// Returns `Some(delay_ms)` clamped to `100..=500` if the cycle activated a target,
-/// modifier keys were down, and visual switcher is enabled. Returns `None` otherwise.
+/// Pure, Win32-free decision function extracted for testability (SPEC-14-05, SPEC-15-03).
+/// Returns `Some(delay_ms)` clamped to `100..=500` if modifier keys were down,
+/// visual switcher is enabled, and cycle outcome is Activated, NoEligibleTarget, or Exhausted.
+/// Returns `None` otherwise.
 pub fn decide_switcher_hold_delay(
     outcome: &CycleOutcome,
     mods: Option<crate::hook::ModifierState>,
@@ -561,7 +564,7 @@ pub fn decide_switcher_hold_delay(
         return None;
     }
     match outcome {
-        CycleOutcome::Activated(_) => {
+        CycleOutcome::Activated(_) | CycleOutcome::NoEligibleTarget | CycleOutcome::Exhausted => {
             let m = mods?;
             if m.any() {
                 Some(switcher_hold_delay_ms(visual_hold_delay_ms))
@@ -569,7 +572,6 @@ pub fn decide_switcher_hold_delay(
                 None
             }
         }
-        _ => None,
     }
 }
 
@@ -1315,6 +1317,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "disrupts interactive desktop session (Show Desktop / Task View / Virtual Desktop)"]
     fn mouse_virtual_desktop_commands_dispatch_safely() {
         for cmd in [
             Command::NextVirtualDesktop,
@@ -1328,6 +1331,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "disrupts interactive desktop session (window snapping / maximizing)"]
     fn snap_commands_from_mouse_dispatch_to_planning() {
         for cmd in [
             Command::SnapLeft,
@@ -1631,5 +1635,120 @@ mod tests {
 
         assert_eq!(first, Some(Command::Cycle));
         assert_eq!(second, Some(Command::CyclePrev));
+    }
+
+    #[test]
+    fn single_window_desktop_arms_hold_timer_on_no_eligible_target_or_exhausted() {
+        let mods = crate::hook::ModifierState {
+            win: true,
+            ctrl: false,
+            alt: false,
+            shift: false,
+        };
+
+        // NoEligibleTarget (e.g. single window on desktop) arms hold timer
+        let delay_no_target =
+            decide_switcher_hold_delay(&CycleOutcome::NoEligibleTarget, Some(mods), true, 150);
+        assert_eq!(
+            delay_no_target,
+            Some(150),
+            "Single-window desktop (NoEligibleTarget) must arm hold timer"
+        );
+
+        // Exhausted also arms hold timer
+        let delay_exhausted =
+            decide_switcher_hold_delay(&CycleOutcome::Exhausted, Some(mods), true, 150);
+        assert_eq!(
+            delay_exhausted,
+            Some(150),
+            "Exhausted outcome must arm hold timer"
+        );
+
+        // If visual_enabled is false, never arms
+        assert_eq!(
+            decide_switcher_hold_delay(&CycleOutcome::NoEligibleTarget, Some(mods), false, 150),
+            None
+        );
+        assert_eq!(
+            decide_switcher_hold_delay(&CycleOutcome::Exhausted, Some(mods), false, 150),
+            None
+        );
+
+        // If no modifiers down, never arms
+        let no_mods = crate::hook::ModifierState::default();
+        assert_eq!(
+            decide_switcher_hold_delay(&CycleOutcome::NoEligibleTarget, Some(no_mods), true, 150),
+            None
+        );
+        assert_eq!(
+            decide_switcher_hold_delay(&CycleOutcome::Exhausted, Some(no_mods), true, 150),
+            None
+        );
+    }
+
+    #[test]
+    fn forward_and_backward_entry_selection_parity() {
+        let candidates = ordered(vec![normal(1), normal(2), normal(3), normal(4)]);
+        let active = active_ctx(1);
+
+        let card_order = crate::switcher::card_order_for_candidates(&candidates, &active);
+        assert_eq!(card_order.len(), 4);
+        assert_eq!(card_order[0], active.foreground);
+
+        // Forward entry with len > 1 highlights index 1
+        let fwd_initial_index = if card_order.len() > 1 { 1 } else { 0 };
+        assert_eq!(fwd_initial_index, 1);
+        assert_ne!(card_order[fwd_initial_index], active.foreground);
+
+        // Single window forward entry highlights index 0
+        let single_card = [WindowId(1)];
+        let single_fwd_initial_index = if single_card.len() > 1 { 1 } else { 0 };
+        assert_eq!(single_fwd_initial_index, 0);
+
+        // Backward entry with len > 1 highlights len - 1 (index 3), which is not active window
+        let bwd_initial_index = card_order.len() - 1;
+        assert_eq!(bwd_initial_index, 3);
+        assert_ne!(card_order[bwd_initial_index], active.foreground);
+    }
+
+    #[test]
+    fn window_on_another_virtual_desktop_absent_from_switcher_card_set() {
+        let candidates = ordered(vec![normal(1), normal(2), normal(3)]);
+        let monitors = FakeMonitors(vec![
+            (WindowId(1), Some(MONITOR_A)),
+            (WindowId(2), Some(MONITOR_A)),
+            (WindowId(3), Some(MONITOR_A)),
+        ]);
+        let desktops = FakeDesktops(vec![
+            (WindowId(1), Some(true)),
+            (WindowId(2), Some(false)), // Another virtual desktop
+            (WindowId(3), Some(true)),
+        ]);
+        let spatial = SpatialContext {
+            origin_monitor: Some(MONITOR_A),
+        };
+        let active = active_ctx(1);
+
+        let (_all, eligible) = collect_eligible_candidates(
+            &StaticSource(candidates.clone()),
+            &WindowEligibility,
+            &active,
+            &monitors,
+            Some(&desktops),
+            &spatial,
+            SpatialScope::AnyMonitorOnCurrentDesktop,
+        );
+
+        let card_order = crate::switcher::card_order_for_candidates(&candidates, &active);
+        let switcher_cards: Vec<WindowId> = card_order
+            .into_iter()
+            .filter(|w| eligible.contains(w))
+            .collect();
+
+        assert_eq!(switcher_cards, vec![WindowId(1), WindowId(3)]);
+        assert!(
+            !switcher_cards.contains(&WindowId(2)),
+            "Window on another virtual desktop must be absent from switcher cards"
+        );
     }
 }

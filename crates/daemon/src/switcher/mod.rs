@@ -171,12 +171,26 @@ impl SwitcherController {
     }
 }
 
-/// Returns the card order for candidates, matching `cycle_order`.
+/// Returns the card order for candidates: active foreground window at index 0,
+/// followed by remaining eligible windows in LRU order.
 pub fn card_order_for_candidates(
     candidates: &[Candidate],
     active: &ActiveContext,
 ) -> Vec<WindowId> {
-    crate::cycling::cycle_order(candidates, active)
+    let mut order = Vec::with_capacity(candidates.len());
+    if candidates
+        .iter()
+        .any(|c| c.facts.window == active.foreground)
+    {
+        order.push(active.foreground);
+    }
+    let rest = crate::cycling::cycle_order(candidates, active);
+    for w in rest {
+        if w != active.foreground {
+            order.push(w);
+        }
+    }
+    order
 }
 
 #[cfg(test)]
@@ -219,7 +233,7 @@ pub mod tests {
         );
 
         let (_switcher_candidates, switcher_eligible) = collect_eligible_candidates(
-            &StaticSource(candidates),
+            &StaticSource(candidates.clone()),
             &WindowEligibility,
             &active,
             &monitors,
@@ -247,15 +261,37 @@ pub mod tests {
             !switcher_eligible.contains(&WindowId(2)),
             "Window on another virtual desktop must be absent from visual switcher"
         );
+
+        // Visual switcher card order includes active foreground WindowId(1) at index 0
+        let card_order = card_order_for_candidates(&candidates, &active);
+        let switcher_cards: Vec<WindowId> = card_order
+            .into_iter()
+            .filter(|w| switcher_eligible.contains(w))
+            .collect();
+        assert_eq!(
+            switcher_cards[0],
+            WindowId(1),
+            "Active foreground must be first card in visual switcher"
+        );
+        assert!(
+            switcher_cards.contains(&WindowId(3)),
+            "Secondary monitor window must be in visual switcher cards"
+        );
+        assert!(
+            !switcher_cards.contains(&WindowId(2)),
+            "Other virtual desktop window must not be in visual switcher cards"
+        );
     }
 
     #[test]
-    fn card_order_equals_cycle_order() {
+    fn card_order_includes_active_foreground_window() {
         let candidates = ordered(vec![normal(1), normal(2), normal(3), normal(4)]);
         let active = active(2);
 
-        let order = cycle_order(&candidates, &active);
         let card_order = card_order_for_candidates(&candidates, &active);
-        assert_eq!(card_order, order);
+        assert_eq!(card_order.len(), 4);
+        assert_eq!(card_order[0], active.foreground);
+        let cycle_rest = cycle_order(&candidates, &active);
+        assert_eq!(&card_order[1..], cycle_rest.as_slice());
     }
 }

@@ -1,12 +1,33 @@
 ---
 type: mandate
 id: DEC-029
-status: accepted
+status: applied
 touches:
   - .control/decisions/DEC-029-autopilot-mandate-for-spec-15-delivery.md
   - .control/memlog/autopilot-DEC-029.md
   - .control/registry/decisions.yaml
   - .control/registry/specs.yaml
+  - .control/questions/assumptions.md
+  - .what/_prd/wira-desk/prd.md
+  - .scratch/smoke-dec-029.md
+  - .scratch/spec-15-visual-switcher-polish-and-lifecycle/SPEC.md
+  - .scratch/spec-15-visual-switcher-polish-and-lifecycle/issues/01-settings-general-and-about-panes-layout-polish.md
+  - .scratch/spec-15-visual-switcher-polish-and-lifecycle/issues/02-helper-and-popup-host-window-eligibility-sanitization.md
+  - .scratch/spec-15-visual-switcher-polish-and-lifecycle/issues/03-active-window-card-inclusion-and-single-window-switcher-triggering.md
+  - .scratch/spec-15-visual-switcher-polish-and-lifecycle/issues/04-cycle-activation-timing-and-hold-threshold-decoupling.md
+  - 3p.md
+  - crates/daemon/src/arrangement/mod.rs
+  - crates/daemon/src/cycling/eligibility.rs
+  - crates/daemon/src/cycling/mod.rs
+  - crates/daemon/src/cycling/source.rs
+  - crates/daemon/src/hook.rs
+  - crates/daemon/src/switcher/mod.rs
+  - crates/daemon/src/worker.rs
+  - crates/settings/src/app.rs
+  - crates/settings/ui/panes/about_pane.slint
+  - crates/settings/ui/panes/general_pane.slint
+  - crates/shared/src/commands.rs
+  - crates/shared/src/config.rs
 supersedes: null
 superseded_by: null
 created: '2026-09-13'
