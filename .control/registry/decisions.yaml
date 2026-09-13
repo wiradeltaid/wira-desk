@@ -751,6 +751,33 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-030.md
 
+  - id: DEC-031
+    title: Autopilot mandate for SPEC-17 delivery
+    status: accepted
+    file: decisions/DEC-031-autopilot-mandate-for-spec-17-delivery.md
+    created: '2026-09-13'
+    touches:
+      - .control/decisions/DEC-031-autopilot-mandate-for-spec-17-delivery.md
+      - .control/memlog/autopilot-DEC-031.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+      - .scratch/spec-17-blind-backward-cycling-multi-window/SPEC.md
+      - .scratch/spec-17-blind-backward-cycling-multi-window/issues/01-defect-def-19-blind-backward-cycling-multi-window.md
+      - crates/daemon/src/cycling/mod.rs
+      - crates/daemon/src/worker.rs
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-20'
+      run_branch: autopilot/DEC-031
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-031.md
+
+
 
 
 
