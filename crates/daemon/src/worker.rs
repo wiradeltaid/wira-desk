@@ -185,6 +185,12 @@ thread_local! {
         const { std::cell::Cell::new(None) };
     static SWITCHER_BACKWARD_ENTRY: std::cell::Cell<bool> =
         const { std::cell::Cell::new(false) };
+    static BACKWARD_CYCLE_SESSION: std::cell::RefCell<crate::cycling::BackwardCycleSession> =
+        std::cell::RefCell::new(crate::cycling::BackwardCycleSession::new());
+}
+
+pub fn reset_backward_cycle_session() {
+    BACKWARD_CYCLE_SESSION.with(|s| s.borrow_mut().reset());
 }
 
 pub fn set_worker_hwnd(hwnd: windows_sys::Win32::Foundation::HWND) {
@@ -419,6 +425,7 @@ fn open_visual_switcher(hwnd: windows_sys::Win32::Foundation::HWND) {
 fn execute_switcher(command: Command) {
     match command {
         Command::SwitcherArm | Command::SwitcherArmPrev => {
+            reset_backward_cycle_session();
             // Suppress Start Menu on arming while Win is physically held down,
             // before consulting the hold-delay gate or setting timers.
             suppress_start_menu();
@@ -452,6 +459,7 @@ fn execute_switcher(command: Command) {
             }
         }
         Command::SwitcherDisarm => {
+            reset_backward_cycle_session();
             crate::hook::set_switcher_active(false);
             if let Some(hwnd) = WORKER_HWND.get() {
                 // SAFETY: KillTimer disarms the hold timer.
@@ -478,6 +486,7 @@ fn execute_switcher(command: Command) {
             SWITCHER.with(|s| s.borrow_mut().down());
         }
         Command::SwitcherCommit => {
+            reset_backward_cycle_session();
             crate::hook::set_switcher_active(false);
             if let Some(hwnd) = WORKER_HWND.get() {
                 // SAFETY: KillTimer kills both switcher timers.
@@ -515,6 +524,7 @@ fn execute_switcher(command: Command) {
             SWITCHER_BACKWARD_ENTRY.set(false);
         }
         Command::SwitcherCancel => {
+            reset_backward_cycle_session();
             crate::hook::set_switcher_active(false);
             if let Some(hwnd) = WORKER_HWND.get() {
                 // SAFETY: KillTimer kills both switcher timers.
@@ -785,11 +795,28 @@ where
         return CycleOutcome::NoEligibleTarget;
     }
 
-    for target in crate::cycling::cycle_order_directed(&candidates, active, direction) {
+    let targets = match direction {
+        crate::cycling::Direction::Forward => {
+            reset_backward_cycle_session();
+            crate::cycling::cycle_order_directed(&candidates, active, direction)
+        }
+        crate::cycling::Direction::Backward => {
+            let now = crate::hook::tick_ms();
+            BACKWARD_CYCLE_SESSION.with(|s| s.borrow_mut().cycle_order(&candidates, active, now))
+        }
+    };
+
+    for target in targets {
         if !eligible.contains(&target) {
             continue;
         }
         if activator.activate(target) == ActivationOutcome::Activated {
+            if direction == crate::cycling::Direction::Backward {
+                let now = crate::hook::tick_ms();
+                BACKWARD_CYCLE_SESSION.with(|s| {
+                    s.borrow_mut().record_activation(target, now);
+                });
+            }
             return CycleOutcome::Activated(target);
         }
     }
@@ -1907,6 +1934,59 @@ mod tests {
             test_suppress_count(),
             0,
             "SwitcherCommit must not call suppress_start_menu on modifier release edge even with targets present"
+        );
+    }
+
+    #[test]
+    fn repeated_backward_blind_cycles_visit_every_window_in_reverse() {
+        reset_backward_cycle_session();
+        let mut z = vec![1isize, 2, 3, 4];
+        let mut visited = Vec::new();
+        let mut current = 1isize;
+        let monitors = FakeMonitors(vec![
+            (WindowId(1), Some(MONITOR_A)),
+            (WindowId(2), Some(MONITOR_A)),
+            (WindowId(3), Some(MONITOR_A)),
+            (WindowId(4), Some(MONITOR_A)),
+        ]);
+        let desktops = FakeDesktops(vec![
+            (WindowId(1), Some(true)),
+            (WindowId(2), Some(true)),
+            (WindowId(3), Some(true)),
+            (WindowId(4), Some(true)),
+        ]);
+        let spatial = SpatialContext {
+            origin_monitor: Some(MONITOR_A),
+        };
+
+        for _ in 0..6 {
+            let candidates = ordered(z.iter().map(|w| normal(*w)).collect());
+            let mut activator = ScriptedActivator::always(ActivationOutcome::Activated);
+            let outcome = run_context_safe_cycle(
+                &StaticSource(candidates),
+                &WindowEligibility,
+                &mut activator,
+                &active_ctx(current),
+                &monitors,
+                Some(&desktops),
+                &spatial,
+                crate::cycling::Direction::Backward,
+            );
+            match outcome {
+                CycleOutcome::Activated(next) => {
+                    visited.push(next.0);
+                    current = next.0;
+                    z.retain(|w| *w != current);
+                    z.insert(0, current);
+                }
+                other => panic!("expected activated, got {other:?}"),
+            }
+        }
+
+        assert_eq!(
+            visited,
+            vec![2, 3, 4, 1, 2, 3],
+            "backward cycling must traverse all windows in reverse rather than oscillating"
         );
     }
 }

@@ -53,6 +53,10 @@ dag:
     - SPEC-16-01
     - SPEC-16-02
     - SPEC-16-03
+- spec: SPEC-17
+  order:
+  - parallel:
+    - SPEC-17-01
 - spec: SPEC-2
   order:
   - parallel:

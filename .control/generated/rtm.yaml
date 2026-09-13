@@ -4,6 +4,21 @@ rtm:
   FR: FR-1
   DEC: []
   UC: UC-1
+  ticket: SPEC-17-01
+  spec: SPEC-17
+  release: 0.4.0
+  test:
+  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
+  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
+  status: done
+  exempt: false
+  green: true
+  broken_at: ''
+- BG: BG-1
+  CAP: CAP-1
+  FR: FR-1
+  DEC: []
+  UC: UC-1
   ticket: W1-S1
   spec: W1
   release: 0.1.0
@@ -477,6 +492,21 @@ rtm:
   FR: FR-2
   DEC: []
   UC: UC-1
+  ticket: SPEC-17-01
+  spec: SPEC-17
+  release: 0.4.0
+  test:
+  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
+  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
+  status: done
+  exempt: false
+  green: true
+  broken_at: ''
+- BG: BG-1
+  CAP: CAP-7
+  FR: FR-2
+  DEC: []
+  UC: UC-1
   ticket: W1-S1
   spec: W1
   release: 0.1.0
@@ -767,6 +797,21 @@ rtm:
   - hook::tests::a_disabled_actions_chord_falls_through_to_call_next_hook_ex
   - hook::tests::a_disabled_field_shares_a_chord_with_an_enabled_field_without_collision
   - arrangement::stack::tests::stack_planner_no_longer_reads_a_layout_level_toggle
+  status: done
+  exempt: false
+  green: true
+  broken_at: ''
+- BG: BG-1
+  CAP: CAP-8
+  FR: FR-3
+  DEC: []
+  UC: UC-1
+  ticket: SPEC-17-01
+  spec: SPEC-17
+  release: 0.4.0
+  test:
+  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
+  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
   status: done
   exempt: false
   green: true
@@ -1075,6 +1120,21 @@ rtm:
   FR: FR-4
   DEC: []
   UC: UC-1
+  ticket: SPEC-17-01
+  spec: SPEC-17
+  release: 0.4.0
+  test:
+  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
+  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
+  status: done
+  exempt: false
+  green: true
+  broken_at: ''
+- BG: BG-1
+  CAP: CAP-1
+  FR: FR-4
+  DEC: []
+  UC: UC-1
   ticket: W1-S1
   spec: W1
   release: 0.1.0
@@ -1093,6 +1153,21 @@ rtm:
   FR: FR-5
   DEC: []
   UC: UC-1
+  ticket: SPEC-17-01
+  spec: SPEC-17
+  release: 0.4.0
+  test:
+  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
+  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
+  status: done
+  exempt: false
+  green: true
+  broken_at: ''
+- BG: BG-1
+  CAP: CAP-1
+  FR: FR-5
+  DEC: []
+  UC: UC-1
   ticket: W1-S1
   spec: W1
   release: 0.1.0
@@ -1102,6 +1177,21 @@ rtm:
   - cycling::tests::multi_process_same_executable_groups_together
   - cycling::tests::excluded_windows_are_skipped
   - cycling::tests::invalid_target_continues_to_next_candidate
+  status: done
+  exempt: false
+  green: true
+  broken_at: ''
+- BG: BG-1
+  CAP: CAP-1
+  FR: FR-6
+  DEC: []
+  UC: UC-1
+  ticket: SPEC-17-01
+  spec: SPEC-17
+  release: 0.4.0
+  test:
+  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
+  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
   status: done
   exempt: false
   green: true

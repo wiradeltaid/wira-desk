@@ -1634,7 +1634,7 @@ specs:
     release: "0.4.0"
     prd: [wira-desk]
     size: S
-    status: open
+    status: closed
     depends_on: [SPEC-16]
     spec_folder: .scratch/spec-17-blind-backward-cycling-multi-window/
     fr: [FR-1, FR-2]

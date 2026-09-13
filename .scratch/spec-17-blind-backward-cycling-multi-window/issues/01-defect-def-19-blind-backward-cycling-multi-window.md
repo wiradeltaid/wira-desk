@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Second-opinion review notes (2026-09-13)
 
@@ -45,9 +45,9 @@
   after each pick, the way `repeated_cycles_reach_every_window` already does for
   forward.
 
-- [ ] **Confirm root cause in dynamic Z-order activation**:
+- [x] **Confirm root cause in dynamic Z-order activation**:
       In `crates/daemon/src/cycling/mod.rs:255`, `cycle_order_directed` for `Direction::Backward` omits `rotated.reverse()`, selecting the window immediately after the foreground in current Z-order (`Z=1`). When window `Z=1` is activated on the live desktop, Windows immediately raises it to the top of the Z-order (`Z=0`), pushing the previous foreground window to `Z=1`. Consequently, the next backward blind cycle command sees the original window at `Z=1` and activates it, locking navigation into a two-window oscillation.
-- [ ] Implement backward traversal for blind cycling via a cycling session (tracked
+- [x] Implement backward traversal for blind cycling via a cycling session (tracked
       visitation history/cursor while consecutive backward taps continue), not a
       stateless reformulation of `cycle_order_directed` — see review notes above for
       why a stateless fix cannot satisfy both first-tap-is-neighbor and full-traversal
@@ -55,7 +55,7 @@
       backward tap after a direction change or a fresh, non-cycling foreground),
       and when it resets (app switch outside cycling, a session window closing,
       a forward tap interleaved, or a timeout).
-- [ ] Add unit test `cycling::tests::backward_blind_cycle_traverses_all_eligible_windows` verifying that repeated backward cycles on a **dynamic, self-mutating** Z-order (candidates reordered after each pick, per the remove-and-prepend rule) with 3+ windows visit all windows in reverse sequence — a single static `cycle_order_directed` call is not sufficient to catch this regression.
-- [ ] Add worker test `worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse` ensuring simulated consecutive `CyclePrev` commands against a dynamic Z-order do not oscillate between two windows.
-- [ ] Verify visual switcher backward entry (`Direction::Backward` / `Command::SwitcherArmPrev` / `Command::SwitcherPrev`) remains intact and aligned with card selection.
-- [ ] Full test suite green once across workspace (`WIRADESK_SKIP_MANIFEST=1 cargo test --workspace`).
+- [x] Add unit test `cycling::tests::backward_blind_cycle_traverses_all_eligible_windows` verifying that repeated backward cycles on a **dynamic, self-mutating** Z-order (candidates reordered after each pick, per the remove-and-prepend rule) with 3+ windows visit all windows in reverse sequence — a single static `cycle_order_directed` call is not sufficient to catch this regression.
+- [x] Add worker test `worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse` ensuring simulated consecutive `CyclePrev` commands against a dynamic Z-order do not oscillate between two windows.
+- [x] Verify visual switcher backward entry (`Direction::Backward` / `Command::SwitcherArmPrev` / `Command::SwitcherPrev`) remains intact and aligned with card selection.
+- [x] Full test suite green once across workspace (`WIRADESK_SKIP_MANIFEST=1 cargo test --workspace`).
