@@ -1657,7 +1657,7 @@ specs:
     release: "0.4.0"
     prd: [wira-desk]
     size: S
-    status: open
+    status: closed
     depends_on: [SPEC-17]
     spec_folder: .scratch/spec-18-blind-backward-cycling-session-lifecycle/
     fr: [FR-1, FR-2]

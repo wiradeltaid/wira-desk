@@ -780,6 +780,33 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-031.md
 
+  - id: DEC-032
+    title: Autopilot mandate for SPEC-18 delivery
+    status: applied
+    file: decisions/DEC-032-autopilot-mandate-for-spec-18-delivery.md
+    created: '2026-09-14'
+    touches:
+      - .control/decisions/DEC-032-autopilot-mandate-for-spec-18-delivery.md
+      - .control/memlog/autopilot-DEC-032.md
+      - .control/registry/decisions.yaml
+      - .control/registry/defects.yaml
+      - .control/registry/specs.yaml
+      - .scratch/smoke-dec-032.md
+      - .scratch/spec-18-blind-backward-cycling-session-lifecycle/issues/01-defect-def-20-blind-backward-cycling-session-lifecycle.md
+      - 3p.md
+      - crates/daemon/src/worker.rs
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-21'
+      run_branch: autopilot/DEC-032
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-032.md
+
 
 
 

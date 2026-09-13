@@ -30,10 +30,10 @@ rtm:
   test:
   - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
   - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-1
@@ -533,10 +533,10 @@ rtm:
   test:
   - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
   - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-7
   FR: FR-2
@@ -862,10 +862,10 @@ rtm:
   test:
   - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
   - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-8
   FR: FR-3
@@ -1191,10 +1191,10 @@ rtm:
   test:
   - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
   - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-4
@@ -1239,10 +1239,10 @@ rtm:
   test:
   - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
   - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-5
@@ -1287,10 +1287,10 @@ rtm:
   test:
   - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
   - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-6
