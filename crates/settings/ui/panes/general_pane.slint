@@ -63,8 +63,9 @@ export component GeneralPane inherits VerticalLayout {
             if root.visual_switcher_enabled : HorizontalLayout {
                 padding-left: 16px;
                 padding-right: 16px;
-                padding-top: 10px;
-                padding-bottom: 12px;
+                padding-top: 12px;
+                padding-bottom: 16px;
+                min-height: 48px;
                 alignment: space-between;
 
                 VerticalLayout {
@@ -79,7 +80,7 @@ export component GeneralPane inherits VerticalLayout {
                         color: Palette.text_primary;
                     }
                     Text {
-                        text: "Milliseconds to hold the chord before the visual overlay appears (100–500 ms).";
+                        text: "Milliseconds to hold the chord before the visual overlay appears\n(100–500 ms).";
                         font-family: Typography.font_family;
                         font-size: Typography.size_caption;
                         color: Palette.text_secondary;

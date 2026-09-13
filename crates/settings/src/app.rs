@@ -2996,7 +2996,7 @@ mod tests {
     }
 
     #[test]
-    fn about_pane_renders_in_process_disclosure() {
+    fn about_pane_renders_in_process_disclosure_with_newline() {
         crate::shortcut_row_slint_snapshot::tests::run_on_ui_thread(|| {
             let (window, model, save_path) =
                 crate::shortcut_row_slint_snapshot::tests::setup_shortcuts_window();
@@ -3008,11 +3008,11 @@ mod tests {
 
             let disclosure = find_about_element(
                 &window,
-                "No telemetry, no account, no separate background service — update checks run entirely in-process against GitHub Releases, which you can switch off.",
+                "No telemetry, no account, no separate background service —\nupdate checks run entirely in-process against GitHub Releases, which you can switch off.",
             );
             assert!(
                 disclosure.is_some(),
-                "In-process disclosure found in About pane"
+                "In-process disclosure with newline found in About pane"
             );
 
             let _ = std::fs::remove_file(&save_path);
@@ -3199,7 +3199,7 @@ mod tests {
     }
 
     #[test]
-    fn visual_hold_delay_description_wraps_without_horizontal_scroll() {
+    fn visual_hold_delay_description_wraps_with_newline() {
         crate::shortcut_row_slint_snapshot::tests::run_on_ui_thread(|| {
             let (window, model, save_path) =
                 crate::shortcut_row_slint_snapshot::tests::setup_shortcuts_window();
@@ -3217,6 +3217,10 @@ mod tests {
             assert!(
                 source.contains("wrap: word-wrap;"),
                 "Hold delay caption must have wrap: word-wrap"
+            );
+            assert!(
+                source.contains("overlay appears\\n(100–500 ms)."),
+                "Hold delay caption must have dedicated newline for bounds"
             );
 
             let _ = std::fs::remove_file(&save_path);
