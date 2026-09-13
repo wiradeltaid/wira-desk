@@ -3,7 +3,7 @@ spec: SPEC-15
 release: "0.4.0"
 prd: wira-desk
 fr: []
-status: open
+status: closed
 ---
 
 # SPEC-15 — Visual Switcher Active Window Parity, Helper Sanitization, Single-Window Hold, Timing Decoupling, and Settings Polish

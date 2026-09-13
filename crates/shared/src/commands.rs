@@ -64,6 +64,10 @@ pub enum Command {
     SwitcherCancel = 26,
     /// Rotate focus backward among same-app windows (Shift + Win+Backtick).
     CyclePrev = 27,
+    /// Arm switcher hold timer on worker window (forward direction).
+    SwitcherArm = 28,
+    /// Arm switcher hold timer on worker window (backward direction).
+    SwitcherArmPrev = 29,
 }
 
 impl Command {
@@ -98,6 +102,8 @@ impl Command {
             25 => Command::SwitcherCommit,
             26 => Command::SwitcherCancel,
             27 => Command::CyclePrev,
+            28 => Command::SwitcherArm,
+            29 => Command::SwitcherArmPrev,
             _ => Command::Nop,
         }
     }
@@ -108,7 +114,9 @@ impl Command {
     pub fn is_exempt_from_throttle(self) -> bool {
         matches!(
             self,
-            Command::SwitcherDisarm
+            Command::SwitcherArm
+                | Command::SwitcherArmPrev
+                | Command::SwitcherDisarm
                 | Command::SwitcherNext
                 | Command::SwitcherPrev
                 | Command::SwitcherUp
@@ -160,6 +168,8 @@ mod tests {
             Command::SwitcherCommit,
             Command::SwitcherCancel,
             Command::CyclePrev,
+            Command::SwitcherArm,
+            Command::SwitcherArmPrev,
         ] {
             assert_eq!(Command::from_u8(cmd.as_u8()), cmd);
         }
@@ -176,7 +186,7 @@ mod tests {
 
     #[test]
     fn unknown_values_map_to_nop() {
-        assert_eq!(Command::from_u8(28), Command::Nop);
+        assert_eq!(Command::from_u8(30), Command::Nop);
         assert_eq!(Command::from_u8(255), Command::Nop);
     }
 

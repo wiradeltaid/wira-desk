@@ -29,13 +29,13 @@ Make the visual switcher show every same-app window on the current desktop — i
 
 > `SPEC-15-04` first, and the draft's edge was the other way round. Until `SPEC-15-04` lands, `Command::Cycle` has already fired by the time `open_visual_switcher` calls `capture_active_context()`, so "the active window" is the window the blind cycle *jumped to*. Seating that at index 0 and highlighting index 1 lands the user two windows from where they started — a worse defect than the one being fixed.
 
-**Status:** blocked
+**Status:** closed
 
-- [ ] When 4 same-app windows exist on the current desktop, `card_order_for_candidates` returns 4 window IDs, with `active.foreground` at index 0.
-- [ ] Forward entry with `len > 1` highlights index 1; with `len == 1` it highlights index 0.
-- [ ] Backward entry highlights `len - 1`, and that card is not the active window when `len > 1`.
-- [ ] On a desktop with only 1 window of the active app, holding the cycle chord arms `TIMER_SWITCHER_HOLD` and opens the overlay with one card.
-- [ ] `decide_switcher_hold_delay` still returns `None` for every outcome when `visual_enabled` is false, and when no modifier is down.
-- [ ] A window on another virtual desktop is absent from the card set.
-- [ ] **Escape** cancels and leaves the original active window focused. Releasing the modifiers **commits** the highlighted card — with forward entry and no navigation that is index 1, matching the blind cycle, not the origin. (The draft's criterion claiming release leaves the origin focused contradicts the commit-on-modifier-release path at `hook.rs:445-455` and is corrected here.)
-- [ ] The two collateral `switcher::tests` above are updated and green.
+- [x] When 4 same-app windows exist on the current desktop, `card_order_for_candidates` returns 4 window IDs, with `active.foreground` at index 0.
+- [x] Forward entry with `len > 1` highlights index 1; with `len == 1` it highlights index 0.
+- [x] Backward entry highlights `len - 1`, and that card is not the active window when `len > 1`.
+- [x] On a desktop with only 1 window of the active app, holding the cycle chord arms `TIMER_SWITCHER_HOLD` and opens the overlay with one card.
+- [x] `decide_switcher_hold_delay` still returns `None` for every outcome when `visual_enabled` is false, and when no modifier is down.
+- [x] A window on another virtual desktop is absent from the card set.
+- [x] **Escape** cancels and leaves the original active window focused. Releasing the modifiers **commits** the highlighted card — with forward entry and no navigation that is index 1, matching the blind cycle, not the origin. (The draft's criterion claiming release leaves the origin focused contradicts the commit-on-modifier-release path at `hook.rs:445-455` and is corrected here.)
+- [x] The two collateral `switcher::tests` above are updated and green.

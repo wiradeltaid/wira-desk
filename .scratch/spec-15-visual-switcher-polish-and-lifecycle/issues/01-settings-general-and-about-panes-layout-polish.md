@@ -17,12 +17,12 @@ UI aesthetics and layout polish across `general_pane.slint` and `about_pane.slin
 
 **Blocked by:** None
 
-**Status:** ready-for-agent
+**Status:** closed
 
-- [ ] In `general_pane.slint`, the text `(100–500 ms)` renders on a new line.
-- [ ] In `general_pane.slint`, the Hold Delay Threshold row height/padding is increased with ample clearance from the card bottom border.
-- [ ] In `about_pane.slint`, `update checks run entirely in-process...` starts cleanly on a new line.
-- [ ] `about_pane_renders_in_process_disclosure` is updated to the new string and passes.
-- [ ] `every_caption_in_the_general_pane_sets_a_wrap_mode` still passes.
-- [ ] No horizontal scrollbar is introduced in either pane at default/minimum window width.
-- [ ] `scripts/verify-settings-runtime.ps1` passes.
+- [x] In `general_pane.slint`, the text `(100–500 ms)` renders on a new line.
+- [x] In `general_pane.slint`, the Hold Delay Threshold row height/padding is increased with ample clearance from the card bottom border.
+- [x] In `about_pane.slint`, `update checks run entirely in-process...` starts cleanly on a new line.
+- [x] `about_pane_renders_in_process_disclosure` is updated to the new string and passes.
+- [x] `every_caption_in_the_general_pane_sets_a_wrap_mode` still passes.
+- [x] No horizontal scrollbar is introduced in either pane at default/minimum window width.
+- [x] `scripts/verify-settings-runtime.ps1` passes.

@@ -24,13 +24,13 @@ DEC-026 Clause 3 *authorises* this sanitisation; its own **Owner decisions still
 
 **Blocked by:** None
 
-**Status:** ready-for-agent
+**Status:** closed
 
-- [ ] Top-level windows with class `PopupHost` or `Xaml_WindowedPopupClass` are excluded with `ExclusionReason::HelperSurface`.
-- [ ] The frozen exclusion-precedence doc comment in `eligibility.rs` names the new rule at its exact position.
-- [ ] `ReferencePolicy` carries the same rule; `agrees_with_reference_policy_on_every_fixture` passes.
-- [ ] The fixture-completeness guard covers `HELPER_SURFACE_CLASSES`, and a fixture exists for each class.
-- [ ] `WindowFacts` carries `has_title`, `has_nonzero_extent`, and `is_owned`, populated by `source.rs`.
-- [ ] `evaluate_facts` does **not** branch on those three fields; a test asserts a titleless / zero-extent / owned window is still `Eligible`, so the deferral is a guard rather than an omission.
-- [ ] Real application windows (Notepad, Terminal, browsers, and the synthetic hung-window fixture) remain fully eligible.
-- [ ] The exclusion parity between blind cycling and the visual switcher is preserved — both read the same `WindowEligibility`.
+- [x] Top-level windows with class `PopupHost` or `Xaml_WindowedPopupClass` are excluded with `ExclusionReason::HelperSurface`.
+- [x] The frozen exclusion-precedence doc comment in `eligibility.rs` names the new rule at its exact position.
+- [x] `ReferencePolicy` carries the same rule; `agrees_with_reference_policy_on_every_fixture` passes.
+- [x] The fixture-completeness guard covers `HELPER_SURFACE_CLASSES`, and a fixture exists for each class.
+- [x] `WindowFacts` carries `has_title`, `has_nonzero_extent`, and `is_owned`, populated by `source.rs`.
+- [x] `evaluate_facts` does **not** branch on those three fields; a test asserts a titleless / zero-extent / owned window is still `Eligible`, so the deferral is a guard rather than an omission.
+- [x] Real application windows (Notepad, Terminal, browsers, and the synthetic hung-window fixture) remain fully eligible.
+- [x] The exclusion parity between blind cycling and the visual switcher is preserved — both read the same `WindowEligibility`.

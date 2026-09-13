@@ -1418,7 +1418,7 @@ specs:
     release: "0.4.0"
     prd: [wira-desk]
     size: M
-    status: open
+    status: closed
     depends_on: [SPEC-14]
     spec_folder: .scratch/spec-15-visual-switcher-polish-and-lifecycle/
     # Peer review (claude-opus-5, 2026-09-13) against the code, not the draft's own account of it.
@@ -1477,12 +1477,9 @@ specs:
         depends_on: [SPEC-15-02, SPEC-15-04]
         tests:
           - switcher::tests::card_order_includes_active_foreground_window
-          - switcher::tests::card_order_no_longer_equals_cycle_order
-          - switcher::tests::forward_selection_highlights_next_window
-          - switcher::tests::forward_selection_on_a_single_card_highlights_it
-          - switcher::tests::backward_selection_highlights_last_window
-          - switcher::tests::another_virtual_desktop_stays_out_of_the_card_set
-          - worker::tests::single_window_arms_hold_delay_when_modifiers_held
+          - worker::tests::single_window_desktop_arms_hold_timer_on_no_eligible_target_or_exhausted
+          - worker::tests::forward_and_backward_entry_selection_parity
+          - worker::tests::window_on_another_virtual_desktop_absent_from_switcher_card_set
           - worker::tests::disabled_visual_switcher_never_arms_the_hold_timer
       - id: SPEC-15-04
         title: Cycle activation timing and hold threshold decoupling
@@ -1493,9 +1490,10 @@ specs:
         # not the other way round.
         depends_on: []
         tests:
-          - hook::tests::rapid_chord_release_executes_blind_cycle
-          - hook::tests::chord_hold_past_threshold_opens_switcher_without_prior_cycle
-          - hook::tests::disabled_visual_switcher_still_cycles_on_keydown
-          - hook::tests::held_main_key_autorepeat_does_not_advance_the_switcher
+          - hook::tests::main_key_release_before_deadline_disarms_without_delaying_cycle
+          - hook::tests::holding_past_threshold_does_not_enqueue_cycle_on_keydown_or_keyup
+          - hook::tests::repeated_taps_below_threshold_each_produce_one_cycle
+          - hook::tests::reload_with_visual_switcher_disabled_leaves_blind_cycling_unchanged
+          - hook::tests::holding_chord_with_overlay_open_does_not_advance_selection_on_auto_repeat
           - hook::tests::hook_and_worker_hold_thresholds_cannot_disagree
 

@@ -566,7 +566,7 @@ The Settings application provides a dedicated Mouse configuration pane containin
 ## Success Metrics
 
 ### Primary Metrics
-- **SM-1: Focus Transfer Latency** — Perceived end-to-end focus transfer latency occurs in under 1 ms following keypress during standard desktop workloads. Validates FR-1, FR-2, FR-6, NFR-2.
+- **SM-1: Focus Transfer Latency** — Perceived end-to-end focus transfer latency occurs in under 1 ms following chord release (the chord's committing edge below hold threshold when visual switcher is enabled, or keypress when visual switcher is disabled) during standard desktop workloads (DEC-029). Validates FR-1, FR-2, FR-6, NFR-2.
 - **SM-2: Hook Stability & Reliability** — Zero unhandled hook dropouts or unhook events across continuous 7-day user sessions. Validates FR-9, FR-10, FR-11, NFR-2, NFR-6.
 
 ### Secondary Metrics

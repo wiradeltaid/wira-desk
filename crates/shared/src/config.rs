@@ -380,6 +380,17 @@ impl Default for MouseConfig {
 
 // ── Defaults (on-disk config.toml schema) ─────────────────────────────────
 
+impl SwitcherConfig {
+    pub const MIN_HOLD_DELAY_MS: u32 = 100;
+    pub const MAX_HOLD_DELAY_MS: u32 = 500;
+    pub const DEFAULT_HOLD_DELAY_MS: u32 = 150;
+
+    #[inline]
+    pub fn clamp_hold_delay(ms: u32) -> u32 {
+        ms.clamp(Self::MIN_HOLD_DELAY_MS, Self::MAX_HOLD_DELAY_MS)
+    }
+}
+
 impl Default for SwitcherConfig {
     fn default() -> Self {
         Self {
@@ -388,7 +399,7 @@ impl Default for SwitcherConfig {
             fallback_shortcut: "alt+backtick".to_string(),
             fallback_shortcut_enabled: true,
             visual_enabled: true,
-            visual_hold_delay_ms: 150,
+            visual_hold_delay_ms: Self::DEFAULT_HOLD_DELAY_MS,
         }
     }
 }

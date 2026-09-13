@@ -32,14 +32,14 @@ Option B (immediate activation plus overlay-tracked reversion) is rejected: it k
 
 > The draft placed this after `SPEC-15-03`. That edge is reversed: `SPEC-15-03` depends on **this** ticket, because the active window's identity at overlay-open time is only truthful once the premature cycle is gone.
 
-**Status:** ready-for-agent
+**Status:** closed
 
-- [ ] `DEC-029` is authored and accepted, naming the timing contract, the `visual_enabled` gate, the SM-1 restatement, and the auto-repeat rule.
-- [ ] SM-1 in `.what/_prd/wira-desk/prd.md` reads consistently with the shipped behaviour (restated, or the decision records why it stands).
-- [ ] With `visual_enabled == false`, `Command::Cycle` still fires on keydown and no behaviour changes.
-- [ ] With `visual_enabled == true`, a chord release below the threshold fires exactly one `Command::Cycle`, and none was enqueued at keydown.
-- [ ] Holding past the threshold opens the overlay with **zero** `Command::Cycle` enqueued beforehand; the pre-hold foreground window is still foreground when the overlay appears.
-- [ ] Repeated taps below the threshold each produce one cycle, subject only to `ANTI_MACRO_THROTTLE_MS`, with no added lag beyond the user's own key release.
-- [ ] Holding the chord with the overlay open does **not** advance the selection: a repeated `WM_KEYDOWN` of `switcher_main_vk` while that key is already down is ignored. This test MUST be seen failing before the latch is added.
-- [ ] The release-vs-hold verdict is derived in one place; a test asserts the hook and worker thresholds cannot disagree.
-- [ ] `cargo test --workspace` is green with `--no-fail-fast`; hook timing, disarm, and modifier-release tests all pass.
+- [x] `DEC-029` is authored and accepted, naming the timing contract, the `visual_enabled` gate, the SM-1 restatement, and the auto-repeat rule.
+- [x] SM-1 in `.what/_prd/wira-desk/prd.md` reads consistently with the shipped behaviour (restated, or the decision records why it stands).
+- [x] With `visual_enabled == false`, `Command::Cycle` still fires on keydown and no behaviour changes.
+- [x] With `visual_enabled == true`, a chord release below the threshold fires exactly one `Command::Cycle`, and none was enqueued at keydown.
+- [x] Holding past the threshold opens the overlay with **zero** `Command::Cycle` enqueued beforehand; the pre-hold foreground window is still foreground when the overlay appears.
+- [x] Repeated taps below the threshold each produce one cycle, subject only to `ANTI_MACRO_THROTTLE_MS`, with no added lag beyond the user's own key release.
+- [x] Holding the chord with the overlay open does **not** advance the selection: a repeated `WM_KEYDOWN` of `switcher_main_vk` while that key is already down is ignored. This test MUST be seen failing before the latch is added.
+- [x] The release-vs-hold verdict is derived in one place; a test asserts the hook and worker thresholds cannot disagree.
+- [x] `cargo test --workspace` is green with `--no-fail-fast`; hook timing, disarm, and modifier-release tests all pass.
