@@ -39,6 +39,11 @@ work_progress:
   tickets_done: 6
   tickets_total: 6
   work_progress: 100%
+- spec: SPEC-15
+  status: open
+  tickets_done: 0
+  tickets_total: 4
+  work_progress: 0%
 - spec: SPEC-2
   status: closed
   tickets_done: 2

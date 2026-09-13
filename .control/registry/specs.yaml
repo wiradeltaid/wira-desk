@@ -1413,3 +1413,89 @@ specs:
           - switcher::layout::tests::geometry_scales_with_monitor_dpi
           - switcher::layout::tests::candidates_beyond_one_page_paginate_rather_than_shrink
           - switcher::selection::tests::up_and_down_pick_the_greatest_horizontal_overlap_across_ragged_rows
+
+  - id: SPEC-15
+    release: "0.4.0"
+    prd: [wira-desk]
+    size: M
+    status: open
+    depends_on: [SPEC-14]
+    spec_folder: .scratch/spec-15-visual-switcher-polish-and-lifecycle/
+    # Peer review (claude-opus-5, 2026-09-13) against the code, not the draft's own account of it.
+    # Two changes it forced, both recorded in SPEC.md: the SPEC-15-03 -> SPEC-15-04 dependency edge
+    # was BACKWARDS and is reversed (until the premature keydown cycle is gone, `active.foreground`
+    # at overlay-open time is the window the blind cycle already jumped to, so seating it at card
+    # index 0 lands the user two windows out); and SPEC-15-02's four filters are split by evidence —
+    # only PopupHost has a reproduction, the other three are captured but not yet excluded, per
+    # DEC-026's own "Clause 3 still has no diagnosed subject" note.
+    #
+    # Two owner calls remain open and are NOT settled by this stamp:
+    #   1. SM-1 (`.what/_prd/wira-desk/prd.md:298`) promises focus transfer "under 1 ms following
+    #      keypress". SPEC-15-04 Option A moves that to the key RELEASE. DEC-029 must restate the
+    #      measurement point or the promise is amended at G2 first.
+    #   2. `fr: []` and every empty `satisfies:` below inherit SPEC-14's state — the visual switcher
+    #      still has no FR and no capability. DEC-026 records that as owner authoring work at G2.
+    spec_reviewed:
+      date: '2026-09-13'
+      sha: 'ef001b8'
+      lenses: [structure, prose, edge-case-hunter]
+    fr: []
+    tickets:
+      - id: SPEC-15-01
+        title: Settings General and About panes layout polish
+        spec_folder: .scratch/spec-15-visual-switcher-polish-and-lifecycle/
+        component: settings
+        satisfies: []
+        depends_on: []
+        tests:
+          - app::tests::visual_hold_delay_description_wraps_with_newline
+          - app::tests::about_pane_renders_in_process_disclosure_with_newline
+      - id: SPEC-15-02
+        title: Helper and PopupHost window eligibility sanitization
+        spec_folder: .scratch/spec-15-visual-switcher-polish-and-lifecycle/
+        component: window-management
+        satisfies: []
+        depends_on: []
+        tests:
+          - cycling::eligibility::tests::popup_host_surface_is_excluded
+          - cycling::eligibility::tests::xaml_windowed_popup_class_is_excluded
+          - cycling::eligibility::tests::agrees_with_reference_policy_on_every_fixture
+          - cycling::tests::every_helper_surface_class_has_a_fixture
+          # The three below assert the DEFERRAL, not the exclusion: DEC-026 Clause 3 has no
+          # diagnosed subject for them yet, so the facts are captured and the window stays
+          # eligible until `wdi-systematic-debugging` produces a reproduction.
+          - cycling::eligibility::tests::empty_title_window_is_still_eligible
+          - cycling::eligibility::tests::zero_extent_window_is_still_eligible
+          - cycling::eligibility::tests::owned_window_is_still_eligible
+      - id: SPEC-15-03
+        title: Active window card inclusion and single-window switcher triggering
+        spec_folder: .scratch/spec-15-visual-switcher-polish-and-lifecycle/
+        component: window-management
+        satisfies: []
+        # SPEC-15-04 added by peer review: the card set is only truthful once the premature
+        # keydown cycle is gone. See the note at the head of this spec.
+        depends_on: [SPEC-15-02, SPEC-15-04]
+        tests:
+          - switcher::tests::card_order_includes_active_foreground_window
+          - switcher::tests::card_order_no_longer_equals_cycle_order
+          - switcher::tests::forward_selection_highlights_next_window
+          - switcher::tests::forward_selection_on_a_single_card_highlights_it
+          - switcher::tests::backward_selection_highlights_last_window
+          - switcher::tests::another_virtual_desktop_stays_out_of_the_card_set
+          - worker::tests::single_window_arms_hold_delay_when_modifiers_held
+          - worker::tests::disabled_visual_switcher_never_arms_the_hold_timer
+      - id: SPEC-15-04
+        title: Cycle activation timing and hold threshold decoupling
+        spec_folder: .scratch/spec-15-visual-switcher-polish-and-lifecycle/
+        component: window-management
+        satisfies: []
+        # Was `depends_on: [SPEC-15-03]`. Reversed by peer review — this ticket blocks SPEC-15-03,
+        # not the other way round.
+        depends_on: []
+        tests:
+          - hook::tests::rapid_chord_release_executes_blind_cycle
+          - hook::tests::chord_hold_past_threshold_opens_switcher_without_prior_cycle
+          - hook::tests::disabled_visual_switcher_still_cycles_on_keydown
+          - hook::tests::held_main_key_autorepeat_does_not_advance_the_switcher
+          - hook::tests::hook_and_worker_hold_thresholds_cannot_disagree
+
