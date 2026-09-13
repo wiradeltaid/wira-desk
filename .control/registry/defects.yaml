@@ -950,7 +950,7 @@ defects:
 
   - id: DEF-19
     title: Blind backward cycling (Shift + cycle chord) oscillates between the top two windows instead of cycling through all windows
-    status: open
+    status: fixed
     severity: high
     component: window-management
     violates: [DEC-026, UC-1]
@@ -960,6 +960,12 @@ defects:
       - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
       - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
     fixed_in: SPEC-17-01
+    fixed_by: >-
+      Implemented `BackwardCycleSession` in `crates/daemon/src/cycling/mod.rs` to maintain a stable circular traversal
+      sequence across consecutive blind backward cycle activations, avoiding the two-window remove-and-prepend
+      oscillation. The session tracks foreground continuity, prunes closed windows, times out after 2000 ms, and resets
+      on focus departure, visual switcher engagement, or forward cycling. Integrated into Worker command execution in
+      `crates/daemon/src/worker.rs` and verified by both unit and worker tests against dynamic self-mutating Z-orders.
     summary: >-
       When holding Shift with the cycle chord (Shift + Alt + ` or Shift + Win + `) for blind cycling,
       focus only ping-pongs back and forth between the two topmost windows rather than cycling backward

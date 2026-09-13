@@ -1,14 +1,17 @@
 ---
 type: mandate
 id: DEC-031
-status: accepted
+status: applied
 touches:
   - .control/decisions/DEC-031-autopilot-mandate-for-spec-17-delivery.md
   - .control/memlog/autopilot-DEC-031.md
   - .control/registry/decisions.yaml
+  - .control/registry/defects.yaml
   - .control/registry/specs.yaml
-  - .scratch/spec-17-blind-backward-cycling-multi-window/SPEC.md
+  - .control/decisions/DEC-026-cross-monitor-switcher-shift-cycle-and-window-eligibility.md
+  - .scratch/smoke-dec-031.md
   - .scratch/spec-17-blind-backward-cycling-multi-window/issues/01-defect-def-19-blind-backward-cycling-multi-window.md
+  - 3p.md
   - crates/daemon/src/cycling/mod.rs
   - crates/daemon/src/worker.rs
 supersedes: null

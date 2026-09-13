@@ -276,6 +276,143 @@ pub fn cycle_order(candidates: &[Candidate], active: &ActiveContext) -> Vec<Wind
     cycle_order_directed(candidates, active, Direction::Forward)
 }
 
+/// Blind backward cycling session timeout in milliseconds.
+/// If consecutive backward cycle inputs arrive within this window without
+/// intervening focus changes to other apps, navigation continues traversing
+/// the same sequence instead of resetting to the top neighbor.
+pub const BACKWARD_CYCLE_SESSION_TIMEOUT_MS: u64 = 2000;
+
+/// Tracks the visitation sequence for blind backward cycling across consecutive
+/// activations (DEF-19, SPEC-17).
+///
+/// In live Win32 activation, activating a target window raises it to the top of the
+/// Z-order (remove-and-prepend), pushing the prior foreground to Z=1. A stateless
+/// backward pick always selects Z=1, locking repeated backward cycling into a
+/// two-window oscillation (A <-> B) instead of traversing all eligible windows.
+///
+/// `BackwardCycleSession` establishes a stable circular window traversal order upon
+/// the first backward tap, and advances along that sequence while consecutive
+/// backward cycle commands arrive within [`BACKWARD_CYCLE_SESSION_TIMEOUT_MS`] without
+/// focus departure or interleaved forward cycling.
+#[derive(Debug, Clone, Default)]
+pub struct BackwardCycleSession {
+    /// Ordered list of windows in the established traversal cycle.
+    pub(crate) windows: Vec<WindowId>,
+    /// Index in `windows` of the window activated on the last step.
+    pub(crate) cursor: usize,
+    /// Window activated on the last step, used to verify foreground continuity.
+    pub(crate) last_activated: Option<WindowId>,
+    /// Timestamp (tick_ms) of the last cycle action.
+    pub(crate) last_tick_ms: u64,
+}
+
+impl BackwardCycleSession {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn reset(&mut self) {
+        self.windows.clear();
+        self.cursor = 0;
+        self.last_activated = None;
+        self.last_tick_ms = 0;
+    }
+
+    /// Check whether this session is currently active and valid for the given active window and time.
+    pub fn is_valid(&self, active_window: WindowId, now_ms: u64) -> bool {
+        if self.windows.is_empty() {
+            return false;
+        }
+        if self.last_activated != Some(active_window) {
+            return false;
+        }
+        if self.last_tick_ms > 0
+            && now_ms > 0
+            && now_ms.saturating_sub(self.last_tick_ms) > BACKWARD_CYCLE_SESSION_TIMEOUT_MS
+        {
+            return false;
+        }
+        true
+    }
+
+    /// Produce the target attempt order for a backward cycle step.
+    ///
+    /// If the session is valid, it synchronizes `self.windows` against current `candidates`
+    /// and advances the cursor to the next target.
+    /// If invalid, it initializes a new sequence from `candidates` where active is the origin,
+    /// ordering subsequent windows in Z-order succession.
+    pub fn cycle_order(
+        &mut self,
+        candidates: &[Candidate],
+        active: &ActiveContext,
+        now_ms: u64,
+    ) -> Vec<WindowId> {
+        let candidate_ids: Vec<WindowId> = candidates.iter().map(|c| c.facts.window).collect();
+        if candidate_ids.is_empty() {
+            self.reset();
+            return Vec::new();
+        }
+
+        if self.is_valid(active.foreground, now_ms) {
+            // Retain only windows that still exist as candidates
+            self.windows.retain(|w| candidate_ids.contains(w));
+            // Append any newly appeared candidates not already in the sequence
+            for &cid in &candidate_ids {
+                if !self.windows.contains(&cid) {
+                    self.windows.push(cid);
+                }
+            }
+
+            if self.windows.is_empty() {
+                self.reset();
+                return Vec::new();
+            }
+
+            // Sync cursor to current active window
+            let current_pos = self
+                .windows
+                .iter()
+                .position(|w| *w == active.foreground)
+                .unwrap_or(self.cursor);
+            self.cursor = (current_pos + 1) % self.windows.len();
+        } else {
+            // Fresh backward cycle session:
+            // Order candidates starting immediately after active foreground, then wrap to active.
+            let mut ordered = candidate_ids.clone();
+            if !ordered.contains(&active.foreground) {
+                ordered.insert(0, active.foreground);
+            }
+            let active_pos = ordered
+                .iter()
+                .position(|w| *w == active.foreground)
+                .unwrap_or(0);
+            self.windows = ordered;
+            self.cursor = (active_pos + 1) % self.windows.len();
+        }
+
+        // Return candidate attempt order starting at self.cursor
+        let len = self.windows.len();
+        let mut targets = Vec::with_capacity(len);
+        for i in 0..len {
+            let idx = (self.cursor + i) % len;
+            let target = self.windows[idx];
+            if target != active.foreground {
+                targets.push(target);
+            }
+        }
+        targets
+    }
+
+    /// Record a successful window activation.
+    pub fn record_activation(&mut self, target: WindowId, now_ms: u64) {
+        self.last_activated = Some(target);
+        self.last_tick_ms = now_ms;
+        if let Some(pos) = self.windows.iter().position(|w| *w == target) {
+            self.cursor = pos;
+        }
+    }
+}
+
 /// Drive one deterministic cycle pass.
 /// Attempts each eligible target **at most once**, in wrap order, and stops at
 /// the first activation. An [`ActivationOutcome::InvalidTarget`] or
@@ -850,5 +987,87 @@ mod tests {
         assert_eq!(backward, forward_reversed);
         assert_eq!(backward, vec![WindowId(3), WindowId(4), WindowId(1)]);
         assert_eq!(forward, vec![WindowId(1), WindowId(4), WindowId(3)]);
+    }
+
+    #[test]
+    fn backward_blind_cycle_traverses_all_eligible_windows() {
+        let mut z = vec![1isize, 2, 3, 4];
+        let mut visited = Vec::new();
+        let mut current = 1isize;
+        let mut session = BackwardCycleSession::new();
+
+        for i in 0..6 {
+            let candidates = ordered(z.iter().map(|w| normal(*w)).collect());
+            let tick = 1000 + i * 200;
+            let targets = session.cycle_order(&candidates, &active(current), tick);
+            assert!(!targets.is_empty(), "targets should not be empty");
+            let next = targets[0];
+            session.record_activation(next, tick);
+            visited.push(next.0);
+            current = next.0;
+            z.retain(|w| *w != current);
+            z.insert(0, current);
+        }
+
+        assert_eq!(
+            visited,
+            vec![2, 3, 4, 1, 2, 3],
+            "backward cycling must traverse all windows in reverse rather than oscillating"
+        );
+    }
+
+    #[test]
+    fn backward_cycle_session_resets_on_timeout() {
+        let candidates = ordered(vec![normal(1), normal(2), normal(3)]);
+        let mut session = BackwardCycleSession::new();
+
+        let targets1 = session.cycle_order(&candidates, &active(1), 1000);
+        assert_eq!(targets1[0], WindowId(2));
+        session.record_activation(WindowId(2), 1000);
+
+        // Exceed session timeout (2000 ms)
+        let targets2 = session.cycle_order(
+            &candidates,
+            &active(2),
+            1000 + BACKWARD_CYCLE_SESSION_TIMEOUT_MS + 100,
+        );
+        // Resets and starts new sequence from active window 2 -> picks neighbor 3
+        assert_eq!(targets2[0], WindowId(3));
+    }
+
+    #[test]
+    fn backward_cycle_session_resets_on_focus_departure() {
+        let candidates = ordered(vec![normal(1), normal(2), normal(3)]);
+        let mut session = BackwardCycleSession::new();
+
+        let targets1 = session.cycle_order(&candidates, &active(1), 1000);
+        assert_eq!(targets1[0], WindowId(2));
+        session.record_activation(WindowId(2), 1000);
+
+        // Active foreground departed to unexpected window 99 (e.g. user clicked another app)
+        let targets2 = session.cycle_order(&candidates, &active(99), 1100);
+        // Session invalidates and treats candidate list afresh
+        assert_eq!(targets2[0], WindowId(1));
+    }
+
+    #[test]
+    fn backward_cycle_session_prunes_closed_window() {
+        let candidates = ordered(vec![normal(1), normal(2), normal(3), normal(4)]);
+        let mut session = BackwardCycleSession::new();
+
+        let targets1 = session.cycle_order(&candidates, &active(1), 1000);
+        assert_eq!(targets1[0], WindowId(2));
+        session.record_activation(WindowId(2), 1000);
+
+        // Window 3 closes before next backward tap: candidates become [2, 1, 4]
+        let remaining_candidates = ordered(vec![normal(2), normal(1), normal(4)]);
+        let targets2 = session.cycle_order(&remaining_candidates, &active(2), 1200);
+        // Closed window 3 is pruned, next target is 4
+        assert_eq!(targets2[0], WindowId(4));
+        session.record_activation(WindowId(4), 1200);
+
+        // Next tap from 4 wraps to 1
+        let targets3 = session.cycle_order(&remaining_candidates, &active(4), 1400);
+        assert_eq!(targets3[0], WindowId(1));
     }
 }

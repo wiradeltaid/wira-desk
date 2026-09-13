@@ -139,6 +139,11 @@ decided by the Hook at match time and immutable thereafter. It is throttled exac
 `Command::Cycle` is — it is **not** added to `is_exempt_from_throttle`. `cycle_order` grows a
 direction parameter, and the backward order is the same rotation without the final `reverse()`.
 
+*(Amendment note, 2026-09-13): The final sentence's stateless assumption — that backward order is simply
+the rotation without reverse — was proven void under live Win32 dynamic Z-order remove-and-prepend behavior
+(DEF-19), which caused repeated backward taps to oscillate between two windows (A <-> B). Under mandate DEC-031
+and SPEC-17, backward blind cycling is implemented via `BackwardCycleSession` tracking across consecutive activations.*
+
 ### B-5 — `Shift` never joins `switcher_mods` or `SWITCHER_CHORD_MODS`
 
 Clause 2 makes `Shift` a direction reverser, not a chord modifier. Two live sites capture the
