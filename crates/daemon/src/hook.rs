@@ -4130,4 +4130,40 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn releasing_win_key_commits_switcher_without_enqueueing_anything_new() {
+        let primary = Shortcut::parse("win+backtick").unwrap();
+        let fallback = Shortcut::parse("alt+backtick").unwrap();
+        let mut rt = test_runtime(primary, fallback);
+
+        let queue = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+        let q = std::sync::Arc::clone(&queue);
+        let enqueue = move |cmd: u8| {
+            q.lock().unwrap().push(cmd);
+            true
+        };
+
+        // 1. Simulate switcher active
+        rt.switcher_active = true;
+        set_switcher_active(true);
+        rt.switcher_armed = true;
+        rt.mods.win = true;
+        rt.switcher_mods.win = true;
+
+        // 2. Release Win key (modifier keyup while switcher active)
+        let o_up =
+            handle_key_event_with_sink(&mut rt, VK_LWIN, false, |_| false, |_| 0, 100, &enqueue);
+
+        // Disposition must pass to next (shell receives keyup)
+        assert_eq!(o_up.disposition, KeyHandleResult::PassToNext);
+        assert!(!rt.switcher_active);
+        assert!(!rt.switcher_armed);
+
+        // Queue must contain exactly SwitcherCommit and nothing else
+        assert_eq!(
+            queue.lock().unwrap().as_slice(),
+            &[Command::SwitcherCommit.as_u8()]
+        );
+    }
 }

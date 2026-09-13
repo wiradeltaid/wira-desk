@@ -83,15 +83,15 @@ If (1) is clean but (2) still fails, the intermittency has a second cause and go
 
 **Blocked by:** None
 
-**Status:** ready-for-agent
+**Status:** closed
 
-- [ ] `suppress_start_menu()` is the first statement of the `SwitcherArm`/`SwitcherArmPrev` arm,
+- [x] `suppress_start_menu()` is the first statement of the `SwitcherArm`/`SwitcherArmPrev` arm,
       before the hold-delay gate.
-- [ ] `suppress_start_menu()` is the first statement of `open_visual_switcher`, before both early
+- [x] `suppress_start_menu()` is the first statement of `open_visual_switcher`, before both early
       returns.
-- [ ] The dead call at `worker.rs:443` is removed and replaced by a comment saying why.
-- [ ] `crates/daemon/src/hook.rs` gained no `SendInput` and no call reaching one.
-- [ ] Manual: releasing `Win` to commit does not open the Start Menu.
-- [ ] Manual: ten consecutive commits all move focus to the highlighted window.
-- [ ] Manual: `Escape` cancel and `Alt + ~` are unchanged.
-- [ ] Unit tests above pass; the SPEC-15-04 hook tests still pass unchanged.
+- [x] The dead call at `worker.rs:443` is removed and replaced by a comment saying why.
+- [x] `crates/daemon/src/hook.rs` gained no `SendInput` and no call reaching one.
+- [x] Manual: releasing `Win` to commit does not open the Start Menu.
+- [x] Manual: ten consecutive commits all move focus to the highlighted window.
+- [x] Manual: `Escape` cancel and `Alt + ~` are unchanged.
+- [x] Unit tests above pass; the SPEC-15-04 hook tests still pass unchanged.

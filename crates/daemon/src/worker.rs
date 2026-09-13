@@ -24,9 +24,27 @@ use crate::ring;
 use crate::util::debug_log;
 
 /// `VK_NONAME` — reserved and unassigned, so nothing acts on it.
+#[cfg(not(test))]
 const VK_NONAME: u16 = 0xFC;
+#[cfg(not(test))]
 const VK_LWIN: i32 = 0x5B;
+#[cfg(not(test))]
 const VK_RWIN: i32 = 0x5C;
+
+#[cfg(test)]
+thread_local! {
+    static SUPPRESS_COUNT: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
+#[cfg(test)]
+pub fn test_suppress_count() -> usize {
+    SUPPRESS_COUNT.with(|c| c.get())
+}
+
+#[cfg(test)]
+pub fn test_reset_suppress_count() {
+    SUPPRESS_COUNT.with(|c| c.set(0));
+}
 
 /// Stop the shell from treating a still-held Win key as a lone press.
 /// Wira Desk swallows the main key of the shortcut, so the shell would otherwise
@@ -40,51 +58,59 @@ const VK_RWIN: i32 = 0x5C;
 /// from inside the low-level hook raced the activation happening here and
 /// stopped cycling from moving focus at all.
 fn suppress_start_menu() {
-    use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
-        GetAsyncKeyState, SendInput, INPUT, INPUT_KEYBOARD, KEYBDINPUT, KEYEVENTF_KEYUP,
-    };
-    // SAFETY: `GetAsyncKeyState` takes no pointers and is callable from any thread.
-    //
-    // `zeroed` is valid for `[INPUT; 2]` because `INPUT` is a tag plus a union of
-    // `MOUSEINPUT`/`KEYBDINPUT`/`HARDWAREINPUT`, all of which are plain integer structs, so
-    // no bit pattern is invalid. The invariant that matters is tag/arm agreement: `r#type`
-    // is set to `INPUT_KEYBOARD` and the arm written is `Anonymous.ki`, so `SendInput` reads
-    // the same arm we initialised. Writing `ki` while claiming `INPUT_MOUSE` would have it
-    // reinterpret those bytes as a different struct.
-    //
-    // `inputs.as_ptr()` is an array of exactly `inputs.len()` elements, and the third
-    // argument is `size_of::<INPUT>()` — the stride Windows uses to walk the array, so a
-    // mismatch there would make it read past the end. Both derive from the same type.
-    //
-    // Thread context is a precondition too, not just a design note: this must run on the
-    // Worker. Calling `SendInput` from inside the low-level keyboard hook re-enters input
-    // processing and raced the activation this function follows, which is what stopped
-    // cycling from moving focus at all.
-    unsafe {
-        // Only if the user is still holding Win — otherwise the chord is over
-        // and an injected key would be a stray keystroke.
-        let held = (GetAsyncKeyState(VK_LWIN) as u16 & 0x8000) != 0
-            || (GetAsyncKeyState(VK_RWIN) as u16 & 0x8000) != 0;
-        if !held {
-            return;
-        }
+    #[cfg(test)]
+    {
+        SUPPRESS_COUNT.with(|c| c.set(c.get() + 1));
+    }
 
-        let mut inputs: [INPUT; 2] = std::mem::zeroed();
-        for (i, input) in inputs.iter_mut().enumerate() {
-            input.r#type = INPUT_KEYBOARD;
-            input.Anonymous.ki = KEYBDINPUT {
-                wVk: VK_NONAME,
-                wScan: 0,
-                dwFlags: if i == 1 { KEYEVENTF_KEYUP } else { 0 },
-                time: 0,
-                dwExtraInfo: 0,
-            };
+    #[cfg(not(test))]
+    {
+        use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
+            GetAsyncKeyState, SendInput, INPUT, INPUT_KEYBOARD, KEYBDINPUT, KEYEVENTF_KEYUP,
+        };
+        // SAFETY: `GetAsyncKeyState` takes no pointers and is callable from any thread.
+        //
+        // `zeroed` is valid for `[INPUT; 2]` because `INPUT` is a tag plus a union of
+        // `MOUSEINPUT`/`KEYBDINPUT`/`HARDWAREINPUT`, all of which are plain integer structs, so
+        // no bit pattern is invalid. The invariant that matters is tag/arm agreement: `r#type`
+        // is set to `INPUT_KEYBOARD` and the arm written is `Anonymous.ki`, so `SendInput` reads
+        // the same arm we initialised. Writing `ki` while claiming `INPUT_MOUSE` would have it
+        // reinterpret those bytes as a different struct.
+        //
+        // `inputs.as_ptr()` is an array of exactly `inputs.len()` elements, and the third
+        // argument is `size_of::<INPUT>()` — the stride Windows uses to walk the array, so a
+        // mismatch there would make it read past the end. Both derive from the same type.
+        //
+        // Thread context is a precondition too, not just a design note: this must run on the
+        // Worker. Calling `SendInput` from inside the low-level keyboard hook re-enters input
+        // processing and raced the activation this function follows, which is what stopped
+        // cycling from moving focus at all.
+        unsafe {
+            // Only if the user is still holding Win — otherwise the chord is over
+            // and an injected key would be a stray keystroke.
+            let held = (GetAsyncKeyState(VK_LWIN) as u16 & 0x8000) != 0
+                || (GetAsyncKeyState(VK_RWIN) as u16 & 0x8000) != 0;
+            if !held {
+                return;
+            }
+
+            let mut inputs: [INPUT; 2] = std::mem::zeroed();
+            for (i, input) in inputs.iter_mut().enumerate() {
+                input.r#type = INPUT_KEYBOARD;
+                input.Anonymous.ki = KEYBDINPUT {
+                    wVk: VK_NONAME,
+                    wScan: 0,
+                    dwFlags: if i == 1 { KEYEVENTF_KEYUP } else { 0 },
+                    time: 0,
+                    dwExtraInfo: 0,
+                };
+            }
+            SendInput(
+                inputs.len() as u32,
+                inputs.as_ptr(),
+                std::mem::size_of::<INPUT>() as i32,
+            );
         }
-        SendInput(
-            inputs.len() as u32,
-            inputs.as_ptr(),
-            std::mem::size_of::<INPUT>() as i32,
-        );
     }
 }
 
@@ -247,36 +273,73 @@ pub fn handle_timer(hwnd: windows_sys::Win32::Foundation::HWND, timer_id: usize)
     }
 }
 
-fn open_visual_switcher(hwnd: windows_sys::Win32::Foundation::HWND) {
-    let active = capture_active_context();
-    let monitors = Win32Monitors;
-    let spatial = capture_spatial_context(&monitors, active.foreground);
+fn open_visual_switcher_core<S, E, M, V, F>(
+    source: &S,
+    policy: &E,
+    monitors: &M,
+    desktops: Option<&V>,
+    active: &ActiveContext,
+    spatial: &crate::context::SpatialContext,
+    mut suppress: F,
+) -> Option<Vec<WindowId>>
+where
+    S: CandidateSource + ?Sized,
+    E: EligibilityPolicy + ?Sized,
+    M: MonitorSource + ?Sized,
+    V: VirtualDesktopSource + ?Sized,
+    F: FnMut(),
+{
+    // Suppress Start Menu at the very start of visual switcher opening, before any early returns.
+    // This ensures that even if candidates/eligibility is empty, lone Win release does not trigger Start Menu.
+    suppress();
 
-    let (candidates, eligible) = with_virtual_desktops(|desktops| {
-        collect_eligible_candidates(
-            &Win32CandidateSource,
-            &WindowEligibility,
-            &active,
-            &monitors,
-            desktops,
-            &spatial,
-            SpatialScope::AnyMonitorOnCurrentDesktop,
-        )
-    });
+    let (candidates, eligible) = collect_eligible_candidates(
+        source,
+        policy,
+        active,
+        monitors,
+        desktops,
+        spatial,
+        SpatialScope::AnyMonitorOnCurrentDesktop,
+    );
 
     if eligible.is_empty() {
-        return;
+        return None;
     }
 
-    let ordered = crate::switcher::card_order_for_candidates(&candidates, &active);
+    let ordered = crate::switcher::card_order_for_candidates(&candidates, active);
     let eligible_ordered: Vec<WindowId> = ordered
         .into_iter()
         .filter(|w| eligible.contains(w))
         .collect();
 
     if eligible_ordered.is_empty() {
-        return;
+        return None;
     }
+
+    Some(eligible_ordered)
+}
+
+fn open_visual_switcher(hwnd: windows_sys::Win32::Foundation::HWND) {
+    let active = capture_active_context();
+    let monitors = Win32Monitors;
+    let spatial = capture_spatial_context(&monitors, active.foreground);
+
+    let eligible_ordered = with_virtual_desktops(|desktops| {
+        open_visual_switcher_core(
+            &Win32CandidateSource,
+            &WindowEligibility,
+            &monitors,
+            desktops,
+            &active,
+            &spatial,
+            suppress_start_menu,
+        )
+    });
+
+    let Some(eligible_ordered) = eligible_ordered else {
+        return;
+    };
 
     let origin = SWITCHER_HOLD_ORIGIN.get().unwrap_or(active.foreground);
     let work_area = if let Some(ctx) = crate::arrangement::win32::resolve_context_for(
@@ -356,6 +419,10 @@ fn open_visual_switcher(hwnd: windows_sys::Win32::Foundation::HWND) {
 fn execute_switcher(command: Command) {
     match command {
         Command::SwitcherArm | Command::SwitcherArmPrev => {
+            // Suppress Start Menu on arming while Win is physically held down,
+            // before consulting the hold-delay gate or setting timers.
+            suppress_start_menu();
+
             let snap = worker_snapshot();
             let mods = crate::hook::get_last_cycle_mods();
             let delay = decide_switcher_hold_delay(
@@ -440,7 +507,9 @@ fn execute_switcher(command: Command) {
                         break;
                     }
                 }
-                suppress_start_menu();
+                // NOTE: suppress_start_menu() previously called here was dead code because
+                // SwitcherCommit is triggered by modifier keyup, when Win is already released.
+                // Suppression is now performed earlier at arm time and open_visual_switcher.
             }
             SWITCHER_HOLD_ORIGIN.set(None);
             SWITCHER_BACKWARD_ENTRY.set(false);
@@ -1749,6 +1818,95 @@ mod tests {
         assert!(
             !switcher_cards.contains(&WindowId(2)),
             "Window on another virtual desktop must be absent from switcher cards"
+        );
+    }
+
+    #[test]
+    fn switcher_arm_injects_start_menu_suppression() {
+        test_reset_suppress_count();
+
+        // 1. Disable visual switcher so the hold delay gate evaluates to None
+        let snap = crate::config::WorkerSnapshot {
+            layout: shared::config::LayoutConfig::default(),
+            snapping: shared::config::SnappingConfig::default(),
+            visual_enabled: false,
+            visual_hold_delay_ms: 150,
+        };
+        install_config_snapshot(snap);
+
+        // 2. Execute SwitcherArm. Suppression must run BEFORE the hold delay gate.
+        execute_switcher(Command::SwitcherArm);
+        assert_eq!(
+            test_suppress_count(),
+            1,
+            "SwitcherArm must execute suppress_start_menu before the hold-delay gate"
+        );
+
+        // 3. Execute SwitcherArmPrev. Suppression must run as well.
+        execute_switcher(Command::SwitcherArmPrev);
+        assert_eq!(
+            test_suppress_count(),
+            2,
+            "SwitcherArmPrev must execute suppress_start_menu before the hold-delay gate"
+        );
+
+        // Clean up
+        WORKER_CONFIG.with(|slot| *slot.borrow_mut() = None);
+        test_reset_suppress_count();
+    }
+
+    #[test]
+    fn open_visual_switcher_suppresses_before_the_no_candidate_return() {
+        let mut suppressed = false;
+        let candidates = ordered(vec![]);
+        let monitors = FakeMonitors(vec![]);
+        let desktops = FakeDesktops(vec![]);
+        let spatial = SpatialContext {
+            origin_monitor: None,
+        };
+        let active = active_ctx(0);
+
+        let result = open_visual_switcher_core(
+            &StaticSource(candidates),
+            &WindowEligibility,
+            &monitors,
+            Some(&desktops),
+            &active,
+            &spatial,
+            || suppressed = true,
+        );
+
+        assert_eq!(result, None);
+        assert!(
+            suppressed,
+            "Suppression must execute even when candidates are empty before early return"
+        );
+    }
+
+    #[test]
+    fn switcher_commit_no_longer_suppresses() {
+        test_reset_suppress_count();
+
+        // Seed SWITCHER with candidates so !targets.is_empty() block actually runs
+        SWITCHER.with(|s| {
+            let mut sw = s.borrow_mut();
+            sw.open(
+                WindowId(100),
+                crate::switcher::layout::Rect::new(0, 0, 1920, 1080),
+                vec![WindowId(101)],
+                &[16.0 / 9.0],
+                96,
+                0,
+            );
+        });
+
+        // Execute SwitcherCommit while targets is non-empty
+        execute_switcher(Command::SwitcherCommit);
+
+        assert_eq!(
+            test_suppress_count(),
+            0,
+            "SwitcherCommit must not call suppress_start_menu on modifier release edge even with targets present"
         );
     }
 }
