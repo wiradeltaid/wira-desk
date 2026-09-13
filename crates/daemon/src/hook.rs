@@ -1344,22 +1344,6 @@ impl HookRuntime {
     pub fn is_switcher_active(&self) -> bool {
         self.switcher_active || (self.worker_hwnd != 0 && is_switcher_active())
     }
-
-    #[allow(dead_code)]
-    pub fn check_switcher_deadline(&mut self, now: u64) -> bool {
-        if self.switcher_armed && !self.switcher_active && now >= self.switcher_deadline_ms {
-            if self.mods.has_any_of(&self.switcher_mods) {
-                self.switcher_active = true;
-                if self.worker_hwnd != 0 {
-                    set_switcher_active(true);
-                }
-                return true;
-            } else {
-                self.switcher_armed = false;
-            }
-        }
-        false
-    }
 }
 
 /// Address of the Hook thread's [`HookRuntime`], which lives on that thread's
@@ -2672,10 +2656,10 @@ mod tests {
         assert!(rt.switcher_armed);
         assert!(!rt.switcher_active);
 
-        // At t = 170 (past deadline), Win is still held down
-        let opened = rt.check_switcher_deadline(170);
-        assert!(opened);
-        assert!(rt.switcher_active);
+        // Arming on worker with modifiers down arms the hold timer with configured delay
+        let outcome = crate::cycling::CycleOutcome::Activated(crate::cycling::WindowId(1));
+        let delay = crate::worker::decide_switcher_hold_delay(&outcome, Some(rt.mods), true, 150);
+        assert_eq!(delay, Some(150));
     }
 
     #[test]

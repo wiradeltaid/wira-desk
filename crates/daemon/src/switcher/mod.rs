@@ -182,7 +182,7 @@ pub mod tests {
     use crate::worker::collect_eligible_candidates;
 
     #[test]
-    fn switcher_candidate_set_equals_blind_cycle_eligible_set() {
+    fn switcher_candidate_set_diverges_from_blind_cycle_on_monitor_boundary() {
         let candidates = ordered(vec![normal(1), normal(2), normal(3), normal(4)]);
         let monitors = FakeMonitors(vec![
             (WindowId(1), Some(MONITOR_A)),
@@ -201,26 +201,45 @@ pub mod tests {
         };
         let active = active(1);
 
-        let (blind_candidates, blind_eligible) = collect_eligible_candidates(
+        let (_blind_candidates, blind_eligible) = collect_eligible_candidates(
             &StaticSource(candidates.clone()),
             &WindowEligibility,
             &active,
             &monitors,
             Some(&desktops),
             &spatial,
+            crate::context::SpatialScope::SameMonitor,
         );
 
-        let (switcher_candidates, switcher_eligible) = collect_eligible_candidates(
+        let (_switcher_candidates, switcher_eligible) = collect_eligible_candidates(
             &StaticSource(candidates),
             &WindowEligibility,
             &active,
             &monitors,
             Some(&desktops),
             &spatial,
+            crate::context::SpatialScope::AnyMonitorOnCurrentDesktop,
         );
 
-        assert_eq!(blind_candidates, switcher_candidates);
-        assert_eq!(blind_eligible, switcher_eligible);
+        // Under DEC-026, WindowId(3) on MONITOR_B is absent from blind cycle but present in switcher
+        assert!(
+            !blind_eligible.contains(&WindowId(3)),
+            "Window on secondary monitor must be absent from blind cycle"
+        );
+        assert!(
+            switcher_eligible.contains(&WindowId(3)),
+            "Window on secondary monitor must be present in visual switcher (DEC-026)"
+        );
+
+        // WindowId(2) (on another virtual desktop) is absent from BOTH
+        assert!(
+            !blind_eligible.contains(&WindowId(2)),
+            "Window on another virtual desktop must be absent from blind cycle"
+        );
+        assert!(
+            !switcher_eligible.contains(&WindowId(2)),
+            "Window on another virtual desktop must be absent from visual switcher"
+        );
     }
 
     #[test]

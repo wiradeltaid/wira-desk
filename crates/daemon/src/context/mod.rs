@@ -60,6 +60,16 @@ pub enum SpatialRejection {
     VirtualDesktopUnavailable,
 }
 
+/// Scope of spatial evaluation: blind cycling vs. visual switcher (DEC-026 §B-7).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SpatialScope {
+    /// Lock evaluation to the active monitor. Used by blind cycling (FR-1, FR-2).
+    SameMonitor,
+    /// Enumerate candidates across all physical monitors on the current virtual desktop.
+    /// Used by visual switcher overlay (DEC-026).
+    AnyMonitorOnCurrentDesktop,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SpatialDecision {
     Eligible,
@@ -73,15 +83,27 @@ impl SpatialDecision {
 }
 
 /// Decide spatial eligibility. **Fails closed on any uncertainty.**
-pub fn evaluate_spatial(ctx: &SpatialContext, facts: &SpatialFacts) -> SpatialDecision {
-    let Some(origin) = ctx.origin_monitor else {
-        return SpatialDecision::Ineligible(SpatialRejection::MonitorUnavailable);
-    };
-    let Some(candidate) = facts.candidate_monitor else {
-        return SpatialDecision::Ineligible(SpatialRejection::MonitorUnavailable);
-    };
-    if origin != candidate {
-        return SpatialDecision::Ineligible(SpatialRejection::DifferentMonitor);
+pub fn evaluate_spatial(
+    scope: SpatialScope,
+    ctx: &SpatialContext,
+    facts: &SpatialFacts,
+) -> SpatialDecision {
+    match scope {
+        SpatialScope::SameMonitor => {
+            let Some(origin) = ctx.origin_monitor else {
+                return SpatialDecision::Ineligible(SpatialRejection::MonitorUnavailable);
+            };
+            let Some(candidate) = facts.candidate_monitor else {
+                return SpatialDecision::Ineligible(SpatialRejection::MonitorUnavailable);
+            };
+            if origin != candidate {
+                return SpatialDecision::Ineligible(SpatialRejection::DifferentMonitor);
+            }
+        }
+        SpatialScope::AnyMonitorOnCurrentDesktop => {
+            // DEC-026 §B-7: origin_monitor lookup is not consulted at all and its failure
+            // is not an exclusion. All physical monitors on current virtual desktop are admitted.
+        }
     }
     match facts.on_current_virtual_desktop {
         None => SpatialDecision::Ineligible(SpatialRejection::VirtualDesktopUnavailable),
@@ -304,15 +326,95 @@ mod tests {
     #[test]
     fn same_monitor_and_current_desktop_is_eligible() {
         assert_eq!(
-            evaluate_spatial(&ctx(Some(MONITOR_A)), &facts(Some(MONITOR_A), Some(true))),
+            evaluate_spatial(
+                SpatialScope::SameMonitor,
+                &ctx(Some(MONITOR_A)),
+                &facts(Some(MONITOR_A), Some(true))
+            ),
             SpatialDecision::Eligible
+        );
+    }
+
+    #[test]
+    fn same_monitor_scope_reproduces_every_existing_spatial_decision() {
+        assert_eq!(
+            evaluate_spatial(
+                SpatialScope::SameMonitor,
+                &ctx(Some(MONITOR_A)),
+                &facts(Some(MONITOR_A), Some(true))
+            ),
+            SpatialDecision::Eligible
+        );
+        assert_eq!(
+            evaluate_spatial(
+                SpatialScope::SameMonitor,
+                &ctx(Some(MONITOR_A)),
+                &facts(Some(MONITOR_B), Some(true))
+            ),
+            SpatialDecision::Ineligible(SpatialRejection::DifferentMonitor)
+        );
+        assert_eq!(
+            evaluate_spatial(
+                SpatialScope::SameMonitor,
+                &ctx(None),
+                &facts(Some(MONITOR_A), Some(true))
+            ),
+            SpatialDecision::Ineligible(SpatialRejection::MonitorUnavailable)
+        );
+        assert_eq!(
+            evaluate_spatial(
+                SpatialScope::SameMonitor,
+                &ctx(Some(MONITOR_A)),
+                &facts(None, Some(true))
+            ),
+            SpatialDecision::Ineligible(SpatialRejection::MonitorUnavailable)
+        );
+    }
+
+    #[test]
+    fn any_monitor_scope_excludes_nothing_when_the_origin_monitor_is_unavailable() {
+        // Asserted with origin_monitor: None and eligible candidates on two monitors (DEC-026 §B-7)
+        let unresolvable_ctx = ctx(None);
+        let candidate_a = facts(Some(MONITOR_A), Some(true));
+        let candidate_b = facts(Some(MONITOR_B), Some(true));
+
+        assert_eq!(
+            evaluate_spatial(
+                SpatialScope::AnyMonitorOnCurrentDesktop,
+                &unresolvable_ctx,
+                &candidate_a
+            ),
+            SpatialDecision::Eligible
+        );
+        assert_eq!(
+            evaluate_spatial(
+                SpatialScope::AnyMonitorOnCurrentDesktop,
+                &unresolvable_ctx,
+                &candidate_b
+            ),
+            SpatialDecision::Eligible
+        );
+
+        // Still excludes candidates on other virtual desktops even under AnyMonitor
+        let other_desktop = facts(Some(MONITOR_A), Some(false));
+        assert_eq!(
+            evaluate_spatial(
+                SpatialScope::AnyMonitorOnCurrentDesktop,
+                &unresolvable_ctx,
+                &other_desktop
+            ),
+            SpatialDecision::Ineligible(SpatialRejection::NotOnCurrentVirtualDesktop)
         );
     }
 
     #[test]
     fn different_monitor_is_rejected() {
         assert_eq!(
-            evaluate_spatial(&ctx(Some(MONITOR_A)), &facts(Some(MONITOR_B), Some(true))),
+            evaluate_spatial(
+                SpatialScope::SameMonitor,
+                &ctx(Some(MONITOR_A)),
+                &facts(Some(MONITOR_B), Some(true))
+            ),
             SpatialDecision::Ineligible(SpatialRejection::DifferentMonitor)
         );
     }
@@ -320,7 +422,11 @@ mod tests {
     #[test]
     fn non_current_virtual_desktop_is_rejected() {
         assert_eq!(
-            evaluate_spatial(&ctx(Some(MONITOR_A)), &facts(Some(MONITOR_A), Some(false))),
+            evaluate_spatial(
+                SpatialScope::SameMonitor,
+                &ctx(Some(MONITOR_A)),
+                &facts(Some(MONITOR_A), Some(false))
+            ),
             SpatialDecision::Ineligible(SpatialRejection::NotOnCurrentVirtualDesktop)
         );
     }
@@ -328,7 +434,11 @@ mod tests {
     #[test]
     fn unknown_origin_monitor_fails_closed() {
         assert_eq!(
-            evaluate_spatial(&ctx(None), &facts(Some(MONITOR_A), Some(true))),
+            evaluate_spatial(
+                SpatialScope::SameMonitor,
+                &ctx(None),
+                &facts(Some(MONITOR_A), Some(true))
+            ),
             SpatialDecision::Ineligible(SpatialRejection::MonitorUnavailable)
         );
     }
@@ -336,7 +446,11 @@ mod tests {
     #[test]
     fn unknown_candidate_monitor_fails_closed() {
         assert_eq!(
-            evaluate_spatial(&ctx(Some(MONITOR_A)), &facts(None, Some(true))),
+            evaluate_spatial(
+                SpatialScope::SameMonitor,
+                &ctx(Some(MONITOR_A)),
+                &facts(None, Some(true))
+            ),
             SpatialDecision::Ineligible(SpatialRejection::MonitorUnavailable)
         );
     }
@@ -344,7 +458,11 @@ mod tests {
     #[test]
     fn unknown_virtual_desktop_fails_closed() {
         assert_eq!(
-            evaluate_spatial(&ctx(Some(MONITOR_A)), &facts(Some(MONITOR_A), None)),
+            evaluate_spatial(
+                SpatialScope::SameMonitor,
+                &ctx(Some(MONITOR_A)),
+                &facts(Some(MONITOR_A), None)
+            ),
             SpatialDecision::Ineligible(SpatialRejection::VirtualDesktopUnavailable)
         );
     }
@@ -355,7 +473,11 @@ mod tests {
         for origin in [None, Some(MONITOR_A)] {
             for candidate in [None, Some(MONITOR_A)] {
                 for desktop in [None, Some(false), Some(true)] {
-                    let decision = evaluate_spatial(&ctx(origin), &facts(candidate, desktop));
+                    let decision = evaluate_spatial(
+                        SpatialScope::SameMonitor,
+                        &ctx(origin),
+                        &facts(candidate, desktop),
+                    );
                     let fully_known = origin == Some(MONITOR_A)
                         && candidate == Some(MONITOR_A)
                         && desktop == Some(true);
@@ -534,6 +656,7 @@ mod tests {
 
         assert_eq!(
             evaluate_spatial(
+                SpatialScope::SameMonitor,
                 &origin,
                 &collect_spatial_facts(&monitors, &desktops, WindowId(1))
             ),
@@ -541,6 +664,7 @@ mod tests {
         );
         assert_eq!(
             evaluate_spatial(
+                SpatialScope::SameMonitor,
                 &origin,
                 &collect_spatial_facts(&monitors, &desktops, WindowId(2))
             ),
@@ -548,6 +672,7 @@ mod tests {
         );
         assert_eq!(
             evaluate_spatial(
+                SpatialScope::SameMonitor,
                 &origin,
                 &collect_spatial_facts(&monitors, &desktops, WindowId(3))
             ),

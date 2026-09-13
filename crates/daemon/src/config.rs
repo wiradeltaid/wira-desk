@@ -34,14 +34,16 @@ pub struct HookSnapshot {
 }
 
 /// Owned, immutable configuration for the Worker actor.
-/// Layout only, because that is genuinely all the Worker reads today. The
-/// `snapping` section holds shortcut *strings*, which belong to whichever actor
-/// does the matching, not to the actor that moves windows — carrying a copy
-/// here would be a field nothing reads and an invitation to read the wrong one.
-#[derive(Debug, Clone)]
+///
+/// Carries layout and snapping configuration for window arrangement, plus
+/// visual switcher settings (`visual_enabled` and `visual_hold_delay_ms`)
+/// governing whether and with what delay `TIMER_SWITCHER_HOLD` is armed (SPEC-14-05).
+#[derive(Debug, Clone, PartialEq)]
 pub struct WorkerSnapshot {
     pub layout: LayoutConfig,
     pub snapping: shared::config::SnappingConfig,
+    pub visual_enabled: bool,
+    pub visual_hold_delay_ms: u32,
 }
 
 /// Why a candidate configuration was refused.
@@ -226,6 +228,8 @@ pub fn validate(text: &str) -> Result<(Config, HookSnapshot, WorkerSnapshot), Re
     let worker = WorkerSnapshot {
         layout: cfg.layout.clone(),
         snapping: cfg.snapping.clone(),
+        visual_enabled: cfg.switcher.visual_enabled,
+        visual_hold_delay_ms: cfg.switcher.visual_hold_delay_ms,
     };
     Ok((cfg, hook, worker))
 }
@@ -750,5 +754,16 @@ snap_half_bottom = \"ctrl+alt+up\"
                 res.err()
             );
         }
+    }
+
+    #[test]
+    fn worker_snapshot_carries_the_visual_switcher_settings() {
+        let text = format!("{VALID}visual_enabled = false\nvisual_hold_delay_ms = 350\n");
+        let (outcome, sink, _, _) = run(FakeSource(Ok(text)));
+        assert!(matches!(outcome, ReloadOutcome::Applied { .. }));
+        let worker_snapshots = sink.worker.borrow();
+        assert_eq!(worker_snapshots.len(), 1);
+        assert!(!worker_snapshots[0].visual_enabled);
+        assert_eq!(worker_snapshots[0].visual_hold_delay_ms, 350);
     }
 }

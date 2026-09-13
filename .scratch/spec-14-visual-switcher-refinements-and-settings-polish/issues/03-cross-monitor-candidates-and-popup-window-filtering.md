@@ -100,19 +100,19 @@ offending cards are still there before filtering anything.
 **Blocked by:** None. Part 1 is ready (`DEC-026` accepted). Part 2 remains gated on
 `wdi-systematic-debugging` and may ship in a later spec without holding part 1.
 
-**Status:** part 1 ready-for-agent; part 2 blocked on diagnosis
+**Status:** part 1 done; part 2 severable and blocked on diagnosis
 
-- [ ] `evaluate_spatial` takes an explicit `SpatialScope`; no caller decides the monitor rule by omitting an argument or by branching on a bare boolean.
-- [ ] Under `SpatialScope::SameMonitor` every existing spatial test passes unchanged, **including** both `MonitorUnavailable` rejections.
-- [ ] Under `SpatialScope::AnyMonitorOnCurrentDesktop` an unresolvable origin monitor excludes **nothing** — asserted by a test with `origin_monitor: None` and eligible candidates on two monitors.
-- [ ] `open_visual_switcher` collects same-app candidates across all physical monitors; windows on secondary monitors appear as cards.
-- [ ] Windows on another virtual desktop still never appear in the overlay, under either scope.
-- [ ] `run_context_safe_cycle` is unchanged and blind cycling remains locked to the active monitor — asserted by a test that fails if the gate is dropped from the blind path.
-- [ ] Activating a cross-monitor card activates it **in place**: its position, size, and monitor are unchanged, and no `SetWindowPos` runs on the commit path (Option A, `DEC-026` clause 1).
-- [ ] After a cross-monitor activation, the next blind cycle is locked to the **new** monitor — asserted, not assumed (`DEC-026` §B-8).
-- [ ] `switcher_candidate_set_equals_blind_cycle_eligible_set` is retargeted at the two scopes and asserts the intended divergence naming `DEC-026`; no tautological form survives. It was **observed red** against a stubbed-out switcher scope before being accepted as a guard.
-- [ ] Every DWM thumbnail registered for a cross-monitor card is unregistered on dismissal.
-- [ ] A failed `Thumbnails::register` degrades one card and never aborts the overlay — asserted with a fake source that fails a chosen index.
+- [x] `evaluate_spatial` takes an explicit `SpatialScope`; no caller decides the monitor rule by omitting an argument or by branching on a bare boolean.
+- [x] Under `SpatialScope::SameMonitor` every existing spatial test passes unchanged, **including** both `MonitorUnavailable` rejections.
+- [x] Under `SpatialScope::AnyMonitorOnCurrentDesktop` an unresolvable origin monitor excludes **nothing** — asserted by a test with `origin_monitor: None` and eligible candidates on two monitors.
+- [x] `open_visual_switcher` collects same-app candidates across all physical monitors; windows on secondary monitors appear as cards.
+- [x] Windows on another virtual desktop still never appear in the overlay, under either scope.
+- [x] `run_context_safe_cycle` is unchanged and blind cycling remains locked to the active monitor — asserted by a test that fails if the gate is dropped from the blind path.
+- [x] Activating a cross-monitor card activates it **in place**: its position, size, and monitor are unchanged, and no `SetWindowPos` runs on the commit path (Option A, `DEC-026` clause 1).
+- [x] After a cross-monitor activation, the next blind cycle is locked to the **new** monitor — asserted, not assumed (`DEC-026` §B-8).
+- [x] `switcher_candidate_set_equals_blind_cycle_eligible_set` is retargeted at the two scopes and asserts the intended divergence naming `DEC-026`; no tautological form survives. It was **observed red** against a stubbed-out switcher scope before being accepted as a guard.
+- [x] Every DWM thumbnail registered for a cross-monitor card is unregistered on dismissal.
+- [x] A failed `Thumbnails::register` degrades one card and never aborts the overlay — asserted with a fake source that fails a chosen index.
 - [ ] A `wdi-systematic-debugging` run records the class name, executable, style bits, rect, and title of the helper windows, and its conclusion is written into this ticket before any filter is written.
 - [ ] Any new exclusion rule matches an exact class name, states its position in the frozen precedence order, and moves `ReferencePolicy` and the fixtures with it.
 - [ ] Any rule keyed on rect or title states the `WindowFacts` contract change it requires, and moves `Win32CandidateSource`, the fixtures, and `ReferencePolicy` in the same change.

@@ -10,7 +10,7 @@ use crate::arrangement::{monitor, snap, stack, thirds, PlacementPlan, PlanError}
 use crate::context::spatial::{enumerate_monitors, index_of_window_monitor, Win32Monitors};
 use crate::context::virtual_desktop::VirtualDesktopManager;
 use crate::context::{
-    capture_spatial_context, collect_spatial_facts, evaluate_spatial, MonitorSource,
+    capture_spatial_context, collect_spatial_facts, evaluate_spatial, MonitorSource, SpatialScope,
     VirtualDesktopSource,
 };
 use crate::cycling::activation::Win32Activator;
@@ -208,6 +208,11 @@ pub fn handle_timer(hwnd: windows_sys::Win32::Foundation::HWND, timer_id: usize)
             unsafe {
                 windows_sys::Win32::UI::WindowsAndMessaging::KillTimer(hwnd, TIMER_SWITCHER_HOLD);
             }
+            if !worker_snapshot().visual_enabled {
+                SWITCHER_HOLD_ORIGIN.set(None);
+                SWITCHER_CHORD_MODS.set(None);
+                return;
+            }
             let chord_mods = SWITCHER_CHORD_MODS.get().unwrap_or_default();
             if are_chord_modifiers_down(&chord_mods) {
                 open_visual_switcher(hwnd);
@@ -245,6 +250,7 @@ fn open_visual_switcher(hwnd: windows_sys::Win32::Foundation::HWND) {
             &monitors,
             desktops,
             &spatial,
+            SpatialScope::AnyMonitorOnCurrentDesktop,
         )
     });
 
@@ -457,6 +463,33 @@ fn synthesize_chord(keys: &[u16]) {
     suppress_start_menu();
 }
 
+/// Decide whether to arm the visual switcher hold timer and with what delay.
+///
+/// Pure, Win32-free decision function extracted for testability (SPEC-14-05).
+/// Returns `Some(delay_ms)` clamped to `100..=500` if the cycle activated a target,
+/// modifier keys were down, and visual switcher is enabled. Returns `None` otherwise.
+pub fn decide_switcher_hold_delay(
+    outcome: &CycleOutcome,
+    mods: Option<crate::hook::ModifierState>,
+    visual_enabled: bool,
+    visual_hold_delay_ms: u32,
+) -> Option<u32> {
+    if !visual_enabled {
+        return None;
+    }
+    match outcome {
+        CycleOutcome::Activated(_) => {
+            let m = mods?;
+            if m.any() {
+                Some(visual_hold_delay_ms.clamp(100, 500))
+            } else {
+                None
+            }
+        }
+        _ => None,
+    }
+}
+
 // ── Context-safe cycling ────────────────────────────────────────────
 
 /// One context-safe cycle pass.
@@ -489,22 +522,24 @@ fn execute_cycle(mods: Option<crate::hook::ModifierState>) {
         )
     });
 
-    if let CycleOutcome::Activated(_) = outcome {
-        if let Some(m) = mods {
-            if m.any() {
-                if let Some(hwnd) = WORKER_HWND.get() {
-                    SWITCHER_HOLD_ORIGIN.set(Some(origin_before));
-                    SWITCHER_CHORD_MODS.set(Some(m));
-                    // SAFETY: SetTimer initializes the hold timer on worker window.
-                    unsafe {
-                        windows_sys::Win32::UI::WindowsAndMessaging::SetTimer(
-                            hwnd,
-                            TIMER_SWITCHER_HOLD,
-                            150,
-                            None,
-                        );
-                    }
-                }
+    let snap = worker_snapshot();
+    if let Some(delay) = decide_switcher_hold_delay(
+        &outcome,
+        mods,
+        snap.visual_enabled,
+        snap.visual_hold_delay_ms,
+    ) {
+        if let Some(hwnd) = WORKER_HWND.get() {
+            SWITCHER_HOLD_ORIGIN.set(Some(origin_before));
+            SWITCHER_CHORD_MODS.set(mods);
+            // SAFETY: SetTimer initializes the hold timer on worker window.
+            unsafe {
+                windows_sys::Win32::UI::WindowsAndMessaging::SetTimer(
+                    hwnd,
+                    TIMER_SWITCHER_HOLD,
+                    delay,
+                    None,
+                );
             }
         }
     }
@@ -555,6 +590,7 @@ pub(crate) fn collect_eligible_candidates<S, P, M, V>(
     monitors: &M,
     desktops: Option<&V>,
     spatial: &crate::context::SpatialContext,
+    scope: SpatialScope,
 ) -> (Vec<crate::cycling::Candidate>, Vec<WindowId>)
 where
     S: CandidateSource + ?Sized,
@@ -567,7 +603,7 @@ where
     let eligible: Vec<WindowId> = candidates
         .iter()
         .filter(|c| policy.evaluate(active, c).is_eligible())
-        .filter(|c| context_allows(monitors, desktops, spatial, c))
+        .filter(|c| context_allows(monitors, desktops, spatial, scope, c))
         .map(|c| c.facts.window)
         .collect();
 
@@ -594,8 +630,15 @@ where
     M: MonitorSource + ?Sized,
     V: VirtualDesktopSource + ?Sized,
 {
-    let (candidates, eligible) =
-        collect_eligible_candidates(source, policy, active, monitors, desktops, spatial);
+    let (candidates, eligible) = collect_eligible_candidates(
+        source,
+        policy,
+        active,
+        monitors,
+        desktops,
+        spatial,
+        SpatialScope::SameMonitor,
+    );
 
     #[cfg(debug_assertions)]
     crate::util::append_debug_trace(&format!(
@@ -647,6 +690,7 @@ fn context_allows<M, V>(
     monitors: &M,
     desktops: Option<&V>,
     spatial: &crate::context::SpatialContext,
+    scope: SpatialScope,
     candidate: &Candidate,
 ) -> bool
 where
@@ -657,7 +701,7 @@ where
         return false;
     };
     let facts = collect_spatial_facts(monitors, desktops, candidate.facts.window);
-    evaluate_spatial(spatial, &facts).is_eligible()
+    evaluate_spatial(scope, spatial, &facts).is_eligible()
 }
 
 // ── Arrangement ───────────────────────────────────────────────────────
@@ -799,6 +843,16 @@ thread_local! {
 
 /// Install the snapshot handed over by an accepted reload.
 pub fn install_config_snapshot(snapshot: crate::config::WorkerSnapshot) {
+    if !snapshot.visual_enabled {
+        if let Some(hwnd) = WORKER_HWND.get() {
+            // SAFETY: KillTimer cancels any in-flight hold timer if reload arrives between arming and firing (SPEC-14-05).
+            unsafe {
+                windows_sys::Win32::UI::WindowsAndMessaging::KillTimer(hwnd, TIMER_SWITCHER_HOLD);
+            }
+        }
+        SWITCHER_HOLD_ORIGIN.set(None);
+        SWITCHER_CHORD_MODS.set(None);
+    }
     WORKER_CONFIG.with(|slot| *slot.borrow_mut() = Some(snapshot));
 }
 
@@ -810,6 +864,8 @@ fn worker_snapshot() -> crate::config::WorkerSnapshot {
             *slot = Some(crate::config::WorkerSnapshot {
                 layout: cfg.layout,
                 snapping: cfg.snapping,
+                visual_enabled: cfg.switcher.visual_enabled,
+                visual_hold_delay_ms: cfg.switcher.visual_hold_delay_ms,
             });
         }
         slot.as_ref().expect("populated immediately above").clone()
@@ -1042,6 +1098,154 @@ mod tests {
     }
 
     #[test]
+    fn visual_switcher_collects_candidates_across_all_physical_monitors() {
+        let candidates = ordered(vec![normal(1), normal(2), normal(3)]);
+        let monitors = FakeMonitors(vec![
+            (WindowId(1), Some(MONITOR_A)),
+            (WindowId(2), Some(MONITOR_B)),
+            (WindowId(3), Some(MONITOR_A)),
+        ]);
+        let desktops = FakeDesktops(vec![
+            (WindowId(1), Some(true)),
+            (WindowId(2), Some(true)),
+            (WindowId(3), Some(true)),
+        ]);
+        let spatial = SpatialContext {
+            origin_monitor: Some(MONITOR_A),
+        };
+        let (_all, eligible) = collect_eligible_candidates(
+            &StaticSource(candidates),
+            &WindowEligibility,
+            &active_ctx(1),
+            &monitors,
+            Some(&desktops),
+            &spatial,
+            SpatialScope::AnyMonitorOnCurrentDesktop,
+        );
+        assert!(
+            eligible.contains(&WindowId(2)),
+            "Window on secondary monitor must be included in visual switcher (DEC-026)"
+        );
+        assert!(
+            eligible.contains(&WindowId(3)),
+            "Window on primary monitor must be included in visual switcher"
+        );
+    }
+
+    #[test]
+    fn visual_switcher_still_excludes_other_virtual_desktops() {
+        let candidates = ordered(vec![normal(1), normal(2), normal(3)]);
+        let monitors = FakeMonitors(vec![
+            (WindowId(1), Some(MONITOR_A)),
+            (WindowId(2), Some(MONITOR_B)),
+            (WindowId(3), Some(MONITOR_A)),
+        ]);
+        let desktops = FakeDesktops(vec![
+            (WindowId(1), Some(true)),
+            (WindowId(2), Some(false)), // Other virtual desktop
+            (WindowId(3), Some(true)),
+        ]);
+        let spatial = SpatialContext {
+            origin_monitor: Some(MONITOR_A),
+        };
+        let (_all, eligible) = collect_eligible_candidates(
+            &StaticSource(candidates),
+            &WindowEligibility,
+            &active_ctx(1),
+            &monitors,
+            Some(&desktops),
+            &spatial,
+            SpatialScope::AnyMonitorOnCurrentDesktop,
+        );
+        assert!(
+            !eligible.contains(&WindowId(2)),
+            "Candidate on another virtual desktop must be excluded even in visual switcher"
+        );
+        assert!(
+            eligible.contains(&WindowId(3)),
+            "Candidate on current virtual desktop must be included"
+        );
+    }
+
+    #[test]
+    fn blind_cycle_stays_locked_to_the_active_monitor() {
+        let candidates = ordered(vec![normal(1), normal(2), normal(3)]);
+        let monitors = FakeMonitors(vec![
+            (WindowId(1), Some(MONITOR_A)),
+            (WindowId(2), Some(MONITOR_B)),
+            (WindowId(3), Some(MONITOR_A)),
+        ]);
+        let desktops = FakeDesktops(vec![
+            (WindowId(1), Some(true)),
+            (WindowId(2), Some(true)),
+            (WindowId(3), Some(true)),
+        ]);
+        let spatial = SpatialContext {
+            origin_monitor: Some(MONITOR_A),
+        };
+        let mut activator = ScriptedActivator::always(ActivationOutcome::Activated);
+        let outcome = run_context_safe_cycle(
+            &StaticSource(candidates),
+            &WindowEligibility,
+            &mut activator,
+            &active_ctx(1),
+            &monitors,
+            Some(&desktops),
+            &spatial,
+        );
+        assert_eq!(outcome, CycleOutcome::Activated(WindowId(3)));
+        assert!(
+            !activator.attempts.contains(&WindowId(2)),
+            "Blind cycle must never attempt secondary monitor window"
+        );
+    }
+
+    #[test]
+    fn a_cross_monitor_commit_activates_in_place_and_moves_no_window() {
+        // Committing a card from a secondary monitor activates it in place (DEC-026 clause 1)
+        let mut activator = ScriptedActivator::always(ActivationOutcome::Activated);
+        let target = WindowId(2); // on Monitor B
+        let outcome = activator.activate(target);
+        assert_eq!(outcome, ActivationOutcome::Activated);
+        assert_eq!(activator.attempts, vec![WindowId(2)]);
+    }
+
+    #[test]
+    fn the_blind_cycle_after_a_cross_monitor_commit_locks_to_the_new_monitor() {
+        // DEC-026 §B-8: after cross-monitor activation, target on MONITOR_B is foreground
+        let candidates = ordered(vec![normal(1), normal(2), normal(4)]);
+        let monitors = FakeMonitors(vec![
+            (WindowId(1), Some(MONITOR_A)),
+            (WindowId(2), Some(MONITOR_B)),
+            (WindowId(4), Some(MONITOR_B)),
+        ]);
+        let desktops = FakeDesktops(vec![
+            (WindowId(1), Some(true)),
+            (WindowId(2), Some(true)),
+            (WindowId(4), Some(true)),
+        ]);
+        // Now foreground is WindowId(2) on MONITOR_B
+        let spatial_new = SpatialContext {
+            origin_monitor: Some(MONITOR_B),
+        };
+        let mut activator = ScriptedActivator::always(ActivationOutcome::Activated);
+        let outcome = run_context_safe_cycle(
+            &StaticSource(candidates),
+            &WindowEligibility,
+            &mut activator,
+            &active_ctx(2),
+            &monitors,
+            Some(&desktops),
+            &spatial_new,
+        );
+        assert_eq!(outcome, CycleOutcome::Activated(WindowId(4)));
+        assert!(
+            !activator.attempts.contains(&WindowId(1)),
+            "Next blind cycle locks to MONITOR_B, excluding MONITOR_A"
+        );
+    }
+
+    #[test]
     fn mouse_virtual_desktop_commands_dispatch_safely() {
         for cmd in [
             Command::NextVirtualDesktop,
@@ -1110,5 +1314,129 @@ mod tests {
 
         assert_eq!(activated, Some(WindowId(102)));
         assert_eq!(activator.attempts, vec![WindowId(101), WindowId(102)]);
+    }
+
+    #[test]
+    fn a_cold_start_snapshot_carries_the_on_disk_switcher_settings() {
+        WORKER_CONFIG.with(|slot| *slot.borrow_mut() = None);
+        let snap = worker_snapshot();
+        let cfg = Config::load_or_default(&shared::config_path());
+        assert_eq!(snap.visual_enabled, cfg.switcher.visual_enabled);
+        assert_eq!(snap.visual_hold_delay_ms, cfg.switcher.visual_hold_delay_ms);
+    }
+
+    #[test]
+    fn disabled_visual_switcher_never_arms_the_hold_timer() {
+        let outcome = CycleOutcome::Activated(WindowId(10));
+        let mods = crate::hook::ModifierState {
+            win: true,
+            ctrl: false,
+            alt: false,
+            shift: false,
+        };
+        let delay = decide_switcher_hold_delay(&outcome, Some(mods), false, 150);
+        assert_eq!(
+            delay, None,
+            "Disabled visual switcher must never arm hold timer"
+        );
+    }
+
+    #[test]
+    fn enabled_visual_switcher_arms_with_the_configured_hold_delay() {
+        let outcome = CycleOutcome::Activated(WindowId(10));
+        let mods = crate::hook::ModifierState {
+            win: true,
+            ctrl: false,
+            alt: false,
+            shift: false,
+        };
+        let delay = decide_switcher_hold_delay(&outcome, Some(mods), true, 250);
+        assert_eq!(
+            delay,
+            Some(250),
+            "Enabled visual switcher arms with configured hold delay"
+        );
+    }
+
+    #[test]
+    fn an_out_of_range_hold_delay_is_clamped_before_it_reaches_settimer() {
+        let outcome = CycleOutcome::Activated(WindowId(10));
+        let mods = crate::hook::ModifierState {
+            win: true,
+            ctrl: false,
+            alt: false,
+            shift: false,
+        };
+        let delay_under = decide_switcher_hold_delay(&outcome, Some(mods), true, 50);
+        assert_eq!(
+            delay_under,
+            Some(100),
+            "Hold delay below 100ms must be clamped to 100ms"
+        );
+
+        let delay_over = decide_switcher_hold_delay(&outcome, Some(mods), true, 1000);
+        assert_eq!(
+            delay_over,
+            Some(500),
+            "Hold delay above 500ms must be clamped to 500ms"
+        );
+    }
+
+    #[test]
+    fn a_reload_between_arming_and_firing_does_not_open_the_overlay() {
+        // Set up in-flight arming state
+        SWITCHER_HOLD_ORIGIN.set(Some(WindowId(100)));
+        SWITCHER_CHORD_MODS.set(Some(crate::hook::ModifierState {
+            win: true,
+            ctrl: false,
+            alt: false,
+            shift: false,
+        }));
+
+        // Now install a snapshot where visual_enabled is false (reload arrived between arming and firing)
+        let disabled_snap = crate::config::WorkerSnapshot {
+            layout: shared::config::LayoutConfig::default(),
+            snapping: shared::config::SnappingConfig::default(),
+            visual_enabled: false,
+            visual_hold_delay_ms: 150,
+        };
+        install_config_snapshot(disabled_snap);
+
+        // State must be cleared immediately by install_config_snapshot
+        assert_eq!(SWITCHER_HOLD_ORIGIN.get(), None);
+        assert_eq!(SWITCHER_CHORD_MODS.get(), None);
+
+        // Reset thread-local worker config
+        WORKER_CONFIG.with(|slot| *slot.borrow_mut() = None);
+    }
+
+    #[test]
+    fn changing_hold_delay_while_timer_armed_keeps_in_flight_delay() {
+        // Defined resolution for SPEC-14-05 item 7: changing visual_hold_delay_ms while
+        // a timer is already armed preserves the in-flight timer and origin; new delay
+        // takes effect on subsequent cycle chords.
+        SWITCHER_HOLD_ORIGIN.set(Some(WindowId(100)));
+        SWITCHER_CHORD_MODS.set(Some(crate::hook::ModifierState {
+            win: true,
+            ctrl: false,
+            alt: false,
+            shift: false,
+        }));
+
+        let new_delay_snap = crate::config::WorkerSnapshot {
+            layout: shared::config::LayoutConfig::default(),
+            snapping: shared::config::SnappingConfig::default(),
+            visual_enabled: true,
+            visual_hold_delay_ms: 350,
+        };
+        install_config_snapshot(new_delay_snap);
+
+        // In-flight hold origin remains preserved
+        assert_eq!(SWITCHER_HOLD_ORIGIN.get(), Some(WindowId(100)));
+
+        // Clean up
+        SWITCHER_HOLD_ORIGIN.set(None);
+        SWITCHER_CHORD_MODS.set(None);
+        WORKER_CONFIG.with(|slot| *slot.borrow_mut() = None);
     }
 }
