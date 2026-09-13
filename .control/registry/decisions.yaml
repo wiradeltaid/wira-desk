@@ -624,6 +624,44 @@ decisions:
       - .how/_platform/ARCHITECTURE-SPINE.md
       - .how/_platform/design-system.md
 
+  - id: DEC-028
+    title: Autopilot mandate for SPEC-14 delivery
+    status: accepted
+    file: decisions/DEC-028-autopilot-mandate-for-spec-14-delivery.md
+    created: '2026-09-13'
+    touches:
+      - .control/decisions/DEC-028-autopilot-mandate-for-spec-14-delivery.md
+      - .control/memlog/autopilot-DEC-028.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+      - .scratch/spec-14-visual-switcher-refinements-and-settings-polish/SPEC.md
+      - crates/daemon/src/context/mod.rs
+      - crates/daemon/src/cycling/eligibility.rs
+      - crates/daemon/src/hook.rs
+      - crates/daemon/src/switcher/layout.rs
+      - crates/daemon/src/switcher/mod.rs
+      - crates/daemon/src/switcher/overlay.rs
+      - crates/daemon/src/switcher/selection.rs
+      - crates/daemon/src/worker.rs
+      - crates/settings/src/app.rs
+      - crates/settings/ui/panes/about_pane.slint
+      - crates/settings/ui/panes/general_pane.slint
+      - crates/shared/src/commands.rs
+      - crates/shared/src/config.rs
+      - crates/shared/src/shortcut.rs
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-20'
+      run_branch: autopilot/DEC-028
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-028.md
+
+
 
 
 
