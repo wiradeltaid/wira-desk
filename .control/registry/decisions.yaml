@@ -626,7 +626,7 @@ decisions:
 
   - id: DEC-028
     title: Autopilot mandate for SPEC-14 delivery
-    status: accepted
+    status: applied
     file: decisions/DEC-028-autopilot-mandate-for-spec-14-delivery.md
     created: '2026-09-13'
     touches:
@@ -634,16 +634,26 @@ decisions:
       - .control/memlog/autopilot-DEC-028.md
       - .control/registry/decisions.yaml
       - .control/registry/specs.yaml
+      - .scratch/smoke-dec-028.md
       - .scratch/spec-14-visual-switcher-refinements-and-settings-polish/SPEC.md
+      - 3p.md
+      - crates/daemon/src/arrangement/mod.rs
+      - crates/daemon/src/arrangement/win32.rs
+      - crates/daemon/src/config.rs
       - crates/daemon/src/context/mod.rs
+      - crates/daemon/src/context/virtual_desktop.rs
       - crates/daemon/src/cycling/eligibility.rs
+      - crates/daemon/src/cycling/mod.rs
       - crates/daemon/src/hook.rs
+      - crates/daemon/src/ring.rs
       - crates/daemon/src/switcher/layout.rs
       - crates/daemon/src/switcher/mod.rs
       - crates/daemon/src/switcher/overlay.rs
       - crates/daemon/src/switcher/selection.rs
+      - crates/daemon/src/switcher/thumbnail.rs
       - crates/daemon/src/worker.rs
       - crates/settings/src/app.rs
+      - crates/settings/src/persistence.rs
       - crates/settings/ui/panes/about_pane.slint
       - crates/settings/ui/panes/general_pane.slint
       - crates/shared/src/commands.rs

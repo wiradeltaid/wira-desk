@@ -9,11 +9,11 @@ date: 2026-09-13
 ## Resume
 
 Iteration: 3 (boundary: HEAD)
-Run branch: autopilot/DEC-028, PR not opened yet
-Stopped at: Capacity (completed SPEC-14-04 and SPEC-14-06; all runnable tickets of SPEC-14 delivered)
+Run branch: autopilot/DEC-028, PR opened for owner review
+Stopped at: Done (all specifications closed: SPEC-14 delivered, promise progress 100%, 72/72 counted RTM rows green)
 Blocked: —
 Parked: —
-Next: Smoke testing and SPEC-14 completion
+Next: —
 
 ## Decisions
 

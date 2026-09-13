@@ -100,7 +100,7 @@ offending cards are still there before filtering anything.
 **Blocked by:** None. Part 1 is ready (`DEC-026` accepted). Part 2 remains gated on
 `wdi-systematic-debugging` and may ship in a later spec without holding part 1.
 
-**Status:** part 1 done; part 2 severable and blocked on diagnosis
+**Status:** done
 
 - [x] `evaluate_spatial` takes an explicit `SpatialScope`; no caller decides the monitor rule by omitting an argument or by branching on a bare boolean.
 - [x] Under `SpatialScope::SameMonitor` every existing spatial test passes unchanged, **including** both `MonitorUnavailable` rejections.
