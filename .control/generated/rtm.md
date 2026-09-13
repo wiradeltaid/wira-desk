@@ -24,6 +24,21 @@ rtm:
   FR: FR-1
   DEC: []
   UC: UC-1
+  ticket: SPEC-18-01
+  spec: SPEC-18
+  release: 0.4.0
+  test:
+  - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
+  - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-1
+  CAP: CAP-1
+  FR: FR-1
+  DEC: []
+  UC: UC-1
   ticket: W1-S1
   spec: W1
   release: 0.1.0
@@ -512,6 +527,21 @@ rtm:
   FR: FR-2
   DEC: []
   UC: UC-1
+  ticket: SPEC-18-01
+  spec: SPEC-18
+  release: 0.4.0
+  test:
+  - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
+  - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-1
+  CAP: CAP-7
+  FR: FR-2
+  DEC: []
+  UC: UC-1
   ticket: W1-S1
   spec: W1
   release: 0.1.0
@@ -821,6 +851,21 @@ rtm:
   exempt: false
   green: true
   broken_at: ''
+- BG: BG-1
+  CAP: CAP-8
+  FR: FR-3
+  DEC: []
+  UC: UC-1
+  ticket: SPEC-18-01
+  spec: SPEC-18
+  release: 0.4.0
+  test:
+  - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
+  - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
 - BG: BG-1
   CAP: CAP-8
   FR: FR-3
@@ -1140,6 +1185,21 @@ rtm:
   FR: FR-4
   DEC: []
   UC: UC-1
+  ticket: SPEC-18-01
+  spec: SPEC-18
+  release: 0.4.0
+  test:
+  - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
+  - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-1
+  CAP: CAP-1
+  FR: FR-4
+  DEC: []
+  UC: UC-1
   ticket: W1-S1
   spec: W1
   release: 0.1.0
@@ -1168,6 +1228,21 @@ rtm:
   exempt: false
   green: true
   broken_at: ''
+- BG: BG-1
+  CAP: CAP-1
+  FR: FR-5
+  DEC: []
+  UC: UC-1
+  ticket: SPEC-18-01
+  spec: SPEC-18
+  release: 0.4.0
+  test:
+  - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
+  - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
 - BG: BG-1
   CAP: CAP-1
   FR: FR-5
@@ -1201,6 +1276,21 @@ rtm:
   exempt: false
   green: true
   broken_at: ''
+- BG: BG-1
+  CAP: CAP-1
+  FR: FR-6
+  DEC: []
+  UC: UC-1
+  ticket: SPEC-18-01
+  spec: SPEC-18
+  release: 0.4.0
+  test:
+  - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
+  - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
 - BG: BG-1
   CAP: CAP-1
   FR: FR-6

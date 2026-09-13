@@ -984,3 +984,35 @@ defects:
       window in reverse succession (e.g. through a cycling session tracking mechanism while modifiers remain held,
       or a direction-aware traversal order that rotates through all windows).
     owner: repo owner
+
+  - id: DEF-20
+    title: Blind backward cycling session is reset on every tap by SwitcherArm and SwitcherDisarm
+    status: open
+    severity: high
+    component: window-management
+    violates: [DEC-026, UC-1, SPEC-17-01]
+    found_in: "0.4.0"
+    found_by: Owner live manual desktop retest of SPEC-17-01, 2026-09-13
+    tests:
+      - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
+      - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
+    fixed_in: SPEC-18-01
+    summary: >-
+      When visual switcher is enabled (default), rapid blind backward cycling (Shift + Alt + ` or Shift + Win + `)
+      enqueues SwitcherArm/SwitcherArmPrev on keydown and SwitcherDisarm on keyup before CyclePrev. Both SwitcherArm
+      and SwitcherDisarm unconditionally call reset_backward_cycle_session(), wiping the BackwardCycleSession on every tap.
+      As a result, each backward tap starts a brand-new session and picks Z=1, locking live desktop blind backward cycling
+      into a two-window ping-pong oscillation (A <-> B) despite BackwardCycleSession passing isolated unit tests.
+    why_it_hid: >-
+      Unit tests in crates/daemon/src/worker.rs:1937 and crates/daemon/src/cycling/mod.rs:991 invoked run_context_safe_cycle
+      directly on candidate slices in a loop, bypassing drain_commands() and the execute_switcher(Command::SwitcherArm/Disarm)
+      handlers that run on live keydown/keyup events when visual_enabled is true.
+    impact: >-
+      Blind backward cycling (Shift + cycle chord) fails on live desktop, oscillating between the top two windows forever.
+    fix_direction: >-
+      Decouple blind backward cycle session reset from SwitcherArm and SwitcherDisarm. The session should only reset on
+      forward cycling (Command::Cycle), session timeout (2000 ms), unexpected focus departure to another app, or when
+      the visual switcher overlay is actually opened (open_visual_switcher / TIMER_SWITCHER_HOLD) or committed. Add end-to-end
+      worker tests driving the full command sequence (SwitcherArmPrev -> SwitcherDisarm -> CyclePrev) across consecutive taps
+      against a dynamic self-mutating Z-order.
+    owner: repo owner

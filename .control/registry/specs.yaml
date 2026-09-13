@@ -1653,4 +1653,28 @@ specs:
           - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
           - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
 
+  - id: SPEC-18
+    release: "0.4.0"
+    prd: [wira-desk]
+    size: S
+    status: open
+    depends_on: [SPEC-17]
+    spec_folder: .scratch/spec-18-blind-backward-cycling-session-lifecycle/
+    fr: [FR-1, FR-2]
+    spec_reviewed:
+      date: '2026-09-13'
+      sha: 'fed560d'
+      lenses: [edge-case-hunter]
+    tickets:
+      - id: SPEC-18-01
+        title: "Defect DEF-20 — Blind backward cycling session lifecycle and arm/disarm decoupling"
+        spec_folder: .scratch/spec-18-blind-backward-cycling-session-lifecycle/
+        component: window-management
+        satisfies: [UC-1]
+        depends_on: []
+        tests:
+          - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
+          - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
+
+
 
