@@ -425,7 +425,6 @@ fn open_visual_switcher(hwnd: windows_sys::Win32::Foundation::HWND) {
 fn execute_switcher(command: Command) {
     match command {
         Command::SwitcherArm | Command::SwitcherArmPrev => {
-            reset_backward_cycle_session();
             // Suppress Start Menu on arming while Win is physically held down,
             // before consulting the hold-delay gate or setting timers.
             suppress_start_menu();
@@ -459,7 +458,6 @@ fn execute_switcher(command: Command) {
             }
         }
         Command::SwitcherDisarm => {
-            reset_backward_cycle_session();
             crate::hook::set_switcher_active(false);
             if let Some(hwnd) = WORKER_HWND.get() {
                 // SAFETY: KillTimer disarms the hold timer.
@@ -656,11 +654,35 @@ pub fn decide_switcher_hold_delay(
 
 // ── Context-safe cycling ────────────────────────────────────────────
 
+#[cfg(test)]
+type TestCycleFn = Box<dyn FnMut(Option<crate::hook::ModifierState>, crate::cycling::Direction)>;
+
+#[cfg(test)]
+thread_local! {
+    pub(crate) static TEST_CYCLE_OVERRIDE: std::cell::RefCell<Option<TestCycleFn>> =
+        const { std::cell::RefCell::new(None) };
+}
+
 /// One context-safe cycle pass.
 /// The active context and the origin monitor are each sampled **once** and
 /// carried through the whole pass, so the result stays deterministic while
 /// windows open, close, and move.
 fn execute_cycle(_mods: Option<crate::hook::ModifierState>, direction: crate::cycling::Direction) {
+    #[cfg(test)]
+    {
+        let overridden = TEST_CYCLE_OVERRIDE.with(|cell| {
+            if let Some(ref mut f) = *cell.borrow_mut() {
+                f(_mods, direction);
+                true
+            } else {
+                false
+            }
+        });
+        if overridden {
+            return;
+        }
+    }
+
     #[cfg(debug_assertions)]
     let started = crate::metrics::qpc_now();
 
@@ -1987,6 +2009,214 @@ mod tests {
             visited,
             vec![2, 3, 4, 1, 2, 3],
             "backward cycling must traverse all windows in reverse rather than oscillating"
+        );
+    }
+
+    #[test]
+    fn backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps() {
+        reset_backward_cycle_session();
+        let mut z = vec![1isize, 2, 3, 4];
+        let mut visited = Vec::new();
+        let mut current = 1isize;
+        let monitors = FakeMonitors(vec![
+            (WindowId(1), Some(MONITOR_A)),
+            (WindowId(2), Some(MONITOR_A)),
+            (WindowId(3), Some(MONITOR_A)),
+            (WindowId(4), Some(MONITOR_A)),
+        ]);
+        let desktops = FakeDesktops(vec![
+            (WindowId(1), Some(true)),
+            (WindowId(2), Some(true)),
+            (WindowId(3), Some(true)),
+            (WindowId(4), Some(true)),
+        ]);
+        let spatial = SpatialContext {
+            origin_monitor: Some(MONITOR_A),
+        };
+
+        for _ in 0..6 {
+            // Rapid tap lifecycle: keydown arms visual switcher, keyup disarms it before hold timeout
+            execute_switcher(Command::SwitcherArmPrev);
+            execute_switcher(Command::SwitcherDisarm);
+
+            let candidates = ordered(z.iter().map(|w| normal(*w)).collect());
+            let mut activator = ScriptedActivator::always(ActivationOutcome::Activated);
+            let outcome = run_context_safe_cycle(
+                &StaticSource(candidates),
+                &WindowEligibility,
+                &mut activator,
+                &active_ctx(current),
+                &monitors,
+                Some(&desktops),
+                &spatial,
+                crate::cycling::Direction::Backward,
+            );
+            match outcome {
+                CycleOutcome::Activated(next) => {
+                    visited.push(next.0);
+                    current = next.0;
+                    z.retain(|w| *w != current);
+                    z.insert(0, current);
+                }
+                other => panic!("expected activated, got {other:?}"),
+            }
+        }
+
+        assert_eq!(
+            visited,
+            vec![2, 3, 4, 1, 2, 3],
+            "backward cycling must traverse all windows in reverse even when SwitcherArmPrev/Disarm occur between taps"
+        );
+
+        // Verify legitimate reset boundaries:
+        // 1. Forward cycle resets session
+        let candidates = ordered(z.iter().map(|w| normal(*w)).collect());
+        let mut activator = ScriptedActivator::always(ActivationOutcome::Activated);
+        let outcome = run_context_safe_cycle(
+            &StaticSource(candidates),
+            &WindowEligibility,
+            &mut activator,
+            &active_ctx(current),
+            &monitors,
+            Some(&desktops),
+            &spatial,
+            crate::cycling::Direction::Forward,
+        );
+        match outcome {
+            CycleOutcome::Activated(next) => {
+                current = next.0;
+                z.retain(|w| *w != current);
+                z.insert(0, current);
+            }
+            other => panic!("expected activated on forward cycle, got {other:?}"),
+        }
+
+        // 2. Next backward cycle starts a fresh session
+        let candidates = ordered(z.iter().map(|w| normal(*w)).collect());
+        let mut activator = ScriptedActivator::always(ActivationOutcome::Activated);
+        let outcome = run_context_safe_cycle(
+            &StaticSource(candidates),
+            &WindowEligibility,
+            &mut activator,
+            &active_ctx(current),
+            &monitors,
+            Some(&desktops),
+            &spatial,
+            crate::cycling::Direction::Backward,
+        );
+        // From current foreground, a fresh backward cycle visits Z=1
+        assert_eq!(outcome, CycleOutcome::Activated(WindowId(z[1])));
+
+        // 3. SwitcherCommit resets session
+        execute_switcher(Command::SwitcherCommit);
+        let candidates = ordered(z.iter().map(|w| normal(*w)).collect());
+        let mut activator = ScriptedActivator::always(ActivationOutcome::Activated);
+        let outcome = run_context_safe_cycle(
+            &StaticSource(candidates),
+            &WindowEligibility,
+            &mut activator,
+            &active_ctx(current),
+            &monitors,
+            Some(&desktops),
+            &spatial,
+            crate::cycling::Direction::Backward,
+        );
+        assert_eq!(outcome, CycleOutcome::Activated(WindowId(z[1])));
+
+        // 4. SwitcherCancel resets session
+        execute_switcher(Command::SwitcherCancel);
+        let candidates = ordered(z.iter().map(|w| normal(*w)).collect());
+        let mut activator = ScriptedActivator::always(ActivationOutcome::Activated);
+        let outcome = run_context_safe_cycle(
+            &StaticSource(candidates),
+            &WindowEligibility,
+            &mut activator,
+            &active_ctx(current),
+            &monitors,
+            Some(&desktops),
+            &spatial,
+            crate::cycling::Direction::Backward,
+        );
+        assert_eq!(outcome, CycleOutcome::Activated(WindowId(z[1])));
+    }
+
+    #[test]
+    fn drain_commands_consecutive_backward_taps_traverse_all_windows() {
+        let _guard = crate::ring::tests::TEST_LOCK.lock().unwrap();
+        reset_backward_cycle_session();
+        let z = std::rc::Rc::new(std::cell::RefCell::new(vec![1isize, 2, 3, 4]));
+        let visited = std::rc::Rc::new(std::cell::RefCell::new(Vec::new()));
+        let current = std::rc::Rc::new(std::cell::Cell::new(1isize));
+
+        let z_clone = std::rc::Rc::clone(&z);
+        let visited_clone = std::rc::Rc::clone(&visited);
+        let current_clone = std::rc::Rc::clone(&current);
+
+        // Drain any residual items from earlier tests
+        while ring::pop().is_some() {}
+
+        // Install test cycle override to simulate dynamic Z-order window environment
+        TEST_CYCLE_OVERRIDE.with(|cell| {
+            *cell.borrow_mut() = Some(Box::new(move |_mods, direction| {
+                let monitors = FakeMonitors(vec![
+                    (WindowId(1), Some(MONITOR_A)),
+                    (WindowId(2), Some(MONITOR_A)),
+                    (WindowId(3), Some(MONITOR_A)),
+                    (WindowId(4), Some(MONITOR_A)),
+                ]);
+                let desktops = FakeDesktops(vec![
+                    (WindowId(1), Some(true)),
+                    (WindowId(2), Some(true)),
+                    (WindowId(3), Some(true)),
+                    (WindowId(4), Some(true)),
+                ]);
+                let spatial = SpatialContext {
+                    origin_monitor: Some(MONITOR_A),
+                };
+
+                let cur = current_clone.get();
+                let z_snapshot = z_clone.borrow().clone();
+                let candidates = ordered(z_snapshot.iter().map(|w| normal(*w)).collect());
+                let mut activator = ScriptedActivator::always(ActivationOutcome::Activated);
+                let outcome = run_context_safe_cycle(
+                    &StaticSource(candidates),
+                    &WindowEligibility,
+                    &mut activator,
+                    &active_ctx(cur),
+                    &monitors,
+                    Some(&desktops),
+                    &spatial,
+                    direction,
+                );
+                match outcome {
+                    CycleOutcome::Activated(next) => {
+                        visited_clone.borrow_mut().push(next.0);
+                        current_clone.set(next.0);
+                        let mut z_mut = z_clone.borrow_mut();
+                        z_mut.retain(|w| *w != next.0);
+                        z_mut.insert(0, next.0);
+                    }
+                    other => panic!("expected activated in cycle override, got {other:?}"),
+                }
+            }));
+        });
+
+        // Pump 6 consecutive rapid taps through the ring and drain_commands()
+        for _ in 0..6 {
+            ring::push(Command::SwitcherArmPrev.as_u8());
+            ring::push(Command::SwitcherDisarm.as_u8());
+            ring::push(Command::CyclePrev.as_u8());
+            drain_commands();
+        }
+
+        // Clean up cycle override
+        TEST_CYCLE_OVERRIDE.with(|cell| *cell.borrow_mut() = None);
+
+        let res = visited.borrow().clone();
+        assert_eq!(
+            res,
+            vec![2, 3, 4, 1, 2, 3],
+            "pumping rapid backward tap sequences through drain_commands() must traverse all windows in reverse"
         );
     }
 }

@@ -1,7 +1,7 @@
 ---
 type: mandate
 id: DEC-032
-status: accepted
+status: applied
 touches:
   - .control/decisions/DEC-032-autopilot-mandate-for-spec-18-delivery.md
   - .control/memlog/autopilot-DEC-032.md

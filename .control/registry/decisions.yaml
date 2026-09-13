@@ -782,7 +782,7 @@ decisions:
 
   - id: DEC-032
     title: Autopilot mandate for SPEC-18 delivery
-    status: accepted
+    status: applied
     file: decisions/DEC-032-autopilot-mandate-for-spec-18-delivery.md
     created: '2026-09-14'
     touches:
