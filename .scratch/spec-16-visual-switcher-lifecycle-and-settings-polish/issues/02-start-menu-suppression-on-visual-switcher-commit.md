@@ -38,7 +38,7 @@ Two sites, both on the Worker, both at points where `Win` is still physically do
   return at `worker.rs:277`. Placed after either one, the no-candidate path still opens Start: the
   overlay never opens, `switcher_active` stays false, and the swallowed main-key release past the
   deadline enqueues nothing (`hook.rs:474-482`), so the user gets no overlay, no switch, and a Start
-  Menu. That is precisely the owner's "pas tidak bisa itulah dia muncul start menu".
+  Menu. That is precisely the owner's "when it fails, that is when the start menu appears".
 
 One injection anywhere inside a single `Win` press is enough — the shell's lone-Win test asks only
 whether *any* other key was pressed during that press. Arming therefore covers commit, cancel
@@ -72,7 +72,7 @@ reaches one, to `crates/daemon/src/hook.rs`.** The only change permitted there i
 ## 6. Manual verification is part of this ticket, and covers both symptoms
 
 The owner reported two things together: the Start Menu opening, **and** the switch itself failing
-intermittently ("kadang bisa kadang tidak"). The focus race with `StartMenuExperienceHost` is the
+intermittently ("sometimes it works, sometimes not"). The focus race with `StartMenuExperienceHost` is the
 working hypothesis for both, but it is inferred, not measured. Verify them separately:
 
 1. Hold `Win + ~` past the threshold, release `Win`. Start Menu must not open.

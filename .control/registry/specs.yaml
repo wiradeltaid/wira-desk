@@ -1515,7 +1515,7 @@ specs:
   #       worker.rs:277). Placed after either, the no-candidate path still opens Start: the overlay
   #       never opens, switcher_active stays false, and the swallowed main-key release past the
   #       deadline enqueues nothing (hook.rs:474-482) -- no overlay, no switch, and a Start Menu.
-  #       That is the owner's "pas tidak bisa itulah dia muncul start menu", and it is a second
+  #       That is the owner's "when it fails, that is when the start menu appears", and it is a second
   #       mechanism producing both reported symptoms at once.
   #   (3) The draft told the implementer to work in hook.rs on the release edge. worker.rs:31-41
   #       carries the opposite as a stated SAFETY precondition earned from a live regression:
@@ -1557,7 +1557,7 @@ specs:
   #       name is kept and only its expected string changes.
   #
   # Two things this stamp does NOT settle:
-  #   - Owner note 3 reports TWO symptoms (Start Menu, and "kadang bisa kadang tidak" switching). The
+  #   - Owner note 3 reports TWO symptoms (Start Menu, and "sometimes it works, sometimes not" switching). The
   #     StartMenuExperienceHost focus race is a coherent single explanation and is the working
   #     hypothesis, but it is inferred, not measured, and finding (2) gives a second mechanism for
   #     the same pair. SPEC-16-02's acceptance now tests the switch separately; if it survives, it is
