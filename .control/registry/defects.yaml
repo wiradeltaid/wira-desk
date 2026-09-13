@@ -947,3 +947,34 @@ defects:
       row), and both departure triggers (Enter, blur) rather than only the one the owner happened to
       type -- `DEF-17`'s own precedent is the reason this ticket asks for that symmetry up front.
     owner: repo owner
+
+  - id: DEF-19
+    title: Blind backward cycling (Shift + cycle chord) oscillates between the top two windows instead of cycling through all windows
+    status: open
+    severity: high
+    component: window-management
+    violates: [DEC-026, UC-1]
+    found_in: "0.4.0"
+    found_by: Owner live manual desktop testing of SPEC-16, 2026-09-13
+    tests:
+      - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
+      - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
+    fixed_in: SPEC-17-01
+    summary: >-
+      When holding Shift with the cycle chord (Shift + Alt + ` or Shift + Win + `) for blind cycling,
+      focus only ping-pongs back and forth between the two topmost windows rather than cycling backward
+      through all eligible same-application windows on the monitor.
+    why_it_hid: >-
+      DEC-026 §B-4 and SPEC-14-04 defined Direction::Backward in cycle_order_directed by omitting rotated.reverse(),
+      yielding rotated[0] (Z=1). In live Win32 activation, activating window Z=1 immediately raises it to Z=0,
+      pushing the previous foreground window to Z=1. The next unreversed cycle selects Z=1 again, repeatedly
+      oscillating between the top two windows without ever reaching window 3+. Existing unit tests asserted single
+      rotations on static candidate vectors rather than simulating consecutive activations against a dynamic Z-order.
+    impact: >-
+      Users cannot navigate backward through 3 or more same-app windows using Shift + Alt + ` or Shift + Win + `.
+      Reverse navigation is trapped in an infinite 2-window loop.
+    fix_direction: >-
+      Implement reverse traversal for blind cycling that ensures repeated backward cycle commands visit every eligible
+      window in reverse succession (e.g. through a cycling session tracking mechanism while modifiers remain held,
+      or a direction-aware traversal order that rotates through all windows).
+    owner: repo owner
