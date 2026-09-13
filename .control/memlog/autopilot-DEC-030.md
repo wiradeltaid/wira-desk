@@ -9,11 +9,11 @@ date: 2026-09-13
 ## Resume
 
 Iteration: 3 (boundary: HEAD)
-Run branch: autopilot/DEC-030, PR not open
-Stopped at: SPEC-16-03 delivered, all SPEC-16 tickets complete
+Run branch: autopilot/DEC-030, PR opened for owner review
+Stopped at: Done (all specifications closed: SPEC-16 delivered, promise progress 100%, 72/72 counted RTM rows green)
 Blocked: —
 Parked: —
-Next: SPEC-16 spec close and cycle-end finish
+Next: —
 
 ## Decisions
 

@@ -3,7 +3,7 @@ spec: SPEC-16
 release: "0.4.0"
 prd: wira-desk
 fr: []
-status: open
+status: closed
 ---
 
 # SPEC-16 — Visual Switcher Start Menu Suppression, WinUI Helper Exclusion, UI Em-Dash Removal, and Stepper Spacing Polish

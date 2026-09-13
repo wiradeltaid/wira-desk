@@ -1,23 +1,27 @@
 ---
 type: mandate
 id: DEC-030
-status: accepted
+status: applied
 touches:
   - .control/decisions/DEC-030-autopilot-mandate-for-spec-16-delivery.md
   - .control/memlog/autopilot-DEC-030.md
   - .control/registry/decisions.yaml
   - .control/registry/specs.yaml
+  - .scratch/smoke-dec-030.md
   - .scratch/spec-16-visual-switcher-lifecycle-and-settings-polish/SPEC.md
   - .scratch/spec-16-visual-switcher-lifecycle-and-settings-polish/issues/01-settings-stepper-centering-and-em-dash-removal.md
-  - .scratch/spec-16-visual-switcher-lifecycle-and-settings-polish/issues/02-start-menu-suppression-while-the-visual-switcher-chord-is-held.md
-  - .scratch/spec-16-visual-switcher-lifecycle-and-settings-polish/issues/03-modern-winui-3-popup-bridge-exclusion.md
+  - .scratch/spec-16-visual-switcher-lifecycle-and-settings-polish/issues/02-start-menu-suppression-on-visual-switcher-commit.md
+  - .scratch/spec-16-visual-switcher-lifecycle-and-settings-polish/issues/03-modern-winui-popup-bridge-and-helper-surface-exclusion.md
+  - 3p.md
   - crates/daemon/src/hook.rs
   - crates/daemon/src/worker.rs
+  - crates/daemon/src/cycling/mod.rs
   - crates/daemon/src/cycling/eligibility.rs
-  - crates/settings/ui/panes/general_pane.slint
+  - crates/settings/src/app.rs
+  - crates/settings/ui/components/key_check.slint
   - crates/settings/ui/panes/about_pane.slint
+  - crates/settings/ui/panes/general_pane.slint
   - crates/settings/ui/panes/shortcuts_pane.slint
-  - crates/settings/ui/key_check.slint
 supersedes: null
 superseded_by: null
 created: '2026-09-13'
