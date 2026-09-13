@@ -31,9 +31,9 @@ work_progress:
   work_progress: 100%
 - spec: SPEC-14
   status: open
-  tickets_done: 3
+  tickets_done: 5
   tickets_total: 6
-  work_progress: 50%
+  work_progress: 83%
 - spec: SPEC-2
   status: closed
   tickets_done: 2

@@ -57,8 +57,8 @@ pub enum RejectReason {
     Malformed,
     /// Parses as a `Config`, but a shortcut string is not a shortcut.
     InvalidShortcut,
-    /// A shortcut is reserved by the Windows operating system.
-    ReservedShortcut,
+    /// A shortcut is reserved by the Windows operating system (names reservation owner).
+    ReservedShortcut(&'static str),
     /// Two actions carry the same chord. Refused wholesale here, unlike at startup, and
     /// `DEC-009` states why: a reload has a last-known-good configuration to keep and a
     /// human who just acted, and the settings process cannot produce a duplicate — so one
@@ -72,28 +72,29 @@ pub enum RejectReason {
 }
 
 impl RejectReason {
-    pub fn message(self) -> &'static str {
+    pub fn message(&self) -> std::borrow::Cow<'static, str> {
         match self {
             RejectReason::Unreadable => {
-                "Config reload skipped: file unreadable; keeping current settings"
+                "Config reload skipped: file unreadable; keeping current settings".into()
             }
             RejectReason::Malformed => {
-                "Config reload skipped: file is not valid TOML; keeping current settings"
+                "Config reload skipped: file is not valid TOML; keeping current settings".into()
             }
             RejectReason::InvalidShortcut => {
-                "Config reload skipped: shortcut is not parseable; keeping current settings"
+                "Config reload skipped: shortcut is not parseable; keeping current settings".into()
             }
-            RejectReason::ReservedShortcut => {
-                "Config reload skipped: contains reserved system shortcuts; keeping current settings"
-            }
+            RejectReason::ReservedShortcut(owner) => format!(
+                "Config reload skipped: contains reserved system shortcut ({owner}); keeping current settings"
+            )
+            .into(),
             RejectReason::DuplicateShortcut => {
-                "Config reload skipped: two actions share one shortcut; keeping current settings"
+                "Config reload skipped: two actions share one shortcut; keeping current settings".into()
             }
             RejectReason::InvalidPercentage => {
-                "Config reload skipped: snap percentage must be between 1 and 99; keeping current settings"
+                "Config reload skipped: snap percentage must be between 1 and 99; keeping current settings".into()
             }
             RejectReason::InvalidHoldDelay => {
-                "Config reload skipped: visual hold delay must be between 100 and 500 ms; keeping current settings"
+                "Config reload skipped: visual hold delay must be between 100 and 500 ms; keeping current settings".into()
             }
         }
     }
@@ -186,10 +187,18 @@ pub fn validate(text: &str) -> Result<(Config, HookSnapshot, WorkerSnapshot), Re
     // a hand-listed array, so a chord added to `Chords` cannot be missed here — the omission
     // would be silent, and its effect would be a reserved chord accepted on reload but
     // refused at startup.
-    for slot in chords.in_declared_order() {
+    for (idx, slot) in chords.in_declared_order().iter().enumerate() {
         if let Some(sc) = slot.chord {
-            if shared::shortcut::reservation(&sc).is_some() {
-                return Err(RejectReason::ReservedShortcut);
+            if let Some(info) = shared::shortcut::reservation(&sc) {
+                return Err(RejectReason::ReservedShortcut(info.owner));
+            }
+            // If this is a cycle slot, also check its derived Shift variant (DEC-026 §B-2)
+            if idx < 2 && !sc.shift {
+                let mut shift_variant = sc;
+                shift_variant.shift = true;
+                if let Some(info) = shared::shortcut::reservation(&shift_variant) {
+                    return Err(RejectReason::ReservedShortcut(info.owner));
+                }
             }
         }
     }
@@ -276,7 +285,7 @@ where
 fn reject<W: WarnSink + ?Sized>(warn: &mut W, reason: RejectReason) -> ReloadOutcome {
     // Exactly one warning per rejected reload — the AC latches Tier-2, and a
     // second warning for the same event would read as a second failure.
-    warn.warn(reason.message());
+    warn.warn(&reason.message());
     ReloadOutcome::Rejected(reason)
 }
 
@@ -713,9 +722,10 @@ snap_half_bottom = \"ctrl+alt+up\"
             RejectReason::Unreadable.message(),
             RejectReason::Malformed.message(),
             RejectReason::InvalidShortcut.message(),
-            RejectReason::ReservedShortcut.message(),
+            RejectReason::ReservedShortcut("Task Manager").message(),
             RejectReason::DuplicateShortcut.message(),
             RejectReason::InvalidPercentage.message(),
+            RejectReason::InvalidHoldDelay.message(),
         ];
         for (i, a) in msgs.iter().enumerate() {
             for b in msgs.iter().skip(i + 1) {
@@ -765,5 +775,51 @@ snap_half_bottom = \"ctrl+alt+up\"
         assert_eq!(worker_snapshots.len(), 1);
         assert!(!worker_snapshots[0].visual_enabled);
         assert_eq!(worker_snapshots[0].visual_hold_delay_ms, 350);
+    }
+
+    #[test]
+    fn a_legacy_shift_bearing_cycle_chord_reloads_without_rejecting_the_config() {
+        let text = r#"
+            [general]
+            auto_start = false
+            [switcher]
+            shortcut = "ctrl+shift+backtick"
+            fallback_shortcut = "alt+shift+backtick"
+            "#
+        .to_string();
+        let (outcome, sink, _, _) = run(FakeSource(Ok(text)));
+        assert!(matches!(outcome, ReloadOutcome::Applied { .. }));
+        let hook_snapshots = sink.hook.borrow();
+        assert_eq!(hook_snapshots.len(), 1);
+        assert_eq!(
+            hook_snapshots[0].chords.primary,
+            Shortcut::parse("ctrl+shift+backtick")
+        );
+        assert_eq!(
+            hook_snapshots[0].chords.fallback,
+            Shortcut::parse("alt+shift+backtick")
+        );
+    }
+
+    #[test]
+    fn a_cycle_chord_whose_shift_variant_is_reserved_is_refused_on_reload() {
+        let text = r#"
+            [general]
+            auto_start = false
+            [switcher]
+            shortcut = "ctrl+escape"
+            fallback_shortcut = "alt+backtick"
+            "#
+        .to_string();
+        let (outcome, _, _, warn) = run(FakeSource(Ok(text)));
+        assert_eq!(
+            outcome,
+            ReloadOutcome::Rejected(RejectReason::ReservedShortcut("Task Manager"))
+        );
+        assert!(
+            warn.0[0].contains("Task Manager"),
+            "Warning message must contain Task Manager, got: {}",
+            warn.0[0]
+        );
     }
 }

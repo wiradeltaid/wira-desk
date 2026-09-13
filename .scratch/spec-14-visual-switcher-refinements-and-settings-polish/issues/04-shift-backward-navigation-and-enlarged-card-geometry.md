@@ -122,22 +122,22 @@ the user sees is the opposite of what they asked for. **1b and 1d ship together 
 **Blocked by:** None. Touches `open_visual_switcher`'s `SWITCHER.open(...)` call, which ticket 03
 also edits — sequence them or expect a conflict there.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] `match_shortcut` resolves exact-first; the shift-relaxed pass runs only on a `None` from the exact pass, and only against the two `Cycle` slots.
-- [ ] Binding cycle to `ctrl+alt+s` leaves the default `ctrl+alt+shift+s` stack chord reachable — asserted by a test that fails if the relaxed pass runs first or covers non-cycle slots.
-- [ ] Pressing the cycle chord with Shift held cycles backward; the window activated is the one a forward cycle would have reached *last*.
-- [ ] Direction is carried as `Command::CyclePrev` in the ring, not read from `SWITCHER_LAST_CYCLE_MODS`. A test enqueues `Cycle` then `CyclePrev` before either is drained and asserts each keeps its own direction.
-- [ ] `Command::CyclePrev` is **not** in `is_exempt_from_throttle`, and is throttled identically to `Command::Cycle`.
-- [ ] `cycle_order`'s backward direction is the forward rotation without the final `reverse()` — asserted against a fixture, both directions, same candidate set.
-- [ ] A rapid Shift-held tap (no hold) activates the previous same-app window on the active monitor, and is still monitor-locked — the blind path keeps `SpatialScope::SameMonitor`.
-- [ ] `hook.rs:625`'s arming guard covers `CyclePrev`: a Shift-held chord *held* past the delay opens the overlay. Asserted, because a backward cycle that never arms passes every other criterion here.
-- [ ] `worker.rs:99`'s drain arm covers `CyclePrev`: the command is executed, not silently dropped.
-- [ ] `shift` is cleared from both `rt.switcher_mods` and `SWITCHER_CHORD_MODS`.
-- [ ] Releasing the non-Shift chord modifier while Shift is still held **commits** the overlay — the case that hangs it open today, asserted.
-- [ ] Releasing Shift during the hold window while the chord modifier stays down still opens the overlay — the case `are_chord_modifiers_down` silently swallows today, asserted.
-- [ ] A backward entry opens with `selected_index == len - 1`, and that index names the same window the backward blind cycle activated.
-- [ ] Saving a cycle chord containing `shift` is refused in Settings, naming the field.
-- [ ] An on-disk config that already binds `shift` in the cycle chord reloads **successfully**, keeps every other setting, matches that chord exactly, and gets no shift-relaxed variant.
-- [ ] Binding cycle to `ctrl+escape` is refused because its Shift variant is `Ctrl+Shift+Escape` (Task Manager) — asserted on both the Settings path and the daemon reservation walk, with the owner string in the message.
-- [ ] In-overlay Shift reversal (`hook.rs:519-526`) is unchanged.
+- [x] `match_shortcut` resolves exact-first; the shift-relaxed pass runs only on a `None` from the exact pass, and only against the two `Cycle` slots.
+- [x] Binding cycle to `ctrl+alt+s` leaves the default `ctrl+alt+shift+s` stack chord reachable — asserted by a test that fails if the relaxed pass runs first or covers non-cycle slots.
+- [x] Pressing the cycle chord with Shift held cycles backward; the window activated is the one a forward cycle would have reached *last*.
+- [x] Direction is carried as `Command::CyclePrev` in the ring, not read from `SWITCHER_LAST_CYCLE_MODS`. A test enqueues `Cycle` then `CyclePrev` before either is drained and asserts each keeps its own direction.
+- [x] `Command::CyclePrev` is **not** in `is_exempt_from_throttle`, and is throttled identically to `Command::Cycle`.
+- [x] `cycle_order`'s backward direction is the forward rotation without the final `reverse()` — asserted against a fixture, both directions, same candidate set.
+- [x] A rapid Shift-held tap (no hold) activates the previous same-app window on the active monitor, and is still monitor-locked — the blind path keeps `SpatialScope::SameMonitor`.
+- [x] `hook.rs:625`'s arming guard covers `CyclePrev`: a Shift-held chord *held* past the delay opens the overlay. Asserted, because a backward cycle that never arms passes every other criterion here.
+- [x] `worker.rs:99`'s drain arm covers `CyclePrev`: the command is executed, not silently dropped.
+- [x] `shift` is cleared from both `rt.switcher_mods` and `SWITCHER_CHORD_MODS`.
+- [x] Releasing the non-Shift chord modifier while Shift is still held **commits** the overlay — the case that hangs it open today, asserted.
+- [x] Releasing Shift during the hold window while the chord modifier stays down still opens the overlay — the case `are_chord_modifiers_down` silently swallows today, asserted.
+- [x] A backward entry opens with `selected_index == len - 1`, and that index names the same window the backward blind cycle activated.
+- [x] Saving a cycle chord containing `shift` is refused in Settings, naming the field.
+- [x] An on-disk config that already binds `shift` in the cycle chord reloads **successfully**, keeps every other setting, matches that chord exactly, and gets no shift-relaxed variant.
+- [x] Binding cycle to `ctrl+escape` is refused because its Shift variant is `Ctrl+Shift+Escape` (Task Manager) — asserted on both the Settings path and the daemon reservation walk, with the owner string in the message.
+- [x] In-overlay Shift reversal (`hook.rs:519-526`) is unchanged.

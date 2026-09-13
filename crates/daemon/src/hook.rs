@@ -622,12 +622,16 @@ where
         #[cfg(debug_assertions)]
         crate::metrics::ACCEPTED.fetch_add(1, Ordering::Relaxed);
 
-        if cmd == Command::Cycle.as_u8() {
+        if cmd == Command::Cycle.as_u8() || cmd == Command::CyclePrev.as_u8() {
             set_last_cycle_mods(rt.mods);
             if rt.switcher_visual_enabled && rt.mods.any() {
                 rt.switcher_armed = true;
                 rt.switcher_main_vk = vk as u16;
-                rt.switcher_mods = rt.mods;
+                // DEC-026 §B-5: Shift is cleared from switcher_mods so releasing
+                // the chord modifier while Shift is still held commits the overlay.
+                let mut chord_mods = rt.mods;
+                chord_mods.shift = false;
+                rt.switcher_mods = chord_mods;
                 let delay = if rt.switcher_hold_delay_ms >= 100 && rt.switcher_hold_delay_ms <= 500
                 {
                     rt.switcher_hold_delay_ms as u64
@@ -1014,12 +1018,12 @@ pub fn unbind_duplicates(resolved: &mut [Option<Shortcut>]) -> Vec<Collision> {
     collisions
 }
 
-/// Pure shortcut equality match → command byte.
+/// Pure shortcut equality match → command byte with two-pass matching (DEC-026 §B-1).
 ///
-/// Resolves against the declared sequence and returns the **first** match, which is the
-/// same first-wins behaviour the previous `if / else if` chain had. Stating it as a walk
-/// over the declared order rather than as a chain is what makes the precedence order and
-/// the match order literally the same code instead of two things that happen to agree.
+/// Resolves against the declared sequence in two passes:
+/// 1. Exact pass over all 16 slots. If any slot matches exactly, returns that command.
+/// 2. Shift-relaxed pass, reached ONLY when pass 1 returns None. Evaluated only against
+///    the two Cycle slots with shift cleared. Returns `Command::CyclePrev`.
 pub fn match_shortcut(chords: &Chords, mods: ModifierState, vk: u16) -> Option<u8> {
     let current = Shortcut {
         win: mods.win,
@@ -1028,11 +1032,32 @@ pub fn match_shortcut(chords: &Chords, mods: ModifierState, vk: u16) -> Option<u
         shift: mods.shift,
         vk,
     };
-    chords
-        .in_declared_order()
-        .iter()
-        .find(|slot| slot.chord == Some(current))
-        .map(|slot| slot.command)
+    let slots = chords.in_declared_order();
+
+    // Pass 1: Exact match over all sixteen slots
+    if let Some(slot) = slots.iter().find(|slot| slot.chord == Some(current)) {
+        return Some(slot.command);
+    }
+
+    // Pass 2: Shift-relaxed pass, reached ONLY when pass 1 returns None (DEC-026 §B-1).
+    if mods.shift {
+        let without_shift = Shortcut {
+            win: mods.win,
+            ctrl: mods.ctrl,
+            alt: mods.alt,
+            shift: false,
+            vk,
+        };
+        for slot in &slots[..2] {
+            if let Some(c) = slot.chord {
+                if !c.shift && c == without_shift {
+                    return Some(Command::CyclePrev.as_u8());
+                }
+            }
+        }
+    }
+
+    None
 }
 
 /// Returns `true` when `now_ms` may accept a new throttled shortcut.
@@ -3724,5 +3749,147 @@ mod tests {
                 assert_ne!(cmd.unwrap(), Command::Nop);
             }
         }
+    }
+
+    #[test]
+    fn the_exact_pass_resolves_before_any_shift_relaxed_pass() {
+        let mut cfg = Config::default();
+        cfg.switcher.shortcut = "ctrl+alt+s".to_string();
+        cfg.layout.stack_shortcut = "ctrl+alt+shift+s".to_string();
+        let chords = Chords::from_config(&cfg);
+
+        // ctrl+alt+shift+s has Shift. Pass 1 must match stack exactly without Pass 2 intervening.
+        let mods = ModifierState {
+            ctrl: true,
+            alt: true,
+            shift: true,
+            win: false,
+        };
+        let cmd = match_shortcut(&chords, mods, b'S' as u16);
+        assert_eq!(cmd, Some(Command::OverlappingStack.as_u8()));
+    }
+
+    #[test]
+    fn a_shift_relaxed_cycle_never_shadows_the_default_stack_chord() {
+        let mut cfg = Config::default();
+        // Even if cycle is configured to ctrl+alt+s, stack (ctrl+alt+shift+s) is never shadowed
+        cfg.switcher.shortcut = "ctrl+alt+s".to_string();
+        let chords = Chords::from_config(&cfg);
+
+        let mods = ModifierState {
+            ctrl: true,
+            alt: true,
+            shift: true,
+            win: false,
+        };
+        let cmd = match_shortcut(&chords, mods, b'S' as u16);
+        assert_eq!(cmd, Some(Command::OverlappingStack.as_u8()));
+        assert_ne!(cmd, Some(Command::CyclePrev.as_u8()));
+    }
+
+    #[test]
+    fn a_shift_variant_never_shadows_another_configured_chord() {
+        let mut cfg = Config::default();
+        cfg.switcher.shortcut = "ctrl+alt+s".to_string();
+        cfg.snapping.snap_maximize = "ctrl+alt+shift+enter".to_string();
+        let chords = Chords::from_config(&cfg);
+
+        let mods = ModifierState {
+            ctrl: true,
+            alt: true,
+            shift: true,
+            win: false,
+        };
+        let cmd = match_shortcut(&chords, mods, 0x0D /* Enter */);
+        assert_eq!(cmd, Some(Command::SnapMaximize.as_u8()));
+    }
+
+    #[test]
+    fn cycle_chord_with_shift_held_enters_the_switcher_backward() {
+        let chords = Chords::from_config(&Config::default());
+        // Default cycle is win+backtick. With Shift held (win+shift+backtick):
+        let mods = ModifierState {
+            win: true,
+            ctrl: false,
+            alt: false,
+            shift: true,
+        };
+        let cmd = match_shortcut(&chords, mods, 0xC0 /* VK_BACKTICK */);
+        assert_eq!(cmd, Some(Command::CyclePrev.as_u8()));
+    }
+
+    #[test]
+    fn shift_is_cleared_from_the_switcher_chord_modifiers() {
+        let primary = Shortcut::parse("win+backtick").unwrap();
+        let fallback = Shortcut::parse("alt+backtick").unwrap();
+        let mut rt = test_runtime(primary, fallback);
+
+        // Press Win and Shift
+        let _ = handle_key_event_with_bypass(&mut rt, VK_LWIN, true, |_| false, |_| 0);
+        let _ = handle_key_event_with_bypass(&mut rt, VK_LSHIFT, true, |_| false, |_| 0);
+
+        // Press Backtick -> Backward cycle
+        let queue = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+        let q = std::sync::Arc::clone(&queue);
+        let enqueue = move |cmd: u8| {
+            q.lock().unwrap().push(cmd);
+            true
+        };
+        let _ =
+            handle_key_event_with_sink(&mut rt, VK_BACKTICK, true, |_| false, |_| 0, 10, &enqueue);
+
+        assert_eq!(
+            queue.lock().unwrap().as_slice(),
+            &[Command::CyclePrev.as_u8()]
+        );
+        assert!(rt.switcher_armed);
+        // DEC-026 §B-5: Shift must be cleared from switcher_mods
+        assert!(
+            !rt.switcher_mods.shift,
+            "Shift must be cleared from switcher_mods"
+        );
+        assert!(rt.switcher_mods.win, "Win must remain in switcher_mods");
+    }
+
+    #[test]
+    fn releasing_one_chord_modifier_while_shift_is_held_commits_the_overlay() {
+        let primary = Shortcut::parse("win+backtick").unwrap();
+        let fallback = Shortcut::parse("alt+backtick").unwrap();
+        let mut rt = test_runtime(primary, fallback);
+
+        // Simulate active switcher entered via Win+Shift+Backtick
+        rt.switcher_active = true;
+        set_switcher_active(true);
+        rt.switcher_mods = ModifierState {
+            win: true,
+            ctrl: false,
+            alt: false,
+            shift: false,
+        };
+        rt.mods = ModifierState {
+            win: true,
+            ctrl: false,
+            alt: false,
+            shift: true,
+        };
+
+        let queue = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+        let q = std::sync::Arc::clone(&queue);
+        let enqueue = move |cmd: u8| {
+            q.lock().unwrap().push(cmd);
+            true
+        };
+
+        // Release Win while Shift is still held
+        let _ =
+            handle_key_event_with_sink(&mut rt, VK_LWIN, false, |_| false, |_| 0, 100, &enqueue);
+
+        // With Shift cleared from switcher_mods, releasing Win drops all tracked chord modifiers
+        // and commits the overlay immediately
+        assert_eq!(
+            queue.lock().unwrap().as_slice(),
+            &[Command::SwitcherCommit.as_u8()]
+        );
+        assert!(!rt.is_switcher_active());
     }
 }

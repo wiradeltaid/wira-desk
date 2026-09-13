@@ -136,8 +136,8 @@ pub fn resolve_context_for(hwnd: HWND) -> Option<PlatformContext> {
         }
     };
 
-    // Physical pixels in, physical pixels out. DPI is carried for traceability
-    // and never used to rescale.
+    // Physical pixels in, physical pixels out. DPI is carried for arrangement
+    // and visual switcher overlay scaling (SPEC-14-06).
     // SAFETY: takes only the handle, writes nothing, and returns 0 when it cannot answer —
     // handled by falling back to the 96-DPI baseline rather than dividing by the result.
     let dpi = match unsafe { GetDpiForWindow(hwnd) } {
@@ -163,9 +163,8 @@ pub fn resolve_context_for(hwnd: HWND) -> Option<PlatformContext> {
 
 /// This monitor's effective DPI, falling back to the 96-DPI baseline.
 ///
-/// The per-*monitor* counterpart of `GetDpiForWindow`, needed because a monitor move reads
-/// the destination's scaling before any window is on it. Carried for traceability only; no
-/// planner scales by it, and applying it would scale coordinates a second time.
+/// The per-*monitor* counterpart of `GetDpiForWindow`. Used by monitor move
+/// and by the visual switcher overlay to scale logical geometry to physical pixels (SPEC-14-06).
 pub fn monitor_dpi(monitor: windows_sys::Win32::Graphics::Gdi::HMONITOR) -> u32 {
     let mut x: u32 = 0;
     let mut y: u32 = 0;

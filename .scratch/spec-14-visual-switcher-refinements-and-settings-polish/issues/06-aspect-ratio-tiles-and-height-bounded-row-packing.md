@@ -96,20 +96,20 @@ paginates rather than shrinking it.
 
 **Blocked by:** None. Independent of SPEC-14-03 and of SPEC-14-04.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] `CARD_H = 212`, `HEADER_H = 32`, and the unit is stated in code as logical-at-96-DPI, not left to the reader.
-- [ ] Card, header, gutter, and margin geometry scales by the origin monitor's effective DPI: at 100% a 16:9 card is 314×212 physical, at 200% it is 628×424.
-- [ ] Tile width follows the source window's aspect ratio; a 16:9 window yields a 306×172 preview and a 21:9 window a visibly wider tile than a 4:3 one, at identical height.
-- [ ] Every card on a page has the **same height** and that height equals the scaled `CARD_H` — asserted, because it is the new invariant.
-- [ ] Aspect is clamped to `0.60 … 2.40`; an ultrawide (3.56:1) and a portrait (0.56:1) window both produce in-band tiles and letterbox inside their preview rect.
-- [ ] A window whose rect cannot be read, or whose height is zero, falls back to 16:9 — no panic, no divide-by-zero, no dropped card.
-- [ ] Aspect ratios reach `layout.rs` as an argument; `layout.rs` calls no Win32 and `WindowFacts` gains no rect.
-- [ ] No packed row exceeds the content width, swept across at least 1366, 1920, 2560, and 3840 wide **and** 768, 800, and 1080 tall, with mixed aspect ratios in the candidate set.
-- [ ] Row count derives from work-area height; the overlay never exceeds the work area, and `overlay_y` is never above `work_area.y`.
-- [ ] Row count is never zero, and the not-even-one-row-fits case is defined in code.
-- [ ] `total_pages` comes from actual packing, not from `count.div_ceil(per_page)`; no page is ever empty.
-- [ ] `select_up`/`select_down` pick the card in the adjacent row with the greatest horizontal overlap — asserted against a fixture whose rows hold different card counts, where index arithmetic would give a different and wrong answer.
-- [ ] `columns_derive_from_the_work_area_and_never_overflow_it` is reformulated as the row-width invariant and was **observed red** against the unbounded packer before the bound was added. Record that in the commit message.
-- [ ] `candidates_beyond_one_page_paginate_rather_than_shrink` asserts the scaled **height** and still passes; it was not deleted to make the scaling land.
-- [ ] `monitor_dpi`'s doc-comment no longer claims that no planner scales by it.
+- [x] `CARD_H = 212`, `HEADER_H = 32`, and the unit is stated in code as logical-at-96-DPI, not left to the reader.
+- [x] Card, header, gutter, and margin geometry scales by the origin monitor's effective DPI: at 100% a 16:9 card is 314×212 physical, at 200% it is 628×424.
+- [x] Tile width follows the source window's aspect ratio; a 16:9 window yields a 306×172 preview and a 21:9 window a visibly wider tile than a 4:3 one, at identical height.
+- [x] Every card on a page has the **same height** and that height equals the scaled `CARD_H` — asserted, because it is the new invariant.
+- [x] Aspect is clamped to `0.60 … 2.40`; an ultrawide (3.56:1) and a portrait (0.56:1) window both produce in-band tiles and letterbox inside their preview rect.
+- [x] A window whose rect cannot be read, or whose height is zero, falls back to 16:9 — no panic, no divide-by-zero, no dropped card.
+- [x] Aspect ratios reach `layout.rs` as an argument; `layout.rs` calls no Win32 and `WindowFacts` gains no rect.
+- [x] No packed row exceeds the content width, swept across at least 1366, 1920, 2560, and 3840 wide **and** 768, 800, and 1080 tall, with mixed aspect ratios in the candidate set.
+- [x] Row count derives from work-area height; the overlay never exceeds the work area, and `overlay_y` is never above `work_area.y`.
+- [x] Row count is never zero, and the not-even-one-row-fits case is defined in code.
+- [x] `total_pages` comes from actual packing, not from `count.div_ceil(per_page)`; no page is ever empty.
+- [x] `select_up`/`select_down` pick the card in the adjacent row with the greatest horizontal overlap — asserted against a fixture whose rows hold different card counts, where index arithmetic would give a different and wrong answer.
+- [x] `columns_derive_from_the_work_area_and_never_overflow_it` is reformulated as the row-width invariant and was **observed red** against the unbounded packer before the bound was added. Record that in the commit message.
+- [x] `candidates_beyond_one_page_paginate_rather_than_shrink` asserts the scaled **height** and still passes; it was not deleted to make the scaling land.
+- [x] `monitor_dpi`'s doc-comment no longer claims that no planner scales by it.

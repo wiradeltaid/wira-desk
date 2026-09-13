@@ -237,7 +237,7 @@ mod tests {
 
     #[test]
     fn unknown_command_values_still_decode_as_nop() {
-        assert_eq!(Command::from_u8(27), Command::Nop);
+        assert_eq!(Command::from_u8(28), Command::Nop);
         assert_eq!(Command::from_u8(200), Command::Nop);
     }
 
@@ -356,7 +356,7 @@ mod tests {
         // protected is not, and the set must stay closed at whatever size it reaches.
         // Deleting the test rather than replacing it would have thrown away the guard
         // along with the rule it happened to be attached to.
-        for raw in 0u8..=26 {
+        for raw in 0u8..=27 {
             let cmd = Command::from_u8(raw);
             assert!(
                 matches!(
@@ -388,13 +388,14 @@ mod tests {
                         | Command::SwitcherDown
                         | Command::SwitcherCommit
                         | Command::SwitcherCancel
+                        | Command::CyclePrev
                 ),
                 "unexpected command at wire value {raw}"
             );
         }
         // One past the end must still be `Nop`, so the range above is the whole set
         // rather than merely a prefix of it.
-        assert_eq!(Command::from_u8(27), Command::Nop);
+        assert_eq!(Command::from_u8(28), Command::Nop);
     }
 
     // --- Plan semantics -----------------------------------------------------

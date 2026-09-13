@@ -69,14 +69,21 @@ impl SwitcherController {
         origin: WindowId,
         work_area: Rect,
         candidates: Vec<WindowId>,
+        aspects: &[f32],
+        dpi: u32,
         selected_index: usize,
     ) {
         self.origin_foreground = origin;
         self.candidates = candidates;
         self.selected_index = selected_index;
         self.open_time_ms = crate::hook::tick_ms();
-        self.overlay
-            .show(work_area, self.candidates.clone(), selected_index);
+        self.overlay.show(
+            work_area,
+            self.candidates.clone(),
+            aspects,
+            dpi,
+            selected_index,
+        );
     }
 
     pub fn next(&mut self) {
@@ -109,11 +116,11 @@ impl SwitcherController {
         if self.candidates.is_empty() {
             return;
         }
-        let (idx, _) = selection::select_up(
+        let idx = selection::select_up(
             self.candidates.len(),
             self.selected_index,
-            self.overlay.cols(),
-            self.overlay.per_page(),
+            &self.overlay.layout().cards,
+            self.overlay.page_start(),
         );
         self.selected_index = idx;
         self.overlay.set_selected_index(idx);
@@ -123,11 +130,11 @@ impl SwitcherController {
         if self.candidates.is_empty() {
             return;
         }
-        let (idx, _) = selection::select_down(
+        let idx = selection::select_down(
             self.candidates.len(),
             self.selected_index,
-            self.overlay.cols(),
-            self.overlay.per_page(),
+            &self.overlay.layout().cards,
+            self.overlay.page_start(),
         );
         self.selected_index = idx;
         self.overlay.set_selected_index(idx);

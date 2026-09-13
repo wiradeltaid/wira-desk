@@ -8,12 +8,12 @@ date: 2026-09-13
 
 ## Resume
 
-Iteration: 2 (boundary: HEAD)
+Iteration: 3 (boundary: HEAD)
 Run branch: autopilot/DEC-028, PR not opened yet
-Stopped at: Capacity (completed SPEC-14-03 and SPEC-14-05; next iteration continues with SPEC-14-04 and SPEC-14-06)
+Stopped at: Capacity (completed SPEC-14-04 and SPEC-14-06; all runnable tickets of SPEC-14 delivered)
 Blocked: —
 Parked: —
-Next: SPEC-14-04 (visual switcher Shift-held backward cycling)
+Next: Smoke testing and SPEC-14 completion
 
 ## Decisions
 
@@ -26,3 +26,5 @@ Next: SPEC-14-04 (visual switcher Shift-held backward cycling)
 | Iter 1 | SPEC-14-02 | Added wrap: word-wrap to hold delay caption and description in GeneralPane, preventing horizontal scrollbar emergence | Unwrapped single-line Text | Window horizontal scrollbar visible when visual switcher enabled | crates/settings/ui/panes/general_pane.slint, crates/settings/src/app.rs |
 | Iter 2 | SPEC-14-03 | Parameterized evaluate_spatial with SpatialScope to collect all physical monitors on visual switcher while keeping blind cycle monitor-locked | Single global spatial policy | Breaks Spatial Preservation Invariant or keeps switcher single-monitor | crates/daemon/src/context/mod.rs, crates/daemon/src/worker.rs, crates/daemon/src/switcher/mod.rs |
 | Iter 2 | SPEC-14-05 | Extended WorkerSnapshot with visual_enabled and visual_hold_delay_ms, gating timer arming and in-flight cancellation on reload | Unchecked Worker timer arming | Disabling switcher in UI does not stop overlay from opening | crates/daemon/src/config.rs, crates/daemon/src/worker.rs, crates/daemon/src/hook.rs |
+| Iter 3 | SPEC-14-04 | Implemented exact-first 2-pass matching, Command::CyclePrev ring opcode, Shift stripping from chord mods, backward initial index len-1, Shift ban on cycle fields in Settings, and derived Shift reservation check | Single relaxed pass or stateful modifier flag | Shadows configured Shift shortcuts or causes race conditions | crates/daemon/src/hook.rs, crates/daemon/src/worker.rs, crates/daemon/src/config.rs, crates/settings/src/persistence.rs, crates/shared/src/commands.rs |
+| Iter 3 | SPEC-14-06 | Implemented Windows Alt+Tab aspect-ratio tile layout, height-bounded row packing, and geometric Up/Down overlap navigation with page_start threading | Fixed-cell grid | Aspect ratio distortion and wrong card navigation across ragged rows | crates/daemon/src/switcher/layout.rs, crates/daemon/src/switcher/selection.rs, crates/daemon/src/switcher/overlay.rs, crates/daemon/src/worker.rs |

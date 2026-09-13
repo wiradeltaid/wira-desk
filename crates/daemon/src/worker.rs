@@ -100,7 +100,13 @@ pub fn drain_commands() {
                 #[cfg(debug_assertions)]
                 crate::util::append_debug_trace("WORKER_DRAIN: cycle=1");
                 let mods = crate::hook::get_last_cycle_mods();
-                execute_cycle(Some(mods));
+                execute_cycle(Some(mods), crate::cycling::Direction::Forward);
+            }
+            Command::CyclePrev => {
+                #[cfg(debug_assertions)]
+                crate::util::append_debug_trace("WORKER_DRAIN: cycle_prev=1");
+                let mods = crate::hook::get_last_cycle_mods();
+                execute_cycle(Some(mods), crate::cycling::Direction::Backward);
             }
             Command::SnapLeft
             | Command::SnapRight
@@ -149,6 +155,8 @@ thread_local! {
         const { std::cell::Cell::new(None) };
     static SWITCHER_CHORD_MODS: std::cell::Cell<Option<crate::hook::ModifierState>> =
         const { std::cell::Cell::new(None) };
+    static SWITCHER_BACKWARD_ENTRY: std::cell::Cell<bool> =
+        const { std::cell::Cell::new(false) };
 }
 
 pub fn set_worker_hwnd(hwnd: windows_sys::Win32::Foundation::HWND) {
@@ -288,8 +296,45 @@ fn open_visual_switcher(hwnd: windows_sys::Win32::Foundation::HWND) {
         )
     };
 
+    let (aspects, dpi) = if let Some(ctx) = crate::arrangement::win32::resolve_context_for(
+        origin.0 as windows_sys::Win32::Foundation::HWND,
+    ) {
+        let asps: Vec<f32> = eligible_ordered
+            .iter()
+            .map(|&w| {
+                if let Some(r) = current_window_rect(w.0) {
+                    crate::switcher::layout::aspect_from_rect(Some(
+                        crate::switcher::layout::Rect::new(r.left, r.top, r.width(), r.height()),
+                    ))
+                } else {
+                    crate::switcher::layout::DEFAULT_ASPECT
+                }
+            })
+            .collect();
+        (asps, ctx.work_area.dpi)
+    } else {
+        (
+            vec![crate::switcher::layout::DEFAULT_ASPECT; eligible_ordered.len()],
+            96,
+        )
+    };
+
+    let is_backward = SWITCHER_BACKWARD_ENTRY.get();
+    let initial_index = if is_backward && !eligible_ordered.is_empty() {
+        eligible_ordered.len() - 1
+    } else {
+        0
+    };
+
     SWITCHER.with(|s| {
-        s.borrow_mut().open(origin, work_area, eligible_ordered, 0);
+        s.borrow_mut().open(
+            origin,
+            work_area,
+            eligible_ordered,
+            &aspects,
+            dpi,
+            initial_index,
+        );
     });
     crate::hook::set_switcher_active(true);
 
@@ -318,6 +363,7 @@ fn execute_switcher(command: Command) {
                 }
             }
             SWITCHER_HOLD_ORIGIN.set(None);
+            SWITCHER_BACKWARD_ENTRY.set(false);
         }
         Command::SwitcherNext => {
             SWITCHER.with(|s| s.borrow_mut().next());
@@ -364,6 +410,7 @@ fn execute_switcher(command: Command) {
                 suppress_start_menu();
             }
             SWITCHER_HOLD_ORIGIN.set(None);
+            SWITCHER_BACKWARD_ENTRY.set(false);
         }
         Command::SwitcherCancel => {
             crate::hook::set_switcher_active(false);
@@ -392,6 +439,7 @@ fn execute_switcher(command: Command) {
                 let _ = activator.activate(origin);
             }
             SWITCHER_HOLD_ORIGIN.set(None);
+            SWITCHER_BACKWARD_ENTRY.set(false);
         }
         _ => {}
     }
@@ -496,7 +544,7 @@ pub fn decide_switcher_hold_delay(
 /// The active context and the origin monitor are each sampled **once** and
 /// carried through the whole pass, so the result stays deterministic while
 /// windows open, close, and move.
-fn execute_cycle(mods: Option<crate::hook::ModifierState>) {
+fn execute_cycle(mods: Option<crate::hook::ModifierState>, direction: crate::cycling::Direction) {
     #[cfg(debug_assertions)]
     let started = crate::metrics::qpc_now();
 
@@ -519,6 +567,7 @@ fn execute_cycle(mods: Option<crate::hook::ModifierState>) {
             &monitors,
             desktops,
             &spatial,
+            direction,
         )
     });
 
@@ -531,7 +580,14 @@ fn execute_cycle(mods: Option<crate::hook::ModifierState>) {
     ) {
         if let Some(hwnd) = WORKER_HWND.get() {
             SWITCHER_HOLD_ORIGIN.set(Some(origin_before));
-            SWITCHER_CHORD_MODS.set(mods);
+            // DEC-026 §B-5: Shift is cleared from SWITCHER_CHORD_MODS so releasing Shift
+            // during the hold window does not prevent the hold timer from opening the overlay.
+            let chord_mods = mods.map(|mut m| {
+                m.shift = false;
+                m
+            });
+            SWITCHER_CHORD_MODS.set(chord_mods);
+            SWITCHER_BACKWARD_ENTRY.set(direction == crate::cycling::Direction::Backward);
             // SAFETY: SetTimer initializes the hold timer on worker window.
             unsafe {
                 windows_sys::Win32::UI::WindowsAndMessaging::SetTimer(
@@ -622,6 +678,7 @@ fn run_context_safe_cycle<S, P, A, M, V>(
     monitors: &M,
     desktops: Option<&V>,
     spatial: &crate::context::SpatialContext,
+    direction: crate::cycling::Direction,
 ) -> CycleOutcome
 where
     S: CandidateSource + ?Sized,
@@ -652,7 +709,7 @@ where
         return CycleOutcome::NoEligibleTarget;
     }
 
-    for target in crate::cycling::cycle_order(&candidates, active) {
+    for target in crate::cycling::cycle_order_directed(&candidates, active, direction) {
         if !eligible.contains(&target) {
             continue;
         }
@@ -978,6 +1035,7 @@ mod tests {
             &monitors,
             Some(&desktops),
             &spatial,
+            crate::cycling::Direction::Forward,
         );
         assert_eq!(outcome, CycleOutcome::Activated(WindowId(3)));
         assert!(!activator.attempts.contains(&WindowId(2)));
@@ -1008,6 +1066,7 @@ mod tests {
             &monitors,
             Some(&desktops),
             &spatial,
+            crate::cycling::Direction::Forward,
         );
         assert_eq!(outcome, CycleOutcome::Activated(WindowId(3)));
         assert!(!activator.attempts.contains(&WindowId(2)));
@@ -1033,6 +1092,7 @@ mod tests {
             &monitors,
             None::<&FakeDesktops>,
             &spatial,
+            crate::cycling::Direction::Forward,
         );
         assert_eq!(outcome, CycleOutcome::NoEligibleTarget);
         assert!(activator.attempts.is_empty());
@@ -1058,6 +1118,7 @@ mod tests {
             &monitors,
             Some(&desktops),
             &spatial,
+            crate::cycling::Direction::Forward,
         );
         assert_eq!(outcome, CycleOutcome::NoEligibleTarget);
     }
@@ -1090,6 +1151,7 @@ mod tests {
             &monitors,
             Some(&desktops),
             &spatial,
+            crate::cycling::Direction::Forward,
         );
         assert_eq!(outcome, CycleOutcome::Exhausted);
         // 4 then 2 - least-recently-used first - with 3 removed by the
@@ -1192,6 +1254,7 @@ mod tests {
             &monitors,
             Some(&desktops),
             &spatial,
+            crate::cycling::Direction::Forward,
         );
         assert_eq!(outcome, CycleOutcome::Activated(WindowId(3)));
         assert!(
@@ -1237,6 +1300,7 @@ mod tests {
             &monitors,
             Some(&desktops),
             &spatial_new,
+            crate::cycling::Direction::Forward,
         );
         assert_eq!(outcome, CycleOutcome::Activated(WindowId(4)));
         assert!(
@@ -1292,6 +1356,8 @@ mod tests {
             WindowId(100),
             crate::switcher::layout::Rect::new(0, 0, 1920, 1080),
             candidates,
+            &[16.0 / 9.0; 3],
+            96,
             0,
         );
 
@@ -1438,5 +1504,127 @@ mod tests {
         SWITCHER_HOLD_ORIGIN.set(None);
         SWITCHER_CHORD_MODS.set(None);
         WORKER_CONFIG.with(|slot| *slot.borrow_mut() = None);
+    }
+
+    #[test]
+    fn releasing_shift_during_the_hold_window_still_opens_the_overlay() {
+        let mods_with_shift = crate::hook::ModifierState {
+            win: true,
+            ctrl: false,
+            alt: false,
+            shift: true,
+        };
+        let outcome = CycleOutcome::Activated(WindowId(1));
+        let delay = decide_switcher_hold_delay(&outcome, Some(mods_with_shift), true, 150);
+        assert_eq!(delay, Some(150));
+
+        // When armed in execute_cycle, Shift is stripped from SWITCHER_CHORD_MODS (DEC-026 §B-5)
+        let chord_mods = Some(mods_with_shift).map(|mut m| {
+            m.shift = false;
+            m
+        });
+        SWITCHER_CHORD_MODS.set(chord_mods);
+
+        let recorded_mods = SWITCHER_CHORD_MODS
+            .get()
+            .expect("hold timer armed chord mods");
+        assert!(recorded_mods.win);
+        assert!(
+            !recorded_mods.shift,
+            "Shift must be stripped from SWITCHER_CHORD_MODS"
+        );
+
+        // Clean up
+        SWITCHER_HOLD_ORIGIN.set(None);
+        SWITCHER_CHORD_MODS.set(None);
+        SWITCHER_BACKWARD_ENTRY.set(false);
+    }
+
+    #[test]
+    fn a_backward_entry_opens_on_the_last_card() {
+        let mut controller = crate::switcher::SwitcherController::new();
+        let candidates = vec![WindowId(101), WindowId(102), WindowId(103)];
+
+        // Under Direction::Backward, backward entry flag is armed
+        let direction = crate::cycling::Direction::Backward;
+        SWITCHER_BACKWARD_ENTRY.set(direction == crate::cycling::Direction::Backward);
+        assert!(
+            SWITCHER_BACKWARD_ENTRY.get(),
+            "Backward entry flag must be set by CyclePrev"
+        );
+
+        let backward = SWITCHER_BACKWARD_ENTRY.get();
+        let initial_index = if backward && !candidates.is_empty() {
+            candidates.len() - 1
+        } else {
+            0
+        };
+        assert_eq!(initial_index, 2);
+
+        controller.open(
+            WindowId(100),
+            crate::switcher::layout::Rect::new(0, 0, 1920, 1080),
+            candidates,
+            &[16.0 / 9.0; 3],
+            96,
+            initial_index,
+        );
+
+        assert_eq!(controller.selected_window(), Some(WindowId(103)));
+        SWITCHER_BACKWARD_ENTRY.set(false);
+    }
+
+    #[test]
+    fn backward_blind_cycle_activates_in_reverse_order_and_stays_monitor_locked() {
+        // Normal 1 (active), 2 on Monitor B, 3 on Monitor A, 4 on Monitor A
+        let candidates = ordered(vec![normal(1), normal(2), normal(3), normal(4)]);
+        let monitors = FakeMonitors(vec![
+            (WindowId(1), Some(MONITOR_A)),
+            (WindowId(2), Some(MONITOR_B)),
+            (WindowId(3), Some(MONITOR_A)),
+            (WindowId(4), Some(MONITOR_A)),
+        ]);
+        let desktops = FakeDesktops(vec![
+            (WindowId(1), Some(true)),
+            (WindowId(2), Some(true)),
+            (WindowId(3), Some(true)),
+            (WindowId(4), Some(true)),
+        ]);
+        let spatial = SpatialContext {
+            origin_monitor: Some(MONITOR_A),
+        };
+        let mut activator = ScriptedActivator::always(ActivationOutcome::Activated);
+        // Forward order among eligible [3, 4] from active 1 is [4, 3]
+        // Backward order is the forward rotation unreversed: activates [3] first!
+        let outcome = run_context_safe_cycle(
+            &StaticSource(candidates),
+            &WindowEligibility,
+            &mut activator,
+            &active_ctx(1),
+            &monitors,
+            Some(&desktops),
+            &spatial,
+            crate::cycling::Direction::Backward,
+        );
+        assert_eq!(outcome, CycleOutcome::Activated(WindowId(3)));
+        assert!(
+            !activator.attempts.contains(&WindowId(2)),
+            "Secondary monitor window is excluded"
+        );
+    }
+
+    #[test]
+    fn queued_cycle_and_cycle_prev_each_keep_their_own_direction() {
+        let _guard = crate::ring::tests::TEST_LOCK.lock().unwrap();
+        // Clear ring and push Command::Cycle followed by Command::CyclePrev
+        while ring::pop().is_some() {}
+        assert!(ring::push(Command::Cycle.as_u8()));
+        assert!(ring::push(Command::CyclePrev.as_u8()));
+
+        let first = ring::pop().map(Command::from_u8);
+        let second = ring::pop().map(Command::from_u8);
+
+        assert_eq!(first, Some(Command::Cycle));
+        assert_eq!(second, Some(Command::CyclePrev));
     }
 }

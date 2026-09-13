@@ -61,14 +61,14 @@ pub fn pop() -> Option<u8> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
     use std::sync::{Arc, Mutex};
     use std::thread;
 
     /// Serializes every test in this module. The ring uses process-wide static
     /// state, so parallel `cargo test` runs would otherwise race on HEAD/TAIL.
-    static TEST_LOCK: Mutex<()> = Mutex::new(());
+    pub(crate) static TEST_LOCK: Mutex<()> = Mutex::new(());
 
     fn reset() {
         while pop().is_some() {}

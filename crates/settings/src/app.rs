@@ -629,6 +629,9 @@ pub fn describe(field: &str, err: ShortcutError) -> String {
         ShortcutError::InvalidHoldDelay(val) => {
             format!("Visual switcher hold delay ({val}ms) must be between 100ms and 500ms.")
         }
+        ShortcutError::CycleContainsShift => {
+            format!("{label} may not contain Shift (Shift is reserved for backward cycling).")
+        }
     }
 }
 

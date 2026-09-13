@@ -217,6 +217,13 @@ pub trait Activator {
 /// Taking the *first* entry after the active window — the obvious reading of
 /// "next in Z-order" — does not work, because activating a window raises it to
 /// the top. With three windows A, B, C that produces:
+/// Direction of window cycling (SPEC-14-04).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Direction {
+    Forward,
+    Backward,
+}
+
 /// ```text
 /// [A B C] active A -> pick B (B raised)
 /// [B A C] active B -> pick A (A raised)
@@ -225,7 +232,11 @@ pub trait Activator {
 /// C is unreachable. Reversing gives `A -> C -> B -> A`, which visits all three.
 /// For two windows the two orders are identical, which is why the bug only
 /// appears from three windows onward.
-pub fn cycle_order(candidates: &[Candidate], active: &ActiveContext) -> Vec<WindowId> {
+pub fn cycle_order_directed(
+    candidates: &[Candidate],
+    active: &ActiveContext,
+    direction: Direction,
+) -> Vec<WindowId> {
     let ordered: Vec<WindowId> = candidates.iter().map(|c| c.facts.window).collect();
     let mut rotated: Vec<WindowId> = match ordered.iter().position(|w| *w == active.foreground) {
         Some(pos) => ordered[pos + 1..]
@@ -235,8 +246,14 @@ pub fn cycle_order(candidates: &[Candidate], active: &ActiveContext) -> Vec<Wind
             .collect(),
         None => ordered,
     };
-    rotated.reverse();
+    if direction == Direction::Forward {
+        rotated.reverse();
+    }
     rotated
+}
+
+pub fn cycle_order(candidates: &[Candidate], active: &ActiveContext) -> Vec<WindowId> {
+    cycle_order_directed(candidates, active, Direction::Forward)
 }
 
 /// Drive one deterministic cycle pass.
@@ -766,5 +783,20 @@ mod tests {
         let source = StaticSource(ordered(vec![normal(1), normal(2)]));
         let mut activator = ScriptedActivator::always(ActivationOutcome::Activated);
         let _ = run_cycle(&source, &ReferencePolicy, &mut activator, &active(1));
+    }
+
+    #[test]
+    fn backward_cycle_order_is_the_forward_rotation_unreversed() {
+        let candidates = ordered(vec![normal(1), normal(2), normal(3), normal(4)]);
+        let active = active(2);
+
+        let forward = cycle_order_directed(&candidates, &active, Direction::Forward);
+        let backward = cycle_order_directed(&candidates, &active, Direction::Backward);
+
+        let mut forward_reversed = forward.clone();
+        forward_reversed.reverse();
+        assert_eq!(backward, forward_reversed);
+        assert_eq!(backward, vec![WindowId(3), WindowId(4), WindowId(1)]);
+        assert_eq!(forward, vec![WindowId(1), WindowId(4), WindowId(3)]);
     }
 }
