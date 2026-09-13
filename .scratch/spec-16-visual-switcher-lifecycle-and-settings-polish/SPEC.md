@@ -3,7 +3,7 @@ spec: SPEC-16
 release: "0.4.0"
 prd: wira-desk
 fr: []
-status: open
+status: closed
 ---
 
 # SPEC-16 — Visual Switcher Start Menu Suppression, WinUI Helper Exclusion, UI Em-Dash Removal, and Stepper Spacing Polish
@@ -173,7 +173,7 @@ against DEC-026 clause 3's recorded state, and it needs a new `DEC-`, not a tick
 ## Open questions and debt carried
 
 1. **The second half of owner note 3 is not proven to share a cause.** The owner reported the Start
-   Menu *and* "glitch tidak stabilnya perpindahan switcher, kadang bisa kadang tidak". The focus
+   Menu *and* "unstable switching glitch, sometimes it works, sometimes not". The focus
    race with `StartMenuExperienceHost` is a coherent single explanation and is the working
    hypothesis — but it is inferred, not measured. A second mechanism produces the same pair: when
    `open_visual_switcher` takes either early return (`worker.rs:267`, `worker.rs:277`) the overlay

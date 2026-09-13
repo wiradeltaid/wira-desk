@@ -96,7 +96,7 @@ export component KeyCheck inherits Rectangle {
                     }
                     Text {
                         text: root.verdict == 4
-                            ? "Wira Desk isn't running — only this window is being checked."
+                            ? "Wira Desk isn't running. Only this window is being checked."
                             : "Press any combination to verify what reaches Wira Desk.";
                         font-family: Typography.font_family;
                         font-size: Typography.size_caption;
@@ -139,7 +139,7 @@ export component KeyCheck inherits Rectangle {
                     border-color: Palette.stroke_card;
 
                     Text {
-                        text: root.last_display == "" ? "—" : root.last_display;
+                        text: root.last_display == "" ? "None yet" : root.last_display;
                         font-family: Typography.font_family;
                         font-size: 12px;
                         font-weight: 600;
@@ -158,8 +158,8 @@ export component KeyCheck inherits Rectangle {
 
             if root.has_note : Text {
                 text: root.verdict == 2
-                    ? "Another app claimed " + root.last_display + " first, but Wira Desk still receives it before that app — this shortcut will work."
-                    : "" + root.last_display + " never reached Wira Desk. Another app running in the background is taking it first — often GPU software, Discord, or a game overlay. Try a different combination.";
+                    ? "Another app claimed " + root.last_display + " first, but Wira Desk still receives it before that app. This shortcut will work."
+                    : "" + root.last_display + " never reached Wira Desk. Another app running in the background is taking it first, often GPU software, Discord, or a game overlay. Try a different combination.";
                 font-family: Typography.font_family;
                 font-size: 11.5px;
                 font-weight: 600;

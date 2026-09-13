@@ -35,6 +35,7 @@ pub const CLASS_PROGMAN: &str = "Progman";
 pub const CLASS_WORKERW: &str = "WorkerW";
 pub const CLASS_POPUP_HOST: &str = "PopupHost";
 pub const CLASS_XAML_WINDOWED_POPUP: &str = "Xaml_WindowedPopupClass";
+pub const CLASS_POPUP_WINDOW_SITE_BRIDGE: &str = "Microsoft.UI.Content.PopupWindowSiteBridge";
 
 /// Shell surfaces excluded regardless of style bits.
 pub const SHELL_SURFACE_CLASSES: &[&str] = &[
@@ -45,7 +46,11 @@ pub const SHELL_SURFACE_CLASSES: &[&str] = &[
 ];
 
 /// Helper surfaces (WinUI/XAML popup hosts) excluded regardless of style bits.
-pub const HELPER_SURFACE_CLASSES: &[&str] = &[CLASS_POPUP_HOST, CLASS_XAML_WINDOWED_POPUP];
+pub const HELPER_SURFACE_CLASSES: &[&str] = &[
+    CLASS_POPUP_HOST,
+    CLASS_XAML_WINDOWED_POPUP,
+    CLASS_POPUP_WINDOW_SITE_BRIDGE,
+];
 
 /// Application identity.
 /// Identity is the case-insensitive executable basename. A PID may be used to
@@ -443,6 +448,11 @@ pub mod fixtures {
             (
                 CLASS_XAML_WINDOWED_POPUP,
                 with_class(15, CLASS_XAML_WINDOWED_POPUP),
+                Eligibility::Excluded(ExclusionReason::HelperSurface),
+            ),
+            (
+                CLASS_POPUP_WINDOW_SITE_BRIDGE,
+                with_class(16, CLASS_POPUP_WINDOW_SITE_BRIDGE),
                 Eligibility::Excluded(ExclusionReason::HelperSurface),
             ),
             (

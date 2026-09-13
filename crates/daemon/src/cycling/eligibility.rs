@@ -392,6 +392,51 @@ mod tests {
     }
 
     #[test]
+    fn popup_window_site_bridge_is_excluded() {
+        assert_eq!(
+            evaluate_facts(
+                &identity(HOST_EXE),
+                &with_class(1, CLASS_POPUP_WINDOW_SITE_BRIDGE)
+            ),
+            Eligibility::Excluded(ExclusionReason::HelperSurface)
+        );
+    }
+
+    #[test]
+    fn winui_notepad_popup_bridge_profile_is_excluded() {
+        let notepad_identity = AppIdentity::Executable("notepad.exe".to_string());
+        let bridge_facts = WindowFacts {
+            class_name: CLASS_POPUP_WINDOW_SITE_BRIDGE.to_string(),
+            is_owned: true,
+            has_nonzero_extent: true,
+            has_title: true,
+            identity: notepad_identity.clone(),
+            ..normal(1)
+        };
+        assert_eq!(
+            evaluate_facts(&notepad_identity, &bridge_facts),
+            Eligibility::Excluded(ExclusionReason::HelperSurface)
+        );
+    }
+
+    #[test]
+    fn real_notepad_window_remains_eligible() {
+        let notepad_identity = AppIdentity::Executable("notepad.exe".to_string());
+        let real_notepad_facts = WindowFacts {
+            class_name: "Notepad".to_string(),
+            is_owned: false,
+            has_nonzero_extent: true,
+            has_title: true,
+            identity: notepad_identity.clone(),
+            ..normal(1)
+        };
+        assert_eq!(
+            evaluate_facts(&notepad_identity, &real_notepad_facts),
+            Eligibility::Eligible
+        );
+    }
+
+    #[test]
     fn empty_title_window_is_still_eligible() {
         let facts = WindowFacts {
             has_title: false,

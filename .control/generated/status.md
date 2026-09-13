@@ -45,10 +45,10 @@ work_progress:
   tickets_total: 4
   work_progress: 100%
 - spec: SPEC-16
-  status: open
-  tickets_done: 0
+  status: closed
+  tickets_done: 3
   tickets_total: 3
-  work_progress: 0%
+  work_progress: 100%
 - spec: SPEC-2
   status: closed
   tickets_done: 2

@@ -74,15 +74,15 @@ survive untouched: `app::tests::visual_hold_delay_description_wraps_with_newline
 
 **Blocked by:** None
 
-**Status:** ready-for-agent
+**Status:** closed
 
-- [ ] `general_pane.slint` Hold Delay row is `padding-top: 12px; padding-bottom: 12px`.
-- [ ] The stepper cluster is wrapped in `VerticalLayout { alignment: center; }`, and its
+- [x] `general_pane.slint` Hold Delay row is `padding-top: 12px; padding-bottom: 12px`.
+- [x] The stepper cluster is wrapped in `VerticalLayout { alignment: center; }`, and its
       `HorizontalLayout` still carries `alignment: end`.
-- [ ] The six user-visible strings above match the pinned replacements exactly.
-- [ ] `(100–500 ms)` (U+2013) is unchanged, and `visual_hold_delay_description_wraps_with_newline`
+- [x] The six user-visible strings above match the pinned replacements exactly.
+- [x] `(100–500 ms)` (U+2013) is unchanged, and `visual_hold_delay_description_wraps_with_newline`
       still passes.
-- [ ] No `.slint` **comment** was rewritten.
-- [ ] `about_pane_renders_in_process_disclosure_with_newline` keeps its name and asserts the new string.
-- [ ] `all_visible_slint_strings_have_zero_em_dashes` passes and is scoped to string literals.
-- [ ] `scripts/verify-settings-runtime.ps1` passes.
+- [x] No `.slint` **comment** was rewritten.
+- [x] `about_pane_renders_in_process_disclosure_with_newline` keeps its name and asserts the new string.
+- [x] `all_visible_slint_strings_have_zero_em_dashes` passes and is scoped to string literals.
+- [x] `scripts/verify-settings-runtime.ps1` passes.
