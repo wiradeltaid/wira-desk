@@ -130,7 +130,9 @@ pub fn drain_commands() {
             | Command::ShowDesktop => {
                 execute_mouse_navigation(Command::from_u8(raw));
             }
-            Command::SwitcherDisarm
+            Command::SwitcherArm
+            | Command::SwitcherArmPrev
+            | Command::SwitcherDisarm
             | Command::SwitcherNext
             | Command::SwitcherPrev
             | Command::SwitcherUp
@@ -351,6 +353,35 @@ fn open_visual_switcher(hwnd: windows_sys::Win32::Foundation::HWND) {
 
 fn execute_switcher(command: Command) {
     match command {
+        Command::SwitcherArm | Command::SwitcherArmPrev => {
+            let snap = worker_snapshot();
+            let mods = crate::hook::get_last_cycle_mods();
+            let delay = decide_switcher_hold_delay(
+                &CycleOutcome::Activated(WindowId(0)),
+                Some(mods),
+                snap.visual_enabled,
+                snap.visual_hold_delay_ms,
+            );
+            if let Some(delay) = delay {
+                let active = capture_active_context();
+                SWITCHER_HOLD_ORIGIN.set(Some(active.foreground));
+                let mut chord_mods = mods;
+                chord_mods.shift = false;
+                SWITCHER_CHORD_MODS.set(Some(chord_mods));
+                SWITCHER_BACKWARD_ENTRY.set(command == Command::SwitcherArmPrev);
+                if let Some(hwnd) = WORKER_HWND.get() {
+                    // SAFETY: SetTimer initializes the hold timer on worker window.
+                    unsafe {
+                        windows_sys::Win32::UI::WindowsAndMessaging::SetTimer(
+                            hwnd,
+                            TIMER_SWITCHER_HOLD,
+                            delay,
+                            None,
+                        );
+                    }
+                }
+            }
+        }
         Command::SwitcherDisarm => {
             crate::hook::set_switcher_active(false);
             if let Some(hwnd) = WORKER_HWND.get() {
@@ -511,6 +542,10 @@ fn synthesize_chord(keys: &[u16]) {
     suppress_start_menu();
 }
 
+pub fn switcher_hold_delay_ms(configured_ms: u32) -> u32 {
+    shared::config::SwitcherConfig::clamp_hold_delay(configured_ms)
+}
+
 /// Decide whether to arm the visual switcher hold timer and with what delay.
 ///
 /// Pure, Win32-free decision function extracted for testability (SPEC-14-05).
@@ -529,7 +564,7 @@ pub fn decide_switcher_hold_delay(
         CycleOutcome::Activated(_) => {
             let m = mods?;
             if m.any() {
-                Some(visual_hold_delay_ms.clamp(100, 500))
+                Some(switcher_hold_delay_ms(visual_hold_delay_ms))
             } else {
                 None
             }
@@ -544,12 +579,11 @@ pub fn decide_switcher_hold_delay(
 /// The active context and the origin monitor are each sampled **once** and
 /// carried through the whole pass, so the result stays deterministic while
 /// windows open, close, and move.
-fn execute_cycle(mods: Option<crate::hook::ModifierState>, direction: crate::cycling::Direction) {
+fn execute_cycle(_mods: Option<crate::hook::ModifierState>, direction: crate::cycling::Direction) {
     #[cfg(debug_assertions)]
     let started = crate::metrics::qpc_now();
 
     let active = capture_active_context();
-    let origin_before = active.foreground;
     let monitors = Win32Monitors;
     let spatial = capture_spatial_context(&monitors, active.foreground);
 
@@ -570,35 +604,6 @@ fn execute_cycle(mods: Option<crate::hook::ModifierState>, direction: crate::cyc
             direction,
         )
     });
-
-    let snap = worker_snapshot();
-    if let Some(delay) = decide_switcher_hold_delay(
-        &outcome,
-        mods,
-        snap.visual_enabled,
-        snap.visual_hold_delay_ms,
-    ) {
-        if let Some(hwnd) = WORKER_HWND.get() {
-            SWITCHER_HOLD_ORIGIN.set(Some(origin_before));
-            // DEC-026 §B-5: Shift is cleared from SWITCHER_CHORD_MODS so releasing Shift
-            // during the hold window does not prevent the hold timer from opening the overlay.
-            let chord_mods = mods.map(|mut m| {
-                m.shift = false;
-                m
-            });
-            SWITCHER_CHORD_MODS.set(chord_mods);
-            SWITCHER_BACKWARD_ENTRY.set(direction == crate::cycling::Direction::Backward);
-            // SAFETY: SetTimer initializes the hold timer on worker window.
-            unsafe {
-                windows_sys::Win32::UI::WindowsAndMessaging::SetTimer(
-                    hwnd,
-                    TIMER_SWITCHER_HOLD,
-                    delay,
-                    None,
-                );
-            }
-        }
-    }
 
     // After the focus change, while Win is still down. Doing it here rather
     // than in the callback keeps `SendInput` off the input-processing path.

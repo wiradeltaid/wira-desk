@@ -111,14 +111,14 @@ validators_skipped:
     (changed at f7c2739, reviewed at f989238)'
 open_questions:
   blocking: 0
-  assumptions: 31
+  assumptions: 32
   external: 2
   answered: 4
   open_by_whose:
     owner: 8
     run: 1
     frozen: 0
-    unstated: 22
+    unstated: 23
   blocking_budget: 6
   blocking_over_budget: false
   assumptions_budget_per_gate: 15

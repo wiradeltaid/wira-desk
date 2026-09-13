@@ -25,6 +25,18 @@ live on this decision's row in `decisions.yaml` under `mandate:`.
 In scope:
 - `SPEC-15`: Visual switcher polish and lifecycle (4 tickets: SPEC-15-01 through SPEC-15-04)
 
+### Architectural Timing Contract & Lifecycle Boundaries (SPEC-15-04)
+
+1. **Option A Decoupled Timing Contract:**
+   - When `visual_enabled` is true, blind cycle activation moves from chord keydown to the chord's committing edge: main-key release below `visual_hold_delay_ms`. Zero `Command::Cycle` is enqueued at keydown; holding past the threshold opens the visual switcher overlay while the pre-hold foreground window remains foreground.
+   - When `visual_enabled` is false, blind cycling continues to fire on keydown; latency profile and behavior are completely untouched.
+2. **SM-1 Measurement Point Restatement:**
+   - The success metric SM-1 in `.what/_prd/wira-desk/prd.md` is restated so that focus transfer latency (< 1 ms) is measured following chord release (the chord's committing edge below hold threshold when visual switcher is enabled, or keypress when visual switcher is disabled).
+3. **Auto-Repeat Suppression on Chord Main Key:**
+   - The low-level hook suppresses synthetic auto-repeat `WM_KEYDOWN` events for `switcher_main_vk` while the key is already latched down, preventing runaway selection advancement when holding the cycle chord with the overlay open.
+4. **Single Source for Hold Threshold Derivation:**
+   - Both Hook and Worker threads derive hold threshold via `shared::config::SwitcherConfig::clamp_hold_delay`, preventing timing skew or race conditions between actors.
+
 Execution constraints specified by owner:
 1. Coding directly implemented by coordinator with mandatory self code review.
 2. Code review performed 2 times: self code review (in-session default, no separate dispatch) + independent peer review shell-out via:

@@ -441,6 +441,10 @@ where
     }
 
     if !key_down {
+        if vk as u16 == rt.switcher_main_vk {
+            rt.switcher_main_key_down = false;
+        }
+
         if ModifierState::is_modifier_vk(vk) {
             if rt.is_switcher_active() {
                 if !rt.mods.has_any_of(&rt.switcher_mods) {
@@ -468,9 +472,18 @@ where
         }
 
         if rt.switcher_armed && vk as u16 == rt.switcher_main_vk {
+            let mut enqueued = false;
+            rt.switcher_armed = false;
             if now < rt.switcher_deadline_ms {
-                rt.switcher_armed = false;
                 let _ = enqueue(Command::SwitcherDisarm.as_u8());
+                set_last_cycle_mods(rt.mods);
+                let cmd_obj = Command::from_u8(rt.switcher_cycle_cmd);
+                if cmd_obj.is_exempt_from_throttle() || throttle_allows(rt.last_throttle_ms, now) {
+                    enqueued = enqueue(rt.switcher_cycle_cmd);
+                    rt.last_throttle_ms = now;
+                    #[cfg(debug_assertions)]
+                    crate::metrics::ACCEPTED.fetch_add(1, Ordering::Relaxed);
+                }
                 // SAFETY: Worker HWND is verified or null check.
                 unsafe {
                     let _ = PostMessageW(rt.worker_hwnd, WM_APP_COMMAND_READY, 0, 0);
@@ -479,7 +492,7 @@ where
             rt.swallow_release_vk = 0;
             return KeyHandleOutcome {
                 disposition: KeyHandleResult::Swallow,
-                enqueued: false,
+                enqueued,
             };
         }
 
@@ -512,6 +525,16 @@ where
     }
 
     if rt.is_switcher_active() {
+        if vk as u16 == rt.switcher_main_vk {
+            if rt.switcher_main_key_down {
+                return KeyHandleOutcome {
+                    disposition: KeyHandleResult::Swallow,
+                    enqueued: false,
+                };
+            }
+            rt.switcher_main_key_down = true;
+        }
+
         let nav_cmd = match vk {
             0x1B => Some(Command::SwitcherCancel), // VK_ESCAPE
             0x27 => Some(Command::SwitcherNext),   // VK_RIGHT
@@ -545,6 +568,13 @@ where
             };
         }
 
+        return KeyHandleOutcome {
+            disposition: KeyHandleResult::Swallow,
+            enqueued: false,
+        };
+    }
+
+    if rt.switcher_armed && vk as u16 == rt.switcher_main_vk && rt.switcher_main_key_down {
         return KeyHandleOutcome {
             disposition: KeyHandleResult::Swallow,
             enqueued: false,
@@ -605,8 +635,48 @@ where
         };
     }
 
-    let mut enqueued = false;
     let cmd_obj = Command::from_u8(cmd);
+    if (cmd == Command::Cycle.as_u8() || cmd == Command::CyclePrev.as_u8())
+        && rt.switcher_visual_enabled
+        && rt.mods.any()
+    {
+        set_last_cycle_mods(rt.mods);
+        rt.switcher_armed = true;
+        rt.switcher_main_vk = vk as u16;
+        rt.switcher_main_key_down = true;
+        rt.switcher_cycle_cmd = cmd;
+        // DEC-026 §B-5: Shift is cleared from switcher_mods so releasing
+        // the chord modifier while Shift is still held commits the overlay.
+        let mut chord_mods = rt.mods;
+        chord_mods.shift = false;
+        rt.switcher_mods = chord_mods;
+        let delay = switcher_hold_delay_ms(rt.switcher_hold_delay_ms);
+        rt.switcher_deadline_ms = now + delay;
+        let arm_cmd = if cmd == Command::CyclePrev.as_u8() {
+            Command::SwitcherArmPrev
+        } else {
+            Command::SwitcherArm
+        };
+        let _ = enqueue(arm_cmd.as_u8());
+        // SAFETY: `PostMessageW` compares `worker_hwnd` rather than dereferencing it;
+        // fails safely if stale.
+        unsafe {
+            let _ = PostMessageW(rt.worker_hwnd, WM_APP_COMMAND_READY, 0, 0);
+        }
+        rt.swallow_release_vk = vk as u16;
+        return KeyHandleOutcome {
+            disposition: KeyHandleResult::Swallow,
+            enqueued: false,
+        };
+    }
+
+    if cmd == Command::Cycle.as_u8() || cmd == Command::CyclePrev.as_u8() {
+        set_last_cycle_mods(rt.mods);
+        rt.switcher_armed = false;
+        rt.switcher_main_key_down = true;
+    }
+
+    let mut enqueued = false;
     // Throttle and capacity rejections are counted separately so the
     // reconciliation can tell an intentional drop from a failure. Atomic
     // increments only — no allocation, no lock, no logging in the callback.
@@ -621,28 +691,6 @@ where
         rt.last_throttle_ms = now;
         #[cfg(debug_assertions)]
         crate::metrics::ACCEPTED.fetch_add(1, Ordering::Relaxed);
-
-        if cmd == Command::Cycle.as_u8() || cmd == Command::CyclePrev.as_u8() {
-            set_last_cycle_mods(rt.mods);
-            if rt.switcher_visual_enabled && rt.mods.any() {
-                rt.switcher_armed = true;
-                rt.switcher_main_vk = vk as u16;
-                // DEC-026 §B-5: Shift is cleared from switcher_mods so releasing
-                // the chord modifier while Shift is still held commits the overlay.
-                let mut chord_mods = rt.mods;
-                chord_mods.shift = false;
-                rt.switcher_mods = chord_mods;
-                let delay = if rt.switcher_hold_delay_ms >= 100 && rt.switcher_hold_delay_ms <= 500
-                {
-                    rt.switcher_hold_delay_ms as u64
-                } else {
-                    150
-                };
-                rt.switcher_deadline_ms = now + delay;
-            } else {
-                rt.switcher_armed = false;
-            }
-        }
 
         // SAFETY: `PostMessageW` compares `worker_hwnd` rather than dereferencing it, so a
         // stale handle makes the call fail instead of faulting — hence `let _ =`. Both
@@ -1361,8 +1409,14 @@ pub struct HookRuntime {
     pub switcher_armed: bool,
     pub switcher_active: bool,
     pub switcher_main_vk: u16,
+    pub switcher_main_key_down: bool,
+    pub switcher_cycle_cmd: u8,
     pub switcher_deadline_ms: u64,
     pub switcher_mods: ModifierState,
+}
+
+pub fn switcher_hold_delay_ms(configured_ms: u32) -> u64 {
+    shared::config::SwitcherConfig::clamp_hold_delay(configured_ms) as u64
 }
 
 impl HookRuntime {
@@ -2051,6 +2105,8 @@ fn hook_thread_main(worker_hwnd: HWND, h_mod: HINSTANCE) {
             switcher_armed: false,
             switcher_active: false,
             switcher_main_vk: 0,
+            switcher_main_key_down: false,
+            switcher_cycle_cmd: Command::Cycle.as_u8(),
             switcher_deadline_ms: 0,
             switcher_mods: ModifierState::default(),
         };
@@ -2597,6 +2653,8 @@ mod tests {
             switcher_armed: false,
             switcher_active: false,
             switcher_main_vk: 0,
+            switcher_main_key_down: false,
+            switcher_cycle_cmd: Command::Cycle.as_u8(),
             switcher_deadline_ms: 0,
             switcher_mods: ModifierState::default(),
         }
@@ -2646,23 +2704,31 @@ mod tests {
         let o1 = handle_key_event_with_sink(&mut rt, VK_LWIN, true, |_| false, |_| 0, 0, &enqueue);
         assert_eq!(o1.disposition, KeyHandleResult::PassToNext);
 
-        // Backtick down at t = 10 -> Cycle enqueued immediately, switcher armed with deadline = 160
+        // Backtick down at t = 10 -> SwitcherArm enqueued, zero Cycle enqueued, switcher armed with deadline = 160
         let o2 =
             handle_key_event_with_sink(&mut rt, VK_BACKTICK, true, |_| false, |_| 0, 10, &enqueue);
         assert_eq!(o2.disposition, KeyHandleResult::Swallow);
-        assert!(o2.enqueued);
+        assert!(!o2.enqueued, "Zero Command::Cycle enqueued at keydown");
         assert!(rt.switcher_armed);
-        assert_eq!(queue.lock().unwrap().as_slice(), &[Command::Cycle.as_u8()]);
+        assert_eq!(
+            queue.lock().unwrap().as_slice(),
+            &[Command::SwitcherArm.as_u8()]
+        );
 
-        // Backtick released at t = 60 (< 160) -> Disarms switcher!
+        // Backtick released at t = 60 (< 160) -> Disarms switcher AND fires Cycle on release!
         let o3 =
             handle_key_event_with_sink(&mut rt, VK_BACKTICK, false, |_| false, |_| 0, 60, &enqueue);
         assert_eq!(o3.disposition, KeyHandleResult::Swallow);
+        assert!(o3.enqueued, "Command::Cycle enqueued at tap release");
         assert!(!rt.switcher_armed);
         assert!(!rt.switcher_active);
         assert_eq!(
             queue.lock().unwrap().as_slice(),
-            &[Command::Cycle.as_u8(), Command::SwitcherDisarm.as_u8()]
+            &[
+                Command::SwitcherArm.as_u8(),
+                Command::SwitcherDisarm.as_u8(),
+                Command::Cycle.as_u8()
+            ]
         );
     }
 
@@ -3828,19 +3894,21 @@ mod tests {
         let _ = handle_key_event_with_bypass(&mut rt, VK_LWIN, true, |_| false, |_| 0);
         let _ = handle_key_event_with_bypass(&mut rt, VK_LSHIFT, true, |_| false, |_| 0);
 
-        // Press Backtick -> Backward cycle
+        // Press Backtick -> Backward cycle hold armed (SwitcherArmPrev)
         let queue = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
         let q = std::sync::Arc::clone(&queue);
         let enqueue = move |cmd: u8| {
             q.lock().unwrap().push(cmd);
             true
         };
-        let _ =
+        let o =
             handle_key_event_with_sink(&mut rt, VK_BACKTICK, true, |_| false, |_| 0, 10, &enqueue);
 
+        assert_eq!(o.disposition, KeyHandleResult::Swallow);
+        assert!(!o.enqueued, "Zero CyclePrev enqueued at keydown");
         assert_eq!(
             queue.lock().unwrap().as_slice(),
-            &[Command::CyclePrev.as_u8()]
+            &[Command::SwitcherArmPrev.as_u8()]
         );
         assert!(rt.switcher_armed);
         // DEC-026 §B-5: Shift must be cleared from switcher_mods
@@ -3849,6 +3917,20 @@ mod tests {
             "Shift must be cleared from switcher_mods"
         );
         assert!(rt.switcher_mods.win, "Win must remain in switcher_mods");
+
+        // Release Backtick at t = 60 (< 160) -> Disarms switcher AND fires CyclePrev on release!
+        let o_up =
+            handle_key_event_with_sink(&mut rt, VK_BACKTICK, false, |_| false, |_| 0, 60, &enqueue);
+        assert_eq!(o_up.disposition, KeyHandleResult::Swallow);
+        assert!(o_up.enqueued, "CyclePrev enqueued on tap release");
+        assert_eq!(
+            queue.lock().unwrap().as_slice(),
+            &[
+                Command::SwitcherArmPrev.as_u8(),
+                Command::SwitcherDisarm.as_u8(),
+                Command::CyclePrev.as_u8()
+            ]
+        );
     }
 
     #[test]
@@ -3891,5 +3973,161 @@ mod tests {
             &[Command::SwitcherCommit.as_u8()]
         );
         assert!(!rt.is_switcher_active());
+    }
+
+    #[test]
+    fn holding_chord_with_overlay_open_does_not_advance_selection_on_auto_repeat() {
+        let primary = Shortcut::parse("win+backtick").unwrap();
+        let fallback = Shortcut::parse("alt+backtick").unwrap();
+        let mut rt = test_runtime(primary, fallback);
+
+        // Overlay is open
+        rt.switcher_active = true;
+        set_switcher_active(true);
+        rt.switcher_main_vk = VK_BACKTICK as u16;
+        rt.switcher_mods = ModifierState {
+            win: true,
+            ..Default::default()
+        };
+        rt.mods = ModifierState {
+            win: true,
+            ..Default::default()
+        };
+
+        let queue = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+        let q = std::sync::Arc::clone(&queue);
+        let enqueue = move |cmd: u8| {
+            q.lock().unwrap().push(cmd);
+            true
+        };
+
+        // First press of Backtick while overlay is open -> SwitcherNext
+        let o1 =
+            handle_key_event_with_sink(&mut rt, VK_BACKTICK, true, |_| false, |_| 0, 100, &enqueue);
+        assert_eq!(o1.disposition, KeyHandleResult::Swallow);
+        assert!(o1.enqueued);
+        assert_eq!(
+            queue.lock().unwrap().as_slice(),
+            &[Command::SwitcherNext.as_u8()]
+        );
+
+        // Windows auto-repeat fires a second WM_KEYDOWN for Backtick while still held down
+        let o2 =
+            handle_key_event_with_sink(&mut rt, VK_BACKTICK, true, |_| false, |_| 0, 130, &enqueue);
+        assert_eq!(o2.disposition, KeyHandleResult::Swallow);
+        assert!(!o2.enqueued, "Auto-repeat keydown must not be enqueued");
+        assert_eq!(
+            queue.lock().unwrap().as_slice(),
+            &[Command::SwitcherNext.as_u8()],
+            "Queue must still have only 1 command; auto-repeat must be ignored"
+        );
+    }
+
+    #[test]
+    fn holding_past_threshold_does_not_enqueue_cycle_on_keydown_or_keyup() {
+        let primary = Shortcut::parse("win+backtick").unwrap();
+        let fallback = Shortcut::parse("alt+backtick").unwrap();
+        let mut rt = test_runtime(primary, fallback);
+
+        let queue = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+        let q = std::sync::Arc::clone(&queue);
+        let enqueue = move |cmd: u8| {
+            q.lock().unwrap().push(cmd);
+            true
+        };
+
+        // Win down at t = 0
+        let _ = handle_key_event_with_sink(&mut rt, VK_LWIN, true, |_| false, |_| 0, 0, &enqueue);
+
+        // Backtick down at t = 10 -> arms switcher hold, zero Cycle enqueued
+        let o_down =
+            handle_key_event_with_sink(&mut rt, VK_BACKTICK, true, |_| false, |_| 0, 10, &enqueue);
+        assert_eq!(o_down.disposition, KeyHandleResult::Swallow);
+        assert!(!o_down.enqueued);
+        assert!(rt.switcher_armed);
+        assert_eq!(
+            queue.lock().unwrap().as_slice(),
+            &[Command::SwitcherArm.as_u8()]
+        );
+
+        // Backtick released at t = 200 (past 10 + 150 threshold = 160)
+        let o_up = handle_key_event_with_sink(
+            &mut rt,
+            VK_BACKTICK,
+            false,
+            |_| false,
+            |_| 0,
+            200,
+            &enqueue,
+        );
+        assert_eq!(o_up.disposition, KeyHandleResult::Swallow);
+        assert!(!o_up.enqueued);
+        assert!(!rt.switcher_armed);
+        // Queue must still have ONLY SwitcherArm: zero Cycle commands enqueued!
+        assert_eq!(
+            queue.lock().unwrap().as_slice(),
+            &[Command::SwitcherArm.as_u8()]
+        );
+    }
+
+    #[test]
+    fn repeated_taps_below_threshold_each_produce_one_cycle() {
+        let primary = Shortcut::parse("win+backtick").unwrap();
+        let fallback = Shortcut::parse("alt+backtick").unwrap();
+        let mut rt = test_runtime(primary, fallback);
+
+        let queue = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+        let q = std::sync::Arc::clone(&queue);
+        let enqueue = move |cmd: u8| {
+            q.lock().unwrap().push(cmd);
+            true
+        };
+
+        // Hold Win down
+        let _ = handle_key_event_with_sink(&mut rt, VK_LWIN, true, |_| false, |_| 0, 0, &enqueue);
+
+        // Tap 1: down at t = 10, up at t = 40 (< 160)
+        let _ =
+            handle_key_event_with_sink(&mut rt, VK_BACKTICK, true, |_| false, |_| 0, 10, &enqueue);
+        let o_up1 =
+            handle_key_event_with_sink(&mut rt, VK_BACKTICK, false, |_| false, |_| 0, 40, &enqueue);
+        assert!(o_up1.enqueued);
+
+        // Tap 2: down at t = 100, up at t = 130 (< 250)
+        let _ =
+            handle_key_event_with_sink(&mut rt, VK_BACKTICK, true, |_| false, |_| 0, 100, &enqueue);
+        let o_up2 = handle_key_event_with_sink(
+            &mut rt,
+            VK_BACKTICK,
+            false,
+            |_| false,
+            |_| 0,
+            130,
+            &enqueue,
+        );
+        assert!(o_up2.enqueued);
+
+        assert_eq!(
+            queue.lock().unwrap().as_slice(),
+            &[
+                Command::SwitcherArm.as_u8(),
+                Command::SwitcherDisarm.as_u8(),
+                Command::Cycle.as_u8(),
+                Command::SwitcherArm.as_u8(),
+                Command::SwitcherDisarm.as_u8(),
+                Command::Cycle.as_u8(),
+            ]
+        );
+    }
+
+    #[test]
+    fn hook_and_worker_hold_thresholds_cannot_disagree() {
+        for delay in [0, 50, 99, 100, 150, 250, 500, 501, 1000, u32::MAX] {
+            assert_eq!(
+                switcher_hold_delay_ms(delay),
+                crate::worker::switcher_hold_delay_ms(delay) as u64,
+                "Hook and worker hold threshold must be identical for input: {delay}"
+            );
+        }
     }
 }
