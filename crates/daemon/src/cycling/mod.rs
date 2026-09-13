@@ -33,6 +33,8 @@ pub const CLASS_SHELL_TRAY: &str = "Shell_TrayWnd";
 pub const CLASS_SHELL_SECONDARY_TRAY: &str = "Shell_SecondaryTrayWnd";
 pub const CLASS_PROGMAN: &str = "Progman";
 pub const CLASS_WORKERW: &str = "WorkerW";
+pub const CLASS_POPUP_HOST: &str = "PopupHost";
+pub const CLASS_XAML_WINDOWED_POPUP: &str = "Xaml_WindowedPopupClass";
 
 /// Shell surfaces excluded regardless of style bits.
 pub const SHELL_SURFACE_CLASSES: &[&str] = &[
@@ -41,6 +43,9 @@ pub const SHELL_SURFACE_CLASSES: &[&str] = &[
     CLASS_PROGMAN,
     CLASS_WORKERW,
 ];
+
+/// Helper surfaces (WinUI/XAML popup hosts) excluded regardless of style bits.
+pub const HELPER_SURFACE_CLASSES: &[&str] = &[CLASS_POPUP_HOST, CLASS_XAML_WINDOWED_POPUP];
 
 /// Application identity.
 /// Identity is the case-insensitive executable basename. A PID may be used to
@@ -110,11 +115,20 @@ pub struct WindowFacts {
     pub tool_window: bool,
     pub class_name: String,
     pub identity: AppIdentity,
+    pub has_title: bool,
+    pub has_nonzero_extent: bool,
+    pub is_owned: bool,
 }
 
 impl WindowFacts {
     pub fn is_shell_surface(&self) -> bool {
         SHELL_SURFACE_CLASSES
+            .iter()
+            .any(|c| c.eq_ignore_ascii_case(&self.class_name))
+    }
+
+    pub fn is_helper_surface(&self) -> bool {
+        HELPER_SURFACE_CLASSES
             .iter()
             .any(|c| c.eq_ignore_ascii_case(&self.class_name))
     }
@@ -150,6 +164,7 @@ pub enum ExclusionReason {
     ToolWindow,
     GhostWindow,
     ShellSurface,
+    HelperSurface,
     DifferentApplication,
     UnavailableIdentity,
 }
@@ -327,6 +342,9 @@ pub mod fixtures {
             tool_window: false,
             class_name: "Notepad".to_string(),
             identity: identity(HOST_EXE),
+            has_title: true,
+            has_nonzero_extent: true,
+            is_owned: false,
         }
     }
 
@@ -418,6 +436,16 @@ pub mod fixtures {
                 Eligibility::Excluded(ExclusionReason::ShellSurface),
             ),
             (
+                CLASS_POPUP_HOST,
+                with_class(14, CLASS_POPUP_HOST),
+                Eligibility::Excluded(ExclusionReason::HelperSurface),
+            ),
+            (
+                CLASS_XAML_WINDOWED_POPUP,
+                with_class(15, CLASS_XAML_WINDOWED_POPUP),
+                Eligibility::Excluded(ExclusionReason::HelperSurface),
+            ),
+            (
                 "different application",
                 WindowFacts {
                     identity: identity(OTHER_EXE),
@@ -448,6 +476,9 @@ pub mod fixtures {
             }
             if f.is_shell_surface() {
                 return Eligibility::Excluded(ExclusionReason::ShellSurface);
+            }
+            if f.is_helper_surface() {
+                return Eligibility::Excluded(ExclusionReason::HelperSurface);
             }
             if !f.visible {
                 return Eligibility::Excluded(ExclusionReason::Hidden);
@@ -605,6 +636,17 @@ mod tests {
             .map(|(l, _, _)| l)
             .collect();
         for class in SHELL_SURFACE_CLASSES.iter().chain([&CLASS_GHOST]) {
+            assert!(labels.contains(class), "fixture missing for class {class}");
+        }
+    }
+
+    #[test]
+    fn every_helper_surface_class_has_a_fixture() {
+        let labels: Vec<&str> = expected_decisions()
+            .into_iter()
+            .map(|(l, _, _)| l)
+            .collect();
+        for class in HELPER_SURFACE_CLASSES {
             assert!(labels.contains(class), "fixture missing for class {class}");
         }
     }

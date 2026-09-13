@@ -4,14 +4,17 @@
 //! `SendMessage`, no `GetWindowText`, no focus API, no eligibility policy, and
 //! no Hook Thread code.
 
-use windows_sys::Win32::Foundation::{CloseHandle, BOOL, FALSE, HANDLE, HWND, LPARAM, S_OK, TRUE};
+use windows_sys::Win32::Foundation::{
+    CloseHandle, BOOL, FALSE, HANDLE, HWND, LPARAM, RECT, S_OK, TRUE,
+};
 use windows_sys::Win32::Graphics::Dwm::{DwmGetWindowAttribute, DWMWA_CLOAKED};
 use windows_sys::Win32::System::Threading::{
     OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GetClassNameW, GetForegroundWindow, GetWindowLongPtrW, GetWindowThreadProcessId,
-    IsIconic, IsWindowVisible, GWL_EXSTYLE, WS_EX_TOOLWINDOW,
+    EnumWindows, GetClassNameW, GetForegroundWindow, GetWindow, GetWindowLongPtrW, GetWindowRect,
+    GetWindowTextLengthW, GetWindowThreadProcessId, IsIconic, IsWindowVisible, GWL_EXSTYLE,
+    GW_OWNER, WS_EX_TOOLWINDOW,
 };
 
 use super::{ActiveContext, AppIdentity, Candidate, CandidateSource, WindowFacts, WindowId};
@@ -119,6 +122,12 @@ unsafe extern "system" fn enum_proc(hwnd: HWND, lparam: LPARAM) -> BOOL {
 
 unsafe fn capture_facts(hwnd: HWND, path: &mut [u16]) -> WindowFacts {
     let ex_style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE) as u32;
+    let mut rect: RECT = core::mem::zeroed();
+    let has_rect = GetWindowRect(hwnd, &mut rect) != FALSE;
+    let width = if has_rect { rect.right - rect.left } else { 0 };
+    let height = if has_rect { rect.bottom - rect.top } else { 0 };
+    let has_title = GetWindowTextLengthW(hwnd) > 0;
+    let owner = GetWindow(hwnd, GW_OWNER);
     WindowFacts {
         window: WindowId(hwnd),
         visible: IsWindowVisible(hwnd) != FALSE,
@@ -127,6 +136,9 @@ unsafe fn capture_facts(hwnd: HWND, path: &mut [u16]) -> WindowFacts {
         tool_window: ex_style & WS_EX_TOOLWINDOW != 0,
         class_name: class_name_of(hwnd),
         identity: identity_of(hwnd, path),
+        has_title,
+        has_nonzero_extent: width > 0 && height > 0,
+        is_owned: owner != 0,
     }
 }
 

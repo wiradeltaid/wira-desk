@@ -8,12 +8,12 @@ date: 2026-09-13
 
 ## Resume
 
-Iteration: 1 (boundary: HEAD)
+Iteration: 2 (boundary: HEAD)
 Run branch: autopilot/DEC-029, draft PR not yet opened
-Stopped at: Capacity / Next ticket (SPEC-15-01 delivered, moving to SPEC-15-02 & SPEC-15-04)
+Stopped at: Capacity / Next ticket (SPEC-15-02 delivered, moving to SPEC-15-04)
 Blocked: —
 Parked: —
-Next: SPEC-15-02 (Helper and PopupHost window eligibility sanitization)
+Next: SPEC-15-04 (Cycle activation timing and hold threshold decoupling)
 
 ## Decisions
 
@@ -23,4 +23,6 @@ Next: SPEC-15-02 (Helper and PopupHost window eligibility sanitization)
 | Preflight | Build safety | Pinned single target dir in main checkout to prevent race conditions and thrashing | Per-worktree target dir | Workspace crate fingerprints thrash | decisions.yaml |
 | Preflight | Peer review | Configured Claude Sonnet 5 shell-out for independent code and doc review | Single-agent self-review | Reviewer independence lost | decisions.yaml |
 | Iter 1 | SPEC-15-01 | Inlined \n before bounds in hold delay caption and expanded container padding/min-height, added \n before GitHub disclosure | Awkward single-line wrapping and cramped card bottom spacing | Sub-optimal UI typography clearance | crates/settings/ui/panes/general_pane.slint, crates/settings/ui/panes/about_pane.slint, crates/settings/src/app.rs |
+| Iter 2 | SPEC-15-02 | Excluded PopupHost & Xaml_WindowedPopupClass with HelperSurface precedence #3, captured title/extent/owner on WindowFacts without branching | Immediate exclusion of undiagnosed title/extent/owner | False positive exclusion of valid canvas or in-flight windows | crates/daemon/src/cycling/mod.rs, crates/daemon/src/cycling/eligibility.rs, crates/daemon/src/cycling/source.rs, assumptions.md |
+
 

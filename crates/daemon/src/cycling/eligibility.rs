@@ -17,12 +17,13 @@ use super::{
 /// cases deterministic instead of implementation-defined.
 /// 1. ghost class
 /// 2. shell surface class
-/// 3. hidden
-/// 4. cloaked (hidden by the compositor)
-/// 5. iconic (minimized)
-/// 6. tool window
-/// 7. unavailable identity
-/// 8. different application
+/// 3. helper surface class
+/// 4. hidden
+/// 5. cloaked (hidden by the compositor)
+/// 6. iconic (minimized)
+/// 7. tool window
+/// 8. unavailable identity
+/// 9. different application
 pub struct WindowEligibility;
 
 impl EligibilityPolicy for WindowEligibility {
@@ -44,6 +45,9 @@ pub fn evaluate_facts(active_identity: &AppIdentity, facts: &WindowFacts) -> Eli
     }
     if facts.is_shell_surface() {
         return Eligibility::Excluded(ExclusionReason::ShellSurface);
+    }
+    if facts.is_helper_surface() {
+        return Eligibility::Excluded(ExclusionReason::HelperSurface);
     }
     if !facts.visible {
         return Eligibility::Excluded(ExclusionReason::Hidden);
@@ -360,6 +364,61 @@ mod tests {
     fn same_executable_across_processes_stays_eligible() {
         let facts = WindowFacts {
             identity: AppIdentity::from_process_path(Some(r"D:\elsewhere\NOTEPAD.EXE")),
+            ..normal(1)
+        };
+        assert_eq!(
+            evaluate_facts(&identity(HOST_EXE), &facts),
+            Eligibility::Eligible
+        );
+    }
+
+    #[test]
+    fn popup_host_surface_is_excluded() {
+        assert_eq!(
+            evaluate_facts(&identity(HOST_EXE), &with_class(1, CLASS_POPUP_HOST)),
+            Eligibility::Excluded(ExclusionReason::HelperSurface)
+        );
+    }
+
+    #[test]
+    fn xaml_windowed_popup_class_is_excluded() {
+        assert_eq!(
+            evaluate_facts(
+                &identity(HOST_EXE),
+                &with_class(1, CLASS_XAML_WINDOWED_POPUP)
+            ),
+            Eligibility::Excluded(ExclusionReason::HelperSurface)
+        );
+    }
+
+    #[test]
+    fn empty_title_window_is_still_eligible() {
+        let facts = WindowFacts {
+            has_title: false,
+            ..normal(1)
+        };
+        assert_eq!(
+            evaluate_facts(&identity(HOST_EXE), &facts),
+            Eligibility::Eligible
+        );
+    }
+
+    #[test]
+    fn zero_extent_window_is_still_eligible() {
+        let facts = WindowFacts {
+            has_nonzero_extent: false,
+            ..normal(1)
+        };
+        assert_eq!(
+            evaluate_facts(&identity(HOST_EXE), &facts),
+            Eligibility::Eligible
+        );
+    }
+
+    #[test]
+    fn owned_window_is_still_eligible() {
+        let facts = WindowFacts {
+            is_owned: true,
             ..normal(1)
         };
         assert_eq!(
