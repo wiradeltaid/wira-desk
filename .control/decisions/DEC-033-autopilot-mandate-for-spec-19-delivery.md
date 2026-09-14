@@ -47,8 +47,8 @@ Execution constraints specified by owner:
 2. Code review performed 2 times: self code review (in-session default, no separate dispatch) + independent peer review shell-out via:
    `$env:ANTHROPIC_BASE_URL = $null; $env:ANTHROPIC_API_KEY = $null; $env:ANTHROPIC_AUTH_TOKEN = $null; $env:CLAUDE_CONFIG_DIR = "$HOME\.claude"; claude --model claude-sonnet-5 --effort high --dangerously-skip-permissions -p "<prompt>"`
 3. Automated smoke testing executed by agent.
-4. Peer review for coding / document review / peer analysis and document repair delegated to Claude Sonnet 5 shell-out — mandate: kalau draf/kode menyentuh architecture spine, SRS, SDD, atau SPEC, boleh langsung jalankan wdi-review dan edit dokumennya sendiri, tidak perlu tanya dulu.
-5. Mengenai build aplikasi/jalankan aplikasi: satu worktree yang sama dipakai bersama untuk semua build/run di run ini (`worktree: .`). Sebelum peer review ikut build/run, kasih tahu dia path worktree yang sedang dipakai coordinator sekarang — peer MUST NOT membuat worktree sendiri, dan MUST NOT build/run bersamaan selagi coordinator sendiri sedang build/run.
+4. Peer review for coding / document review / peer analysis and document repair delegated to Claude Sonnet 5 shell-out — mandate: if draft/code touches architecture spine, SRS, SDD, or SPEC, run `wdi-review` and edit documents directly without prompting.
+5. Application build/run: one shared worktree used across all build/run operations in this run (`worktree: .`). Before peer review joins build/run, inform it of the current worktree path — peer MUST NOT create its own worktree, and MUST NOT build/run concurrently while coordinator is building/running.
 
 ## Why
 
