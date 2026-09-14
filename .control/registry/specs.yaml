@@ -1704,7 +1704,7 @@ specs:
     release: "0.3.0"
     prd: [wira-desk]
     size: S
-    status: open
+    status: closed
     depends_on: []
     spec_folder: .scratch/spec-20-static-crt-and-software-renderer/
     spec_reviewed:
@@ -1724,4 +1724,5 @@ specs:
           - binary::tests::pe_import_scanner_detects_all_dynamic_msvc_crt_families
           - binary::tests::pe_import_scanner_rejects_malformed_pe_input
           - binary::tests::pe_import_scanner_passes_clean_static_binary
+          - binary::tests::prohibited_crt_import_predicate_matches_canonical_families_and_stems
 

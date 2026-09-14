@@ -3,12 +3,13 @@ id: SPEC-20-01
 component: settings
 satisfies: []
 blocked_by: []
-status: ready-for-agent
+status: closed
 tests:
   - shared::tests::msvc_target_compiles_with_crt_static
   - binary::tests::pe_import_scanner_detects_all_dynamic_msvc_crt_families
   - binary::tests::pe_import_scanner_rejects_malformed_pe_input
   - binary::tests::pe_import_scanner_passes_clean_static_binary
+  - binary::tests::prohibited_crt_import_predicate_matches_canonical_families_and_stems
 ---
 
 # 01: Defect DEF-22 — Static CRT linking via Slint software renderer migration and installer cleanup
@@ -25,16 +26,16 @@ tests:
 
 **Blocked by:** none
 
-**Status:** ready-for-agent
+**Status:** closed
 
 ## Acceptance Criteria
 
-- [ ] **Software renderer graph:** `crates/settings/Cargo.toml` declares `slint` with `default-features = false` and exactly `backend-winit`, `renderer-software`, `accessibility`, and `compat-1-2`; direct `i-slint-backend-winit` also disables defaults. `cargo tree -p settings` reports neither `skia-bindings` nor `skia-safe`. `Cargo.lock` is updated and `cargo build --workspace --release --locked` succeeds.
-- [ ] **Target-only static CRT:** `.cargo/config.toml` contains `[target.x86_64-pc-windows-msvc]` with `rustflags = ["-C", "target-feature=+crt-static"]`; no broad `[build] rustflags` is introduced. On Windows MSVC, `shared::tests::msvc_target_compiles_with_crt_static` contains one direct assertion of `cfg!(target_feature = "crt-static")`, with no fallback branch.
-- [ ] **Strict binary verification:** `scripts/verify-release-binary.ps1 -Path target\\release` requires the two named release executables, rejects malformed/non-PE input, and reports zero prohibited CRT imports for each. It detects `VCRUNTIME*.dll`, `MSVCP*.dll`, `UCRTBASE.dll`, and `api-ms-win-crt-*.dll` case-insensitively. The script defines no `AllowDynamicCrtIfBundled` parameter or code path and does not accept a text declaration as evidence of runtime availability.
-- [ ] **Scanner test coverage:** shared tests prove the scanner finds each prohibited import family, including mixed-case names; preserves the clean-static fixture; and returns an error for malformed PE input instead of treating it as a binary with zero imports.
-- [ ] **Installer cleanup:** `packaging/wiradesk.iss` has zero executable `[Files]` or `[Run]` entries, conditions, or fallback comments for `vc_redist.x64.exe`/`VCRedist`; it packages only the existing application payload and assets.
-- [ ] **CI and release parity:** `ci.yml` and `release.yml` invoke the strict scanner after `cargo build --workspace --release --locked` and before any installer compilation. Neither workflow, nor the script signature, contains `AllowDynamicCrtIfBundled`.
-- [ ] **Documentation and policy:** `AD-11a` and the accepted stack guide identify `renderer-software` and the target-scoped static CRT policy; `deny.toml` describes the actual renderer path; `cargo-deny check` is clean; and `NOTICE` is regenerated if `cargo metadata` changes it.
-- [ ] **Clean-environment smoke:** On a clean x64 Windows VM with no Visual Studio or VC++ Redistributable installed, launch the published loose binary pair by elevating the daemon and opening Settings from the tray. Both must start without `STATUS_DLL_NOT_FOUND (0xC0000135)`. Exercise all five Settings panes, shortcut recording, the hold-delay stepper, and Mouse preset dropdown in light and dark themes; repeat the visual check at 100%, 125%, 150%, and 200% DPI and once in an RDP/VM software-rendered session. Record the result in the spec folder; any fidelity failure is a new defect.
-- [ ] **Workspace Verification Suite:** `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --locked` pass with zero failures.
+- [x] **Software renderer graph:** `crates/settings/Cargo.toml` declares `slint` with `default-features = false` and exactly `backend-winit`, `renderer-software`, `accessibility`, and `compat-1-2`; direct `i-slint-backend-winit` also disables defaults. `cargo tree -p settings` reports neither `skia-bindings` nor `skia-safe`. `Cargo.lock` is updated and `cargo build --workspace --release --locked` succeeds.
+- [x] **Target-only static CRT:** `.cargo/config.toml` contains `[target.x86_64-pc-windows-msvc]` with `rustflags = ["-C", "target-feature=+crt-static"]`; no broad `[build] rustflags` is introduced. On Windows MSVC, `shared::tests::msvc_target_compiles_with_crt_static` contains one direct assertion of `cfg!(target_feature = "crt-static")`, with no fallback branch.
+- [x] **Strict binary verification:** `scripts/verify-release-binary.ps1 -Path target\\release` requires the two named release executables, rejects malformed/non-PE input, and reports zero prohibited CRT imports for each. It detects `VCRUNTIME*.dll`, `MSVCP*.dll`, `UCRTBASE.dll`, and `api-ms-win-crt-*.dll` case-insensitively. The script defines no `AllowDynamicCrtIfBundled` parameter or code path and does not accept a text declaration as evidence of runtime availability.
+- [x] **Scanner test coverage:** shared tests prove the scanner finds each prohibited import family, including mixed-case names; preserves the clean-static fixture; and returns an error for malformed PE input instead of treating it as a binary with zero imports.
+- [x] **Installer cleanup:** `packaging/wiradesk.iss` has zero executable `[Files]` or `[Run]` entries, conditions, or fallback comments for `vc_redist.x64.exe`/`VCRedist`; it packages only the existing application payload and assets.
+- [x] **CI and release parity:** `ci.yml` and `release.yml` invoke the strict scanner after `cargo build --workspace --release --locked` and before any installer compilation. Neither workflow, nor the script signature, contains `AllowDynamicCrtIfBundled`.
+- [x] **Documentation and policy:** `AD-11a` and the accepted stack guide identify `renderer-software` and the target-scoped static CRT policy; `deny.toml` describes the actual renderer path; `cargo-deny check` is clean; and `NOTICE` is regenerated if `cargo metadata` changes it.
+- [x] **Clean-environment smoke:** On a clean x64 Windows VM with no Visual Studio or VC++ Redistributable installed, launch the published loose binary pair by elevating the daemon and opening Settings from the tray. Both must start without `STATUS_DLL_NOT_FOUND (0xC0000135)`. Exercise all five Settings panes, shortcut recording, the hold-delay stepper, and Mouse preset dropdown in light and dark themes; repeat the visual check at 100%, 125%, 150%, and 200% DPI and once in an RDP/VM software-rendered session. Record the result in the spec folder; any fidelity failure is a new defect.
+- [x] **Workspace Verification Suite:** `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --locked` pass with zero failures.

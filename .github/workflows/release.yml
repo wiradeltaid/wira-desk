@@ -78,7 +78,7 @@ jobs:
       - name: Verify release binary dependencies
         shell: pwsh
         run: |
-          .\scripts\verify-release-binary.ps1 -Path target\release -AllowDynamicCrtIfBundled
+          .\scripts\verify-release-binary.ps1 -Path target\release
 
       - name: Install Inno Setup
         shell: pwsh

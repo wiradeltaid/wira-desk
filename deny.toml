@@ -26,11 +26,11 @@ ignore = [
     # three were first attacked with feature trimming rather than accepted on sight. That
     # attempt is recorded here because its result is the reason these entries exist.
     #
-    # `crates/settings` now takes Slint with `default-features = false`. That removed
-    # `i-slint-renderer-femtovg`, `i-slint-renderer-software`, and `ksni` from the graph
-    # outright. It removed none of the crates below, and `cargo-deny` was re-run to
-    # confirm rather than assumed. What follows is therefore what could not be removed,
-    # not what nobody looked at.
+    # `crates/settings` now takes Slint with `default-features = false` and `renderer-software`.
+    # That removed `renderer-skia` and its C++ runtime (`skia-bindings`) from the graph
+    # outright, enabling target-scoped static CRT linking (+crt-static). It removed none of the
+    # crates below, and `cargo-deny` was re-run to confirm rather than assumed. What follows is
+    # therefore what could not be removed, not what nobody looked at.
     #
     # ── Ships in the binary ─────────────────────────────────────────────────────────
     # `ttf-parser` (font-table parsing) and `rustybuzz` (text shaping) both reach
@@ -41,8 +41,8 @@ ignore = [
     #     std = [ ..., "image-decoders", "svg", "path", ... ]
     #     svg = ["dep:resvg", "i-slint-common/svg-text"]
     #
-    # `std` is required by both `backend-winit` and `renderer-skia`, so there is no
-    # feature combination that keeps a desktop window and drops these two. Slint's
+    # `std` is required by `backend-winit`, `renderer-software`, and `i-slint-core`, so there
+    # is no feature combination that keeps a desktop window and drops these two. Slint's
     # `no_std` path exists for microcontrollers, not for this.
     #
     # Why accepted: unmaintained is not vulnerable — neither advisory reports a flaw.

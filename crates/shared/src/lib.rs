@@ -23,17 +23,14 @@ pub use shortcut::{name_from_vk, vk_from_name, Shortcut};
 #[cfg(test)]
 mod tests {
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn msvc_target_compiles_with_crt_static() {
         #[cfg(all(target_os = "windows", target_env = "msvc"))]
         {
-            // Under the primary static CRT path, cfg!(target_feature = "crt-static") is active.
-            // Under the documented fallback branch (Slint renderer-skia prebuilt binary compatibility),
-            // dynamic linking is preserved and VCRedist is bundled in the installer.
-            let has_crt_static = cfg!(target_feature = "crt-static");
-            if has_crt_static {
-                let verified = has_crt_static;
-                assert!(verified);
-            }
+            assert!(
+                cfg!(target_feature = "crt-static"),
+                "Windows MSVC target must compile with static CRT (+crt-static)"
+            );
         }
     }
 }
