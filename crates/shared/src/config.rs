@@ -383,7 +383,7 @@ impl Default for MouseConfig {
 impl SwitcherConfig {
     pub const MIN_HOLD_DELAY_MS: u32 = 100;
     pub const MAX_HOLD_DELAY_MS: u32 = 500;
-    pub const DEFAULT_HOLD_DELAY_MS: u32 = 150;
+    pub const DEFAULT_HOLD_DELAY_MS: u32 = 300;
 
     #[inline]
     pub fn clamp_hold_delay(ms: u32) -> u32 {
@@ -542,12 +542,12 @@ mod tests {
             "defaults visual_enabled to true"
         );
         assert_eq!(
-            cfg.switcher.visual_hold_delay_ms, 150,
-            "defaults visual_hold_delay_ms to 150ms"
+            cfg.switcher.visual_hold_delay_ms, 300,
+            "defaults visual_hold_delay_ms to 300ms"
         );
         let serialized = cfg.to_toml_string().unwrap();
         assert!(serialized.contains("visual_enabled = true"));
-        assert!(serialized.contains("visual_hold_delay_ms = 150"));
+        assert!(serialized.contains("visual_hold_delay_ms = 300"));
     }
 
     #[test]

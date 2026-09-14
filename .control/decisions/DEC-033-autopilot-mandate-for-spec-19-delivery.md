@@ -1,12 +1,22 @@
 ---
 type: mandate
 id: DEC-033
-status: accepted
+status: applied
 touches:
   - .control/decisions/DEC-033-autopilot-mandate-for-spec-19-delivery.md
   - .control/memlog/autopilot-DEC-033.md
   - .control/registry/decisions.yaml
+  - .control/registry/defects.yaml
   - .control/registry/specs.yaml
+  - .scratch/smoke-dec-033.md
+  - .scratch/spec-19-visual-switcher-mouse-selection-and-hold-threshold/issues/01-defect-def-21-visual-switcher-mouse-selection-and-hold-threshold.md
+  - 3p.md
+  - crates/daemon/src/switcher/mod.rs
+  - crates/daemon/src/switcher/overlay.rs
+  - crates/settings/src/app.rs
+  - crates/settings/ui/main_window.slint
+  - crates/settings/ui/panes/general_pane.slint
+  - crates/shared/src/config.rs
 supersedes: null
 superseded_by: null
 created: '2026-09-14'

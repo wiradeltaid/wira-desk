@@ -3266,7 +3266,7 @@ mod tests {
 
             // Verify defaults
             assert!(window.get_visual_switcher_enabled());
-            assert_eq!(window.get_visual_hold_delay_ms(), 150);
+            assert_eq!(window.get_visual_hold_delay_ms(), 300);
 
             // 2. Toggle visual switcher off
             window.invoke_visual_switcher_toggled(false);

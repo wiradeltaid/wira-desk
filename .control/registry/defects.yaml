@@ -1026,7 +1026,7 @@ defects:
 
   - id: DEF-21
     title: Visual switcher mouse click does not activate the clicked window due to SwitcherController selection desynchronization
-    status: open
+    status: fixed
     severity: high
     component: window-management
     violates: [DEC-013, UC-1]
@@ -1036,6 +1036,13 @@ defects:
       - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
       - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
       - switcher::tests::default_hold_delay_threshold_is_300ms
+    fixed_in: SPEC-19-01
+    fixed_by: >-
+      Delegated `selected_index()` and `candidates_from_selection()` in `SwitcherController` to `SwitcherOverlay::selected_index()`,
+      eliminating the duplicate, desynchronized `selected_index` state in `crates/daemon/src/switcher/mod.rs`. When mouse hover (`WM_MOUSEMOVE`)
+      or mouse click (`WM_LBUTTONDOWN`) updates `SwitcherOverlay::set_selected_index`, `candidates_from_selection()` immediately returns
+      candidates starting with the clicked or hovered window ID. Raised default visual switcher hold delay threshold from 150 ms to 300 ms
+      across `crates/shared/src/config.rs`, `crates/settings/ui/panes/general_pane.slint`, `crates/settings/ui/main_window.slint`, and companion tests.
     summary: >-
       When clicking a window card in the visual switcher overlay using the mouse cursor, the clicked
       window is not consistently activated as the foreground focus. While keyboard navigation updates both

@@ -6,22 +6,29 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** closed
 
 ## Acceptance Criteria
 
-- [ ] **Mouse Click Selection Synchronization**:
+- [x] **Mouse Click Selection Synchronization**:
       When a card is hovered or clicked in `crates/daemon/src/switcher/overlay.rs`, the selected candidate index is reflected in `SwitcherController` and `candidates_from_selection()`. On `Command::SwitcherCommit`, the first candidate returned by `candidates_from_selection()` MUST be the window corresponding to the clicked card.
-- [ ] **Mouse Hover Followed by Keyboard Modifier Commit**:
+- [x] **Mouse Hover Followed by Keyboard Modifier Commit**:
       When a card is hovered by the mouse cursor, `SwitcherOverlay` updates its selection highlight, and a subsequent modifier release without mouse click (`Command::SwitcherCommit`) commits the hovered card window rather than reverting to the initial keyboard selection.
-- [ ] **Multi-Page Mouse Selection Support**:
+- [x] **Multi-Page Mouse Selection Support**:
       Clicking a card on page > 0 correctly incorporates `page_start` and activates the intended target window without out-of-bounds indexing or page-wrap desync.
-- [ ] **Default Hold Delay Raised to 300 ms**:
+- [x] **Default Hold Delay Raised to 300 ms**:
       Update `shared::config::SwitcherConfig::DEFAULT_HOLD_DELAY_MS` to `300`. Update the initial value of `visual_hold_delay_ms` in `crates/settings/ui/panes/general_pane.slint` and `crates/settings/ui/main_window.slint` to `300`. Existing validation clamping band (`100..=500` ms) remains unchanged.
-- [ ] **Unit and Integration Test Coverage**:
+- [x] **Unit and Integration Test Coverage**:
       Add unit tests in `crates/daemon/src/switcher/mod.rs` verifying:
       1. Mouse click selection updates candidate ordering in `SwitcherController::candidates_from_selection()`.
       2. Mouse hover updates selection for subsequent modifier release commits.
       3. Default hold delay threshold is 300 ms across shared config, daemon, and settings test assertions.
-- [ ] **Workspace Test Suite**:
+- [x] **Workspace Test Suite**:
       All workspace tests pass green (`WIRADESK_SKIP_MANIFEST=1 cargo test --workspace`).
+
+## Comments
+
+- Implemented by coordinator in Iteration 1 under DEC-033 mandate.
+- In-session code review completed.
+- Independent peer review completed via Claude Sonnet 5 shell-out (verdict: ACCEPTED). Dead field `selected_index` cleaned up from `SwitcherController`.
+- 720 tests passing across workspace. Verification smoke test documented in `.scratch/smoke-dec-033.md`.
