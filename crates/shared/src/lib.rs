@@ -7,17 +7,16 @@ pub mod commands;
 pub mod config;
 pub mod constants;
 pub mod https;
-pub mod migrate;
 pub mod shortcut;
 pub mod update;
 
 pub use commands::Command;
 pub use config::{
-    app_data_dir, config_path, log_path, Config, GeneralConfig, LayoutConfig, MouseActionPreset,
-    MouseConfig, SnappingConfig, SwitcherConfig, VmBypassConfig,
+    app_data_dir, app_data_dir_at, config_path, config_path_at, log_path, log_path_at, Config,
+    GeneralConfig, LayoutConfig, MouseActionPreset, MouseConfig, SnappingConfig, SwitcherConfig,
+    VmBypassConfig,
 };
 pub use constants::{ONBOARDING_FLAG, SETTINGS_BIN_NAME, SETTINGS_EXE_NAME};
-pub use migrate::migrate_appdata;
 pub use shortcut::{name_from_vk, vk_from_name, Shortcut};
 
 #[cfg(test)]

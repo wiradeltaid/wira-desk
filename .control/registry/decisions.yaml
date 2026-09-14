@@ -939,7 +939,7 @@ decisions:
 
   - id: DEC-037
     title: Autopilot mandate for SPEC-23 delivery
-    status: accepted
+    status: applied
     file: decisions/DEC-037-autopilot-mandate-for-spec-23-delivery.md
     created: '2026-09-14'
     touches:

@@ -11,7 +11,6 @@ mod health;
 mod hook;
 mod icon;
 mod icon_data;
-mod legacy;
 mod log;
 mod menu;
 #[cfg(debug_assertions)]
@@ -36,7 +35,6 @@ use windows_sys::Win32::System::Threading::{
 };
 
 use shared::constants::SINGLE_INSTANCE_MUTEX;
-use shared::migrate_appdata;
 
 use crate::util::wide;
 
@@ -93,8 +91,6 @@ fn main() {
         );
     }
 
-    migrate_appdata();
-
     let mutex_name = wide(SINGLE_INSTANCE_MUTEX);
     // SAFETY: `mutex_name` comes from `wide`, so it is NUL-terminated, and it is a local
     // that outlives this block — the pointer stays valid for the whole call. A null
@@ -122,16 +118,9 @@ fn main() {
         handle
     };
 
-    legacy::stop_legacy_daemon();
-
-    // Before the migration, not after, and the ordering is the whole reason this line
-    // is here rather than below: `migrate_scheduled_task` returns early when a
-    // `WiraDesk` task already exists, and creates one from the current executable when
-    // it does not. So a refresh first covers the case it cannot (a task that exists
-    // with a drifted path) and stays a no-op in the case it does — the task is created
-    // once, by whichever of the two applies, never rewritten twice.
+    // Refresh the registered executable path if a WiraDesk scheduled task exists,
+    // ensuring moved installations update their task target.
     autostart::refresh_registered_path();
-    legacy::migrate_scheduled_task();
 
     let exit_code = tray::run_message_loop();
 

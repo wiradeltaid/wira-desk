@@ -1172,7 +1172,7 @@ defects:
 
   - id: DEF-25
     title: Ready memo verbosity and legacy WinTick migration obsolete shortcut and log resurrection
-    status: open
+    status: closed
     severity: medium
     component: settings
     violates: [NFR-1]
@@ -1201,3 +1201,9 @@ defects:
       2. Remove legacy WinTick migration (M-01) from crates/shared/src/migrate.rs and its startup calls in crates/daemon/src/main.rs
          and crates/settings/src/main.rs so Wira Desk uses its modern default configuration and imports no historical WinTick log content.
     owner: repo owner
+    fixed_in: "0.2.0"
+    fixed_by: >-
+      SPEC-23-01 (packaging/wiradesk.iss, scripts/verify-installer-safety.ps1,
+      crates/shared/src/migrate.rs, crates/daemon/src/legacy.rs,
+      crates/daemon/src/main.rs, crates/settings/src/main.rs,
+      crates/shared/src/config.rs)

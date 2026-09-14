@@ -493,9 +493,7 @@ begin
        Space + ExpandConstant('{app}') + NewLine + NewLine +
        'Configuration and logs:' + NewLine +
        Space + ExpandConstant('{userappdata}\WiraDesk') + NewLine +
-       Space + 'Preserved if present; Setup never bundles or overwrites user state.' + NewLine +
-       Space + 'A missing config.toml opens first-run onboarding; completing it writes a fresh default configuration.' + NewLine +
-       Space + 'The log file is created on first demand when the daemon writes a log entry.' + NewLine + NewLine +
+       Space + 'Preserved across updates; clean installs start fresh.' + NewLine + NewLine +
        'Auto-start task:' + NewLine +
        Space + '{#TaskName} (optional elevated logon task)' + NewLine +
        Space + 'Setup does not create or enable auto-start.' + NewLine +
@@ -717,9 +715,8 @@ begin
     // the consequence is milder than it first looked: the wrong-profile case deletes the
     // RUNNING administrator's own folder, which is either absent or theirs to lose, and
     // it cannot reach another user's profile. The second objection -- that the folder
-    // carries migration semantics, since its absence re-imports from a legacy
-    // %APPDATA%\WinTick -- no longer applies to anyone but this project's own maintainer,
-    // because WinTick was never publicly released and so no user has one.
+    // carried legacy WinTick migration semantics -- no longer applies at all, as all
+    // legacy WinTick migration shims have been retired (DEF-25, SPEC-23).
     //
     // Silent uninstall never prompts and never deletes. Package managers uninstall
     // unattended, and destroying user data with nobody present to consent is not a

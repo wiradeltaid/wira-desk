@@ -140,9 +140,7 @@ Write-Step "Checking packaging\wiradesk.iss for required safety directives and i
 $requiredPatterns = @(
     @{ Pattern = 'UpdateReadyMemo'; Description = 'UpdateReadyMemo function implemented' },
     @{ Pattern = '\{userappdata\}\\WiraDesk'; Description = 'User configuration and log path displayed' },
-    @{ Pattern = 'Preserved if present; Setup never bundles or overwrites user state\.'; Description = 'Ready memo user state preservation disclosure' },
-    @{ Pattern = 'A missing config\.toml opens first-run onboarding; completing it writes a fresh default configuration\.'; Description = 'Ready memo clean install onboarding config initialization' },
-    @{ Pattern = 'The log file is created on first demand when the daemon writes a log entry\.'; Description = 'Ready memo on-demand log initialization disclosure' },
+    @{ Pattern = 'Preserved across updates; clean installs start fresh\.'; Description = 'Concise Ready memo user state summary' },
     @{ Pattern = '\{#TaskName\} \(optional elevated logon task\)'; Description = 'Explicit task identification without service claim' },
     @{ Pattern = 'Setup does not create or enable auto-start'; Description = 'Auto-start non-creation disclaimer' },
     @{ Pattern = 'RegKeyExists\(HKEY_LOCAL_MACHINE_64'; Description = 'Explicit 64-bit HKLM registry check' },
@@ -160,10 +158,13 @@ foreach ($rp in $requiredPatterns) {
     }
 }
 
-# Assert absence of orphaned mid-sentence linebreaks
+# Assert absence of orphaned mid-sentence linebreaks and retired verbose prose
 $prohibitedPatterns = @(
     @{ Pattern = 'please uninstall the current'' \+ #13#10 \+\s*''version first\.'; Description = 'Orphaned linebreak before "version first."' },
-    @{ Pattern = 'Please uninstall the current'' \+ #13#10 \+\s*''version before continuing\.'; Description = 'Orphaned linebreak before "version before continuing."' }
+    @{ Pattern = 'Please uninstall the current'' \+ #13#10 \+\s*''version before continuing\.'; Description = 'Orphaned linebreak before "version before continuing."' },
+    @{ Pattern = 'Preserved if present; Setup never bundles or overwrites user state\.'; Description = 'Retired verbose Ready memo user state disclosure' },
+    @{ Pattern = 'A missing config\.toml opens first-run onboarding'; Description = 'Retired verbose Ready memo onboarding prose' },
+    @{ Pattern = 'The log file is created on first demand'; Description = 'Retired verbose Ready memo log lifecycle prose' }
 )
 
 foreach ($pp in $prohibitedPatterns) {

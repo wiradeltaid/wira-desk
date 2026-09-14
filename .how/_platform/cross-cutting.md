@@ -6,7 +6,7 @@
 | --- | --- | --- | --- |
 | `app-config` | Data | `_platform` | TOML configuration schema and on-disk file `%APPDATA%\WiraDesk\config.toml` (general, switcher, snapping, layout, vm_bypass, mouse) shared by daemon and settings. |
 | `ipc-reload-signal` | Control / Endpoint | `_platform` | Custom Win32 message `WM_APP_RELOAD_CONFIG` (`0x8001`) sent by settings to the daemon's hidden message-only window (`WiraDeskDaemonHiddenWindow`). |
-| `runtime-paths` | Data | `_platform` | Standard paths for `%APPDATA%\WiraDesk` (config, log), executable locations, and legacy `%APPDATA%\WinTick` migration paths. |
+| `runtime-paths` | Data | `_platform` | Standard paths for `%APPDATA%\WiraDesk` (config, log) and executable locations. |
 
 ## Platform-Owned Specifications
 
@@ -38,7 +38,6 @@
 - **Config Path**: `%APPDATA%\WiraDesk\config.toml`
 - **Log Path**: `%APPDATA%\WiraDesk\wiradesk.log`
 - **Settings Executable**: `wiradesk-settings.exe` located in the same directory as `wiradesk.exe`.
-- **Legacy Migration Path**: `%APPDATA%\WinTick\config.toml` (one-time automatic copy to `%APPDATA%\WiraDesk\config.toml` if target does not exist).
 
 ## Error Protocol & Envelope
 

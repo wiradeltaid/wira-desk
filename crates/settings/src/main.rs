@@ -26,7 +26,7 @@ use windows_sys::Win32::UI::WindowsAndMessaging::{
 };
 
 use shared::constants::SETTINGS_SINGLE_INSTANCE_MUTEX;
-use shared::{config_path, migrate_appdata, Config};
+use shared::{config_path, Config};
 
 use app::{format_shortcut_display, Pane, SaveFeedback, SettingsModel, ShortcutField};
 use daemon_watch::{DaemonWatch, Startup};
@@ -701,8 +701,6 @@ fn close_window(window: &MainWindow) {
 }
 
 fn main() -> Result<(), slint::PlatformError> {
-    migrate_appdata();
-
     // Enforce single-instance for settings executable
     let mutex_name = wide(SETTINGS_SINGLE_INSTANCE_MUTEX);
     // SAFETY: `mutex_name` is a NUL-terminated wide string local that outlives the call.

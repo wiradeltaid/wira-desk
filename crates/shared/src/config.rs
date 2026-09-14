@@ -507,20 +507,39 @@ impl Config {
 /// Application data directory: `%APPDATA%\WiraDesk`. Falls back to the working
 /// directory when `APPDATA` is unavailable (very rare scenario).
 pub fn app_data_dir() -> PathBuf {
-    match std::env::var_os("APPDATA") {
-        Some(appdata) => PathBuf::from(appdata).join(APP_DIR_NAME),
-        None => PathBuf::from(".").join(APP_DIR_NAME),
+    app_data_dir_at(None)
+}
+
+/// Resolves the application data directory with an optional explicit AppData root.
+/// Enables deterministic testing without relying on machine-global environment state.
+pub fn app_data_dir_at(root: Option<&std::path::Path>) -> PathBuf {
+    match root {
+        Some(p) => p.join(APP_DIR_NAME),
+        None => match std::env::var_os("APPDATA") {
+            Some(appdata) => PathBuf::from(appdata).join(APP_DIR_NAME),
+            None => PathBuf::from(".").join(APP_DIR_NAME),
+        },
     }
 }
 
 /// Full path to `config.toml`.
 pub fn config_path() -> PathBuf {
-    app_data_dir().join(CONFIG_FILE_NAME)
+    config_path_at(None)
+}
+
+/// Full path to `config.toml` under an optional explicit AppData root.
+pub fn config_path_at(root: Option<&std::path::Path>) -> PathBuf {
+    app_data_dir_at(root).join(CONFIG_FILE_NAME)
 }
 
 /// Full path to `wiradesk.log`.
 pub fn log_path() -> PathBuf {
-    app_data_dir().join(LOG_FILE_NAME)
+    log_path_at(None)
+}
+
+/// Full path to `wiradesk.log` under an optional explicit AppData root.
+pub fn log_path_at(root: Option<&std::path::Path>) -> PathBuf {
+    app_data_dir_at(root).join(LOG_FILE_NAME)
 }
 
 #[cfg(test)]
@@ -1046,5 +1065,101 @@ mod tests {
             MouseActionPreset::SnapThirdCenter.display_label(),
             "Snap to middle third"
         );
+    }
+
+    #[test]
+    fn clean_default_configuration_with_legacy_residue_present() {
+        use std::sync::{Mutex, OnceLock};
+
+        static TEST_LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+        let _guard = TEST_LOCK.get_or_init(|| Mutex::new(())).lock().unwrap();
+
+        let temp_dir =
+            std::env::temp_dir().join(format!("wiradesk-clean-test-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&temp_dir);
+        let legacy_dir = temp_dir.join("WinTick");
+        let wira_dir = temp_dir.join(crate::constants::APP_DIR_NAME);
+        std::fs::create_dir_all(&legacy_dir).unwrap();
+
+        // Seed legacy WinTick residue with obsolete pre-DEC-008 shortcuts and historical July 2026 logs
+        let obsolete_toml = r#"
+            [snapping]
+            snap_half_left = "ctrl+win+left"
+            snap_half_right = "ctrl+win+right"
+            [layout]
+            stack_shortcut = "ctrl+win+down"
+        "#;
+        let legacy_cfg = legacy_dir.join(crate::constants::CONFIG_FILE_NAME);
+        let legacy_log = legacy_dir.join("wintick.log");
+        std::fs::write(&legacy_cfg, obsolete_toml).unwrap();
+        std::fs::write(&legacy_log, "[2026-07-15 06:07:06] historical log\n").unwrap();
+
+        // Verify seam resolution at the explicit fixture root
+        assert!(!wira_dir.exists());
+        let expected_cfg_path = config_path_at(Some(&temp_dir));
+        let expected_log_path = log_path_at(Some(&temp_dir));
+        assert_eq!(
+            expected_cfg_path,
+            wira_dir.join(crate::constants::CONFIG_FILE_NAME)
+        );
+        assert_eq!(
+            expected_log_path,
+            wira_dir.join(crate::constants::LOG_FILE_NAME)
+        );
+
+        // Loading from a missing config path under the legacy-polluted AppData root yields modern defaults,
+        // without creating WiraDesk files or copying legacy WinTick config/log state.
+        let default_cfg = Config::load_or_default(&expected_cfg_path);
+        assert_eq!(default_cfg.snapping.snap_half_left, "ctrl+alt+left");
+        assert_eq!(default_cfg.snapping.snap_half_right, "ctrl+alt+right");
+        assert_eq!(default_cfg.layout.stack_shortcut, "ctrl+alt+shift+s");
+        assert!(
+            !wira_dir.exists(),
+            "load_or_default must not create directory or import residue"
+        );
+
+        // Now test with APPDATA environment variable explicitly pointed at temp_dir
+        let orig_appdata = std::env::var_os("APPDATA");
+        std::env::set_var("APPDATA", &temp_dir);
+
+        let runtime_cfg_path = config_path();
+        let runtime_log_path = log_path();
+        assert_eq!(runtime_cfg_path, expected_cfg_path);
+        assert_eq!(runtime_log_path, expected_log_path);
+
+        // First-run loading with APPDATA pointed at legacy residue produces clean modern defaults
+        let runtime_loaded = Config::load_or_default(&runtime_cfg_path);
+        assert_eq!(runtime_loaded.snapping.snap_half_left, "ctrl+alt+left");
+        assert_eq!(runtime_loaded.snapping.snap_half_right, "ctrl+alt+right");
+        assert_eq!(runtime_loaded.layout.stack_shortcut, "ctrl+alt+shift+s");
+
+        // Saving clean defaults writes config.toml only, creating no legacy migration log
+        runtime_loaded.save(&runtime_cfg_path).unwrap();
+        assert!(runtime_cfg_path.exists());
+        assert!(
+            !runtime_log_path.exists(),
+            "clean install must not import or generate legacy migration log"
+        );
+
+        // Verify written config.toml contains modern bindings, not obsolete WinTick bindings
+        let saved_toml = std::fs::read_to_string(&runtime_cfg_path).unwrap();
+        assert!(saved_toml.contains("ctrl+alt+left"));
+        assert!(saved_toml.contains("ctrl+alt+right"));
+        assert!(!saved_toml.contains("ctrl+win+left"));
+        assert!(!saved_toml.contains("ctrl+win+right"));
+
+        // Verify legacy WinTick files were never modified or consumed
+        let legacy_cfg_after = std::fs::read_to_string(&legacy_cfg).unwrap();
+        let legacy_log_after = std::fs::read_to_string(&legacy_log).unwrap();
+        assert_eq!(legacy_cfg_after, obsolete_toml);
+        assert_eq!(legacy_log_after, "[2026-07-15 06:07:06] historical log\n");
+
+        // Restore original APPDATA environment variable
+        match orig_appdata {
+            Some(val) => std::env::set_var("APPDATA", val),
+            None => std::env::remove_var("APPDATA"),
+        }
+
+        let _ = std::fs::remove_dir_all(&temp_dir);
     }
 }

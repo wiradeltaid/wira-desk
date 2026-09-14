@@ -47,8 +47,6 @@ published under the Wira Desk name as its first public release.
 Wira Desk is built and maintained by [@kodesh87](https://github.com/kodesh87) - the studio name
 and the maintainer are the same effort, not separate products.
 
-If you used WinTick before, settings migrate automatically on first run (see Factory reset below).
-
 ## Install
 
 Download `WiraDesk-<version>-x64-setup.exe` from the
@@ -119,18 +117,13 @@ Configuration and logs live under `%APPDATA%\WiraDesk\` (`config.toml`, `wirades
 
 ## Factory reset
 
-To restore defaults (including first-run onboarding), delete the config file only:
+To restore defaults (including first-run onboarding), delete the config file:
 
 ```text
 Delete   %APPDATA%\WiraDesk\config.toml
-Do NOT   delete the %APPDATA%\WiraDesk\ folder
 ```
 
-Migration from a prior WinTick install is triggered by the **presence** of the legacy
-`%APPDATA%\WinTick\` directory, which is kept intact so rollback remains possible. Removing the
-whole `WiraDesk` folder does not reset settings - the next start re-imports from WinTick. Deleting
-only `config.toml` while leaving both directories in place skips re-migration and loads factory
-defaults.
+When `config.toml` is absent, the next launch opens first-run onboarding and writes clean default configuration.
 
 ## Status
 
