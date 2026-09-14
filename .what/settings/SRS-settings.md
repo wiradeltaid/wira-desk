@@ -42,6 +42,7 @@ UC Catalogue — see `.control/registry/usecases.yaml`, rows where `component: s
 - Must provide complete keyboard navigation (Tab/Shift+Tab, arrow keys, Escape/Enter) across all interactive dialogs (FR-20).
 - Must expose full UI Automation properties (names, roles, states, shortcut values) to assistive technologies via AccessKit (FR-21, AD-11a).
 - Must render UI in pure native Rust (`Slint`) without webview wrappers or heavy runtime frameworks (AD-11).
+- Installer packaging must strictly prevent version downgrades via numeric SemVer comparison in 64-bit HKLM, display explicit persistent paths on the Ready page, and abort before extraction if existing processes fail to exit cleanly (SPEC-21, DEF-23, DEC-035).
 
 ## Non-Goals
 

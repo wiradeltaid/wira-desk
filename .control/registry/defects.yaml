@@ -1116,7 +1116,7 @@ defects:
 
   - id: DEF-23
     title: Installer permits silent version downgrade, lacks installation path summary confirmation, and fails open on locked processes
-    status: open
+    status: closed
     severity: medium
     component: settings
     violates: [NFR-1]
@@ -1142,4 +1142,7 @@ defects:
       3. Make PrepareToInstall fail closed with an informative message if daemon or settings processes cannot be stopped.
       4. Add compile-time ISPP macro checking that AppVersion has exactly 3 components.
     owner: repo owner
+    fixed_in: "0.2.0"
+    fixed_by: "SPEC-21-01 (packaging/wiradesk.iss, scripts/verify-installer-safety.ps1, .github/workflows/ci.yml)"
+
 

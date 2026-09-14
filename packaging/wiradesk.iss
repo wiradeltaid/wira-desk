@@ -76,6 +76,52 @@
 #define DaemonExe "wiradesk.exe"
 #define SettingsExe "wiradesk-settings.exe"
 #define AppVersion GetStringFileInfo(STAGE_DIR + "\" + DaemonExe, "FileVersion")
+
+; ============================================================================
+; COMPILE-TIME STABLE-VERSION GUARD (SPEC-21 / DEF-23)
+; Accepts only stable, exactly three-component decimal major.minor.patch.
+; Rejects 4-component versions, empty components, leading 'v', and prerelease/build metadata.
+; ============================================================================
+#define private VerValid 1
+#define private VerStr AppVersion
+#if Pos("v", VerStr) > 0 || Pos("V", VerStr) > 0 || Pos("-", VerStr) > 0 || Pos("+", VerStr) > 0
+  #define private VerValid 0
+#endif
+
+#define private Dot1 Pos(".", VerStr)
+#if Dot1 <= 1
+  #define private VerValid 0
+#endif
+
+#if VerValid
+  #define private Part1 Copy(VerStr, 1, Dot1 - 1)
+  #define private Rest1 Copy(VerStr, Dot1 + 1)
+  #define private Dot2 Pos(".", Rest1)
+  #if Dot2 <= 1
+    #define private VerValid 0
+  #else
+    #define private Part2 Copy(Rest1, 1, Dot2 - 1)
+    #define private Part3 Copy(Rest1, Dot2 + 1)
+    #if Len(Part3) == 0 || Pos(".", Part3) > 0
+      #define private VerValid 0
+    #endif
+  #endif
+#endif
+
+#if VerValid
+  #define private i 0
+  #define private ch ""
+  #for {i = 1; i <= Len(Part1); i++} \
+    (ch = Copy(Part1, i, 1)), (Pos(ch, "0123456789") == 0 ? VerValid = 0 : 0)
+  #for {i = 1; i <= Len(Part2); i++} \
+    (ch = Copy(Part2, i, 1)), (Pos(ch, "0123456789") == 0 ? VerValid = 0 : 0)
+  #for {i = 1; i <= Len(Part3); i++} \
+    (ch = Copy(Part3, i, 1)), (Pos(ch, "0123456789") == 0 ? VerValid = 0 : 0)
+#endif
+
+#if !VerValid
+  #error Invalid AppVersion. Must be stable decimal major.minor.patch (e.g. 0.2.0).
+#endif
 #define AppName "Wira Desk"
 #define Publisher "Wira Digital Indonesia"
 // Kept identical to `LegalCopyright` in `crates/daemon/wiradesk.rc`. Two copies of one
@@ -292,72 +338,358 @@ begin
   Result := WizardSilent;
 end;
 
-{ Ask a running daemon to exit, and wait for it.
+{ Helper: returns True if S is non-empty and contains only decimal digits '0'..'9'. }
+function IsAllDigits(const S: String): Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  if Length(S) = 0 then Exit;
+  for I := 1 to Length(S) do
+  begin
+    if (S[I] < '0') or (S[I] > '9') then
+      Exit;
+  end;
+  Result := True;
+end;
 
-  Replacing a running executable fails on Windows, so this must succeed before
-  any file is written. It is a request rather than a kill: WM_CLOSE on the
-  daemon's hidden window reaches DefWindowProc, which calls DestroyWindow, which
-  runs the daemon's WM_DESTROY arm — unhooking WH_KEYBOARD_LL and releasing the
-  tray icon before the process exits. taskkill /F skips all of that and orphans
-  the tray icon until Explorer next refreshes, so it is the last resort only.
+{ Strict version parser: accepts only exact decimal major.minor.patch.
+  Rejects empty components, 4th component, whitespace, and metadata ('v', '-', '+'). }
+function ParseVersion(const VStr: String; var Major, Minor, Patch: Integer): Boolean;
+var
+  S: String;
+  P1, P2: Integer;
+  Comp1, Comp2, Comp3: String;
+begin
+  Result := False;
+  Major := 0;
+  Minor := 0;
+  Patch := 0;
+  S := VStr; { No trim: input must strictly and cleanly match decimal major.minor.patch }
+  if Length(S) = 0 then Exit;
 
-  Setup runs elevated and so does the daemon, so both sit at the same integrity
-  level and UIPI does not block the message. }
-procedure StopDaemon;
+  P1 := Pos('.', S);
+  if P1 <= 1 then Exit;
+  Comp1 := Copy(S, 1, P1 - 1);
+
+  Delete(S, 1, P1);
+  P2 := Pos('.', S);
+  if P2 <= 1 then Exit;
+  Comp2 := Copy(S, 1, P2 - 1);
+
+  Comp3 := Copy(S, P2 + 1, Length(S) - P2);
+  if Length(Comp3) = 0 then Exit;
+
+  // Reject 4th component (additional dot)
+  if Pos('.', Comp3) > 0 then Exit;
+
+  // Verify all components are purely decimal digits
+  if not (IsAllDigits(Comp1) and IsAllDigits(Comp2) and IsAllDigits(Comp3)) then Exit;
+
+  Major := StrToIntDef(Comp1, -1);
+  Minor := StrToIntDef(Comp2, -1);
+  Patch := StrToIntDef(Comp3, -1);
+  if (Major < 0) or (Minor < 0) or (Patch < 0) then Exit;
+
+  Result := True;
+end;
+
+{ Numeric SemVer comparison: returns 1 if V1 > V2, -1 if V1 < V2, 0 if V1 = V2. }
+function CompareVersions(const V1Str, V2Str: String): Integer;
+var
+  Maj1, Min1, Pat1: Integer;
+  Maj2, Min2, Pat2: Integer;
+  V1Ok, V2Ok: Boolean;
+begin
+  V1Ok := ParseVersion(V1Str, Maj1, Min1, Pat1);
+  V2Ok := ParseVersion(V2Str, Maj2, Min2, Pat2);
+
+  if not V1Ok or not V2Ok then
+  begin
+    if not V1Ok then
+      Log(Format('CompareVersions: invalid V1 version "%s"', [V1Str]));
+    if not V2Ok then
+      Log(Format('CompareVersions: invalid V2 version "%s"', [V2Str]));
+    Result := 0;
+    Exit;
+  end;
+
+  if Maj1 > Maj2 then Result := 1
+  else if Maj1 < Maj2 then Result := -1
+  else if Min1 > Min2 then Result := 1
+  else if Min1 < Min2 then Result := -1
+  else if Pat1 > Pat2 then Result := 1
+  else if Pat1 < Pat2 then Result := -1
+  else Result := 0;
+end;
+
+{ Pre-setup check: block installer version downgrade and malformed records.
+  Inno Setup queries the explicit 64-bit view via HKEY_LOCAL_MACHINE_64 ($82000002).
+  This per-call mapping isolates the 64-bit query and ensures standard HKEY_LOCAL_MACHINE
+  calls in Setup remain unaltered. }
+function InitializeSetup(): Boolean;
+var
+  InstalledVer: String;
+  CurrentVer: String;
+  UninstallKey: String;
+  KeyExists: Boolean;
+  ValExists: Boolean;
+  Maj, Min, Pat: Integer;
+begin
+  Result := True;
+  CurrentVer := '{#AppVersion}';
+  UninstallKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{7E4F9C21-6B3D-4A88-9F14-2C5E8D0A1B73}_is1';
+
+  KeyExists := RegKeyExists(HKEY_LOCAL_MACHINE_64, UninstallKey);
+  if not KeyExists then
+  begin
+    Log('InitializeSetup: No existing Wira Desk installation found in 64-bit HKLM.');
+    Exit;
+  end;
+
+  ValExists := RegQueryStringValue(HKEY_LOCAL_MACHINE_64, UninstallKey, 'DisplayVersion', InstalledVer);
+
+  if (not ValExists) or (InstalledVer = '') or (not ParseVersion(InstalledVer, Maj, Min, Pat)) then
+  begin
+    Log(Format('InitializeSetup: Existing installation record has invalid DisplayVersion "%s". Aborting for safety.', [InstalledVer]));
+    if not RunningSilently then
+    begin
+      MsgBox(
+        'An existing {#AppName} installation was found, but its version information' + #13#10 +
+        'is missing or invalid (' + InstalledVer + ').' + #13#10#13#10 +
+        'Setup cannot verify version compatibility. Please uninstall the current' + #13#10 +
+        'version before continuing.',
+        mbError, MB_OK
+      );
+    end;
+    Result := False;
+    Exit;
+  end;
+
+  if CompareVersions(InstalledVer, CurrentVer) > 0 then
+  begin
+    Log(Format('InitializeSetup: Downgrade rejected. Installed: %s, Candidate: %s.', [InstalledVer, CurrentVer]));
+    if not RunningSilently then
+    begin
+      MsgBox(
+        'A newer version of {#AppName} (' + InstalledVer + ') is already installed.' + #13#10 +
+        'Downgrading to version ' + CurrentVer + ' is not permitted.' + #13#10#13#10 +
+        'If you wish to install an older version, please uninstall the current' + #13#10 +
+        'version first.',
+        mbError, MB_OK
+      );
+    end;
+    Result := False;
+    Exit;
+  end;
+
+  Log(Format('InitializeSetup: Existing version %s is compatible with candidate %s.', [InstalledVer, CurrentVer]));
+end;
+
+{ Formats the Ready to Install wizard summary. }
+function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
+var
+  S: String;
+begin
+  S := 'Destination location:' + NewLine +
+       Space + ExpandConstant('{app}') + NewLine + NewLine +
+       'Configuration and logs:' + NewLine +
+       Space + ExpandConstant('{userappdata}\WiraDesk') + NewLine + NewLine +
+       'Auto-start task:' + NewLine +
+       Space + '{#TaskName} (optional elevated logon task)' + NewLine +
+       Space + 'Setup does not create or enable auto-start.' + NewLine +
+       Space + 'Auto-start can be enabled later from Settings or the tray icon.';
+  Result := S;
+end;
+
+const
+  PROCESS_STATE_ABSENT = 0;
+  PROCESS_STATE_PRESENT = 1;
+  PROCESS_STATE_ERROR = 2;
+
+{ Helper: checks process presence with robust fail-closed probe verification.
+  Executes tasklist directly, asserts zero exit code on the enumeration command itself,
+  and inspects captured output. Avoids pipelining through findstr where a failing
+  left-hand command with exit 1 would be indistinguishable from process absence. }
+function CheckProcessState(const ExeName: String): Integer;
+var
+  ResultCode: Integer;
+  TempFile: String;
+  Lines: TArrayOfString;
+  I: Integer;
+  Cmd: String;
+begin
+  Result := PROCESS_STATE_ERROR;
+  TempFile := ExpandConstant('{tmp}\tasklist_' + ExeName + '.txt');
+  if FileExists(TempFile) then
+    DeleteFile(TempFile);
+
+  Cmd := Format('/c tasklist /FI "IMAGENAME eq %s" /NH > "%s" 2>nul', [ExeName, TempFile]);
+  if not Exec(ExpandConstant('{cmd}'), Cmd, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+  begin
+    Log(Format('CheckProcessState: failed to execute tasklist probe for %s', [ExeName]));
+    Exit;
+  end;
+
+  if ResultCode <> 0 then
+  begin
+    Log(Format('CheckProcessState: tasklist returned non-zero exit code %d for %s', [ResultCode, ExeName]));
+    if FileExists(TempFile) then DeleteFile(TempFile);
+    Exit;
+  end;
+
+  if not FileExists(TempFile) then
+  begin
+    Log(Format('CheckProcessState: output file missing for %s', [ExeName]));
+    Exit;
+  end;
+
+  if not LoadStringsFromFile(TempFile, Lines) then
+  begin
+    Log(Format('CheckProcessState: failed to read output file for %s', [ExeName]));
+    DeleteFile(TempFile);
+    Exit;
+  end;
+
+  DeleteFile(TempFile);
+
+  Result := PROCESS_STATE_ABSENT;
+  for I := 0 to GetArrayLength(Lines) - 1 do
+  begin
+    if Pos(Lowercase(ExeName), Lowercase(Lines[I])) > 0 then
+    begin
+      Result := PROCESS_STATE_PRESENT;
+      Break;
+    end;
+  end;
+end;
+
+{ Polite then bounded-forced termination of daemon; non-forced exit of Settings.
+  Fails closed if either process cannot be verified absent. }
+function StopDaemonAndSettings(var ErrorMsg: String): Boolean;
 var
   Wnd: HWND;
   Polls: Integer;
   ResultCode: Integer;
+  PState: Integer;
 begin
+  Result := True;
+  ErrorMsg := '';
+
+  { Step 1: Polite shutdown via WM_CLOSE while polling daemon window and process }
   Polls := 0;
   while True do
   begin
     Wnd := FindWindowByClassName('{#DaemonWindowClass}');
-    if Wnd = 0 then
+    PState := CheckProcessState('{#DaemonExe}');
+    if PState = PROCESS_STATE_ERROR then
+    begin
+      ErrorMsg := 'Failed to probe {#AppName} process state during shutdown. Aborting for safety.';
+      Result := False;
+      Exit;
+    end;
+
+    if (Wnd = 0) and (PState = PROCESS_STATE_ABSENT) then
       Break;
 
     if Polls >= StopMaxPolls then
     begin
-      Log('Daemon did not exit within six seconds; forcing.');
+      Log('Daemon did not exit within polite timeout; invoking bounded forced termination.');
       Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM "{#DaemonExe}"',
            '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
       Sleep(500);
       Break;
     end;
 
-    PostMessage(Wnd, WM_CLOSE, 0, 0);
+    if Wnd <> 0 then
+      PostMessage(Wnd, WM_CLOSE, 0, 0);
+
     Sleep(StopPollIntervalMs);
     Polls := Polls + 1;
   end;
 
-  { The settings window is bound to the daemon's lifetime and should already be
-    gone. Asked without /F so an unsaved edit is not destroyed; a failure here
-    just means it had already closed, which is why the code is discarded.
+  { Verify daemon window and process are both absent }
+  for Polls := 1 to 8 do
+  begin
+    Wnd := FindWindowByClassName('{#DaemonWindowClass}');
+    PState := CheckProcessState('{#DaemonExe}');
+    if PState = PROCESS_STATE_ERROR then
+    begin
+      ErrorMsg := 'Failed to verify {#AppName} daemon process exit. Aborting for safety.';
+      Result := False;
+      Exit;
+    end;
+    if (Wnd = 0) and (PState = PROCESS_STATE_ABSENT) then
+      Break;
+    Sleep(250);
+  end;
 
-    DO NOT REMOVE THIS TO FIX AN UPDATER THAT DIES MID-UPDATE. It has to stay:
-    `[Files]` replaces `wiradesk-settings.exe`, and Windows cannot replace a
-    running image. The obligation is the other way round — the updater lives
-    inside Settings, so it MUST launch Setup detached and then exit, rather than
-    waiting on a process whose first act is to kill it. That contract is the
-    updater's to keep, and this comment exists because the tempting fix is here. }
-  Exec(ExpandConstant('{sys}\taskkill.exe'), '/IM "{#SettingsExe}"',
-       '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Wnd := FindWindowByClassName('{#DaemonWindowClass}');
+  PState := CheckProcessState('{#DaemonExe}');
+  if (Wnd <> 0) or (PState <> PROCESS_STATE_ABSENT) then
+  begin
+    ErrorMsg := 'The {#AppName} background process ({#DaemonExe}) is still running and could not be stopped. ' +
+                'Please close it and retry Setup.';
+    Result := False;
+    Exit;
+  end;
+
+  { Step 2: Request Settings exit without /F to preserve unsaved edits }
+  PState := CheckProcessState('{#SettingsExe}');
+  if PState = PROCESS_STATE_ERROR then
+  begin
+    ErrorMsg := 'Failed to probe Settings process state during shutdown. Aborting for safety.';
+    Result := False;
+    Exit;
+  end;
+
+  if PState = PROCESS_STATE_PRESENT then
+  begin
+    Log('Requesting Settings window to close without /F.');
+    Exec(ExpandConstant('{sys}\taskkill.exe'), '/IM "{#SettingsExe}"',
+         '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+
+    for Polls := 1 to 12 do
+    begin
+      PState := CheckProcessState('{#SettingsExe}');
+      if PState = PROCESS_STATE_ABSENT then
+        Break;
+      Sleep(250);
+    end;
+
+    PState := CheckProcessState('{#SettingsExe}');
+    if PState <> PROCESS_STATE_ABSENT then
+    begin
+      ErrorMsg := '{#AppName} Settings ({#SettingsExe}) is still running. ' +
+                  'Please save your changes, close Settings, and retry Setup.';
+      Result := False;
+      Exit;
+    end;
+  end;
 end;
 
 { Runs after the wizard and before any file is installed — the correct hook for
   this, because it must happen before the executable is replaced. }
 function PrepareToInstall(var NeedsRestart: Boolean): String;
+var
+  Err: String;
 begin
-  StopDaemon;
+  if not StopDaemonAndSettings(Err) then
+  begin
+    Log(Format('PrepareToInstall: Process termination failed: %s', [Err]));
+    Result := Err;
+    Exit;
+  end;
   Result := '';
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   DataDir: String;
+  DummyErr: String;
 begin
   if CurUninstallStep = usUninstall then
-    StopDaemon
+    StopDaemonAndSettings(DummyErr)
   else if CurUninstallStep = usPostUninstall then
   begin
     // OFFER THE DELETION RATHER THAN DESCRIBING IT.

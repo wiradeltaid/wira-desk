@@ -3,7 +3,7 @@ id: SPEC-21-01
 component: settings
 satisfies: []
 blocked_by: []
-status: ready-for-agent
+status: closed
 tests:
   - scripts/verify-installer-safety.ps1
   - ci::build::installer-safety
@@ -39,12 +39,12 @@ tests:
 
 ## Acceptance Criteria
 
-- [ ] **Compile-Time Version Guard:** `packaging/wiradesk.iss` accepts only a stable, exactly-three-component decimal `AppVersion`. `0.2.0.0`, `v0.2.0`, `0.2`, `0.2.0-rc.1`, and `0.2.0+build.1` fail compilation.
-- [ ] **64-bit HKLM Lookup:** The installer reads the existing AppId uninstall record in an explicit 64-bit `HKLM` registry view and restores the previous view after the query.
-- [ ] **Downgrade Rejection:** A newer valid installed version, or a malformed/blank `DisplayVersion` in an existing AppId record, aborts in `InitializeSetup` before extraction. Interactive mode explains the refusal; silent modes log and exit non-zero without a modal dialog.
-- [ ] **Clean Upgrade and Reinstall:** A missing uninstall record, an older installed version, and an identical installed version proceed without a downgrade prompt.
-- [ ] **Numeric SemVer Ordering:** The comparison treats `0.10.0` as newer than `0.9.9`, `0.2.10` as newer than `0.2.9`, and equality as neither newer nor older.
-- [ ] **Ready to Install Summary:** The interactive Ready page explicitly shows `{app}`, `{userappdata}\WiraDesk`, and optional task `WiraDesk`; it states that Setup does not create or enable auto-start and does not call it a service.
-- [ ] **Fail-Closed Process Shutdown:** A surviving daemon window/process or Settings process makes `PrepareToInstall` abort with an informative error before `[Files]` extraction. The daemon retains its polite-close then bounded-force fallback; Settings is never force-killed.
-- [ ] **Executable Installer Tests:** `scripts/verify-installer-safety.ps1` runs the real installer and proves every registry decision-table row plus candidate-version ISPP rejections, cleaning its `HKLM` and filesystem fixtures even if an assertion fails. CI runs it after installer compilation.
-- [ ] **Workspace Integrity:** `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --locked` pass cleanly.
+- [x] **Compile-Time Version Guard:** `packaging/wiradesk.iss` accepts only a stable, exactly-three-component decimal `AppVersion`. `0.2.0.0`, `v0.2.0`, `0.2`, `0.2.0-rc.1`, and `0.2.0+build.1` fail compilation.
+- [x] **64-bit HKLM Lookup:** The installer reads the existing AppId uninstall record in an explicit 64-bit `HKLM` registry view and restores the previous view after the query.
+- [x] **Downgrade Rejection:** A newer valid installed version, or a malformed/blank `DisplayVersion` in an existing AppId record, aborts in `InitializeSetup` before extraction. Interactive mode explains the refusal; silent modes log and exit non-zero without a modal dialog.
+- [x] **Clean Upgrade and Reinstall:** A missing uninstall record, an older installed version, and an identical installed version proceed without a downgrade prompt.
+- [x] **Numeric SemVer Ordering:** The comparison treats `0.10.0` as newer than `0.9.9`, `0.2.10` as newer than `0.2.9`, and equality as neither newer nor older.
+- [x] **Ready to Install Summary:** The interactive Ready page explicitly shows `{app}`, `{userappdata}\WiraDesk`, and optional task `WiraDesk`; it states that Setup does not create or enable auto-start and does not call it a service.
+- [x] **Fail-Closed Process Shutdown:** A surviving daemon window/process or Settings process makes `PrepareToInstall` abort with an informative error before `[Files]` extraction. The daemon retains its polite-close then bounded-force fallback; Settings is never force-killed.
+- [x] **Executable Installer Tests:** `scripts/verify-installer-safety.ps1` runs the real installer and proves every registry decision-table row plus candidate-version ISPP rejections, cleaning its `HKLM` and filesystem fixtures even if an assertion fails. CI runs it after installer compilation.
+- [x] **Workspace Integrity:** `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --locked` pass cleanly.

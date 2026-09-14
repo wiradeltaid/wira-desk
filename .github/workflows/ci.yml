@@ -79,6 +79,11 @@ jobs:
           }
           Get-ChildItem dist
 
+      - name: Verify installer safety
+        shell: pwsh
+        run: |
+          .\scripts\verify-installer-safety.ps1 -StageDir stage -OutDir dist
+
   secrets:
     runs-on: ubuntu-latest
     steps:
