@@ -118,6 +118,8 @@ export component ShortcutsPane inherits VerticalLayout {
     in property <int> revert_generation: 0;
 
     in property <int> listening_field: -1; // -1 = idle, otherwise the action's index
+    in property <bool> show_stack_conflict_banner: false;
+    in property <bool> can_fix_stack_conflict: false;
 
     // The Key check diagnostic is deliberately NOT here. It is a live instrument — you press
     // a chord and read what it observed — so it has to stay visible while you are editing the
@@ -131,41 +133,151 @@ export component ShortcutsPane inherits VerticalLayout {
     callback toggle_enabled(int, bool);
     callback show_tooltip(string, length);
     callback hide_tooltip();
+    callback restore_shortcuts_clicked();
+    callback fix_stack_conflict_clicked();
 
     spacing: 14px;
     alignment: start;
 
     // Heading Section
-    VerticalLayout {
-        spacing: 2px;
-        Text {
-            text: "Shortcuts Configuration";
-            font-family: Typography.font_family;
-            font-size: Typography.size_heading;
-            font-weight: 700;
-            color: Palette.text_primary;
+    HorizontalLayout {
+        alignment: space-between;
+
+        VerticalLayout {
+            spacing: 2px;
+            horizontal-stretch: 1;
+
+            Text {
+                text: "Shortcuts Configuration";
+                font-family: Typography.font_family;
+                font-size: Typography.size_heading;
+                font-weight: 700;
+                color: Palette.text_primary;
+            }
+
+            Text {
+                text: "Click any shortcut button to record physical key combinations directly. Every action Wira Desk can trigger lives here.";
+                font-family: Typography.font_family;
+                font-size: Typography.size_caption;
+                color: Palette.text_secondary;
+                wrap: word-wrap;
+            }
         }
 
-        Text {
-            text: "Click any shortcut button to record physical key combinations directly. Every action Wira Desk can trigger lives here.";
-            font-family: Typography.font_family;
-            font-size: Typography.size_caption;
-            color: Palette.text_secondary;
-            wrap: word-wrap;
+        // Secondary Restore Shortcuts Action Button (SPEC-25-01)
+        HorizontalLayout {
+            alignment: end;
+            padding-left: 12px;
+
+            Rectangle {
+                width: 148px;
+                height: 32px;
+                border-radius: 6px;
+                background: restore_touch.has_hover ? Palette.bg_card_hover : Palette.bg_subtle;
+                border-width: 1px;
+                border-color: Palette.stroke_card;
+
+                Text {
+                    text: "↺ Restore shortcuts";
+                    font-family: Typography.font_family;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: Palette.text_primary;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                restore_touch := TouchArea {
+                    accessible-role: button;
+                    accessible-label: "Restore shortcuts to defaults";
+                    accessible-action-default => {
+                        root.restore_shortcuts_clicked();
+                    }
+                    mouse-cursor: pointer;
+                    clicked => {
+                        root.restore_shortcuts_clicked();
+                    }
+                }
+            }
         }
     }
 
-    // Guidance for CHOOSING a chord, so it sits where the reader starts rather than at the
-    // bottom of the Key check card, which reports what a keypress already did. A sibling of
-    // the groups rather than part of the title block above: that block is spaced at 2px
-    // because it is a title and its subtitle, and a third line crammed into it reads as a
-    // continuation of the subtitle instead of a separate note.
-    Text {
-        text: "💡 Tip: Windows reserves Win + 1..9, Win + E, Win + D, and Win + Ctrl + ←/→. Wira Desk ships on Ctrl + Alt + ..., a good family for custom actions too.";
-        font-family: Typography.font_family;
-        font-size: Typography.size_caption;
-        color: Palette.accent_primary;
-        wrap: word-wrap;
+    // Legacy Conflict Banner (SPEC-25-01)
+    if root.show_stack_conflict_banner : Card {
+        background: Palette.is_dark ? rgba(255, 185, 0, 0.12) : rgba(255, 185, 0, 0.15);
+        border-color: Palette.signal_warning;
+
+        VerticalLayout {
+            padding: 14px;
+            spacing: 8px;
+
+            HorizontalLayout {
+                spacing: 8px;
+                alignment: start;
+
+                Text {
+                    text: "⚠";
+                    font-size: 14px;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    text: "Update a conflicting shortcut";
+                    font-family: Typography.font_family;
+                    font-size: Typography.size_body;
+                    font-weight: 700;
+                    color: Palette.text_primary;
+                    accessible-role: text;
+                    accessible-label: "Update a conflicting shortcut";
+                    vertical-alignment: center;
+                }
+            }
+
+            Text {
+                text: root.can_fix_stack_conflict
+                    ? "“Overlapping window stack” used the same shortcut as “Snap to bottom edge.” Move it to its new default shortcut: Ctrl + Alt + Shift + S."
+                    : "“Overlapping window stack” used the same shortcut as “Snap to bottom edge.” However, the new default shortcut (Ctrl + Alt + Shift + S) is already in use by another enabled action. Please manually choose a unique shortcut.";
+                font-family: Typography.font_family;
+                font-size: Typography.size_caption;
+                color: Palette.text_secondary;
+                wrap: word-wrap;
+            }
+
+            if root.can_fix_stack_conflict : HorizontalLayout {
+                alignment: start;
+                padding-top: 4px;
+
+                Rectangle {
+                    width: 140px;
+                    height: 30px;
+                    border-radius: 6px;
+                    background: update_touch.has_hover ? Palette.accent_hover : Palette.accent_primary;
+
+                    Text {
+                        text: "Update shortcut";
+                        accessible-role: none;
+                        font-family: Typography.font_family;
+                        font-size: 12.5px;
+                        font-weight: 600;
+                        color: Palette.text_on_accent;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+
+                    update_touch := TouchArea {
+                        accessible-role: button;
+                        accessible-label: "Update shortcut";
+                        accessible-action-default => {
+                            root.fix_stack_conflict_clicked();
+                        }
+                        mouse-cursor: pointer;
+                        clicked => {
+                            root.fix_stack_conflict_clicked();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     ShortcutGroup {

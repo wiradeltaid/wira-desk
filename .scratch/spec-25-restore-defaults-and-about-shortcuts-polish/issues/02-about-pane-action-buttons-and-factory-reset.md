@@ -3,7 +3,7 @@ id: SPEC-25-02
 component: settings
 satisfies: []
 blocked_by: []
-status: ready-for-agent
+status: done
 tests:
   - app::tests::factory_reset_restores_every_config_section_in_the_draft
   - app::tests::factory_reset_is_draft_only_and_revert_restores_saved_preferences
