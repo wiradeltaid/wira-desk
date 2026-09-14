@@ -38,13 +38,16 @@ struct SectionHeader {
     size_of_raw_data: u32,
 }
 
-fn rva_to_offset(rva: u32, sections: &[SectionHeader]) -> Option<usize> {
+fn rva_to_offset(rva: u32, sections: &[SectionHeader], file_len: usize) -> Option<usize> {
     for s in sections {
         let size = std::cmp::max(s.virtual_size, s.size_of_raw_data);
         if rva >= s.virtual_address && rva < s.virtual_address.saturating_add(size) {
-            let offset_in_sec = rva - s.virtual_address;
-            if offset_in_sec < s.size_of_raw_data {
-                return Some((s.pointer_to_raw_data + offset_in_sec) as usize);
+            let offset_in_sec = (rva - s.virtual_address) as usize;
+            if offset_in_sec < s.size_of_raw_data as usize {
+                let file_offset = (s.pointer_to_raw_data as usize).checked_add(offset_in_sec)?;
+                if file_offset < file_len {
+                    return Some(file_offset);
+                }
             }
         }
     }
@@ -138,51 +141,67 @@ pub fn scan_pe_imports(bytes: &[u8]) -> Result<Vec<String>, PeScanError> {
         });
     }
 
-    let import_file_offset = match rva_to_offset(import_rva, &sections) {
+    let import_file_offset = match rva_to_offset(import_rva, &sections, bytes.len()) {
         Some(offset) => offset,
         None => return Err(PeScanError::InvalidImportTable),
     };
 
     let mut dll_names = Vec::new();
     let mut curr_desc = import_file_offset;
+    let mut found_null_descriptor = false;
 
-    loop {
-        if curr_desc + 20 > bytes.len() {
-            break;
-        }
+    while curr_desc + 20 <= bytes.len() {
         let is_null_desc = bytes[curr_desc..curr_desc + 20].iter().all(|&b| b == 0);
         if is_null_desc {
+            found_null_descriptor = true;
             break;
         }
 
         let name_rva =
             u32::from_le_bytes(bytes[curr_desc + 12..curr_desc + 16].try_into().unwrap());
-        if let Some(name_offset) = rva_to_offset(name_rva, &sections) {
-            if name_offset < bytes.len() {
-                let name_bytes = &bytes[name_offset..];
-                let len = name_bytes.iter().position(|&b| b == 0).unwrap_or(0);
-                if let Ok(name) = std::str::from_utf8(&name_bytes[..len]) {
-                    if !name.is_empty() {
-                        dll_names.push(name.to_string());
-                    }
-                }
-            }
+        if name_rva == 0 {
+            return Err(PeScanError::InvalidImportTable);
         }
+        let name_offset = rva_to_offset(name_rva, &sections, bytes.len())
+            .ok_or(PeScanError::InvalidImportTable)?;
+
+        let name_bytes = &bytes[name_offset..];
+        let len = name_bytes
+            .iter()
+            .position(|&b| b == 0)
+            .ok_or(PeScanError::InvalidImportTable)?;
+        if len == 0 {
+            return Err(PeScanError::InvalidImportTable);
+        }
+        let name =
+            std::str::from_utf8(&name_bytes[..len]).map_err(|_| PeScanError::InvalidImportTable)?;
+        dll_names.push(name.to_string());
 
         curr_desc += 20;
     }
 
+    if !found_null_descriptor {
+        return Err(PeScanError::InvalidImportTable);
+    }
+
     Ok(dll_names)
+}
+
+/// Checks whether a DLL name matches any prohibited dynamic MSVC runtime library.
+pub fn is_prohibited_crt_import(dll: &str) -> bool {
+    let lower = dll.to_ascii_lowercase();
+    let stem = lower.strip_suffix(".dll").unwrap_or(&lower);
+    stem.starts_with("vcruntime")
+        || stem.starts_with("msvcp")
+        || stem.starts_with("ucrtbase")
+        || stem.starts_with("api-ms-win-crt-")
 }
 
 /// Filter a list of imported DLL names to only those matching dynamic MSVC runtime libraries.
 pub fn detect_dynamic_msvc_imports(imports: &[String]) -> Vec<String> {
     imports
         .iter()
-        .filter(|dll| {
-            let lower = dll.to_ascii_lowercase();
-            lower.starts_with("vcruntime") || lower.starts_with("msvcp")
-        })
+        .filter(|dll| is_prohibited_crt_import(dll))
         .cloned()
         .collect()
 }
@@ -262,22 +281,133 @@ pub mod tests {
     }
 
     #[test]
-    fn pe_import_scanner_detects_dynamic_msvc_imports() {
+    fn pe_import_scanner_detects_all_dynamic_msvc_crt_families() {
         let pe_bytes = build_synthetic_pe(&[
             "KERNEL32.dll",
-            "VCRUNTIME140.dll",
-            "MSVCP140.dll",
+            "VcRuntime140.dll",
+            "msvcp140.dll",
+            "UCRTBASE.dll",
+            "api-ms-win-crt-runtime-l1-1-0.dll",
             "USER32.dll",
         ]);
         let imports = scan_pe_imports(&pe_bytes).expect("synthetic PE must scan successfully");
-        assert_eq!(imports.len(), 4);
+        assert_eq!(imports.len(), 6);
         assert_eq!(imports[0], "KERNEL32.dll");
-        assert_eq!(imports[1], "VCRUNTIME140.dll");
-        assert_eq!(imports[2], "MSVCP140.dll");
-        assert_eq!(imports[3], "USER32.dll");
+        assert_eq!(imports[1], "VcRuntime140.dll");
+        assert_eq!(imports[2], "msvcp140.dll");
+        assert_eq!(imports[3], "UCRTBASE.dll");
+        assert_eq!(imports[4], "api-ms-win-crt-runtime-l1-1-0.dll");
+        assert_eq!(imports[5], "USER32.dll");
 
         let dynamic_crt = detect_dynamic_msvc_imports(&imports);
-        assert_eq!(dynamic_crt, vec!["VCRUNTIME140.dll", "MSVCP140.dll"]);
+        assert_eq!(
+            dynamic_crt,
+            vec![
+                "VcRuntime140.dll",
+                "msvcp140.dll",
+                "UCRTBASE.dll",
+                "api-ms-win-crt-runtime-l1-1-0.dll"
+            ]
+        );
+    }
+
+    #[test]
+    fn pe_import_scanner_rejects_malformed_pe_input() {
+        // Buffer too small (< 0x40)
+        assert_eq!(scan_pe_imports(&[0u8; 16]), Err(PeScanError::TooSmall));
+
+        // Invalid DOS signature
+        let mut bad_dos = vec![0u8; 128];
+        bad_dos[0..2].copy_from_slice(b"NO");
+        assert_eq!(
+            scan_pe_imports(&bad_dos),
+            Err(PeScanError::InvalidDosSignature)
+        );
+
+        // Invalid PE offset (points beyond buffer)
+        let mut bad_pe_offset = vec![0u8; 128];
+        bad_pe_offset[0..2].copy_from_slice(b"MZ");
+        let oob_offset: u32 = 0x200;
+        bad_pe_offset[0x3c..0x40].copy_from_slice(&oob_offset.to_le_bytes());
+        assert_eq!(
+            scan_pe_imports(&bad_pe_offset),
+            Err(PeScanError::InvalidPeOffset)
+        );
+
+        // Missing PE\0\0 signature at offset
+        let mut bad_pe_sig = vec![0u8; 256];
+        bad_pe_sig[0..2].copy_from_slice(b"MZ");
+        let pe_offset: u32 = 0x80;
+        bad_pe_sig[0x3c..0x40].copy_from_slice(&pe_offset.to_le_bytes());
+        bad_pe_sig[0x80..0x84].copy_from_slice(b"FAIL");
+        assert_eq!(
+            scan_pe_imports(&bad_pe_sig),
+            Err(PeScanError::InvalidPeSignature)
+        );
+
+        // Missing terminating null descriptor (buffer truncated before null descriptor)
+        let mut pe_truncated_desc = build_synthetic_pe(&["KERNEL32.dll"]);
+        // The first descriptor is at offset 512 (len 20), followed by null descriptor at 532.
+        // Truncate right at offset 532 so no null descriptor fits.
+        pe_truncated_desc.truncate(532);
+        assert_eq!(
+            scan_pe_imports(&pe_truncated_desc),
+            Err(PeScanError::InvalidImportTable)
+        );
+
+        // Invalid / out-of-bounds name RVA
+        let mut pe_bad_name_rva = build_synthetic_pe(&["KERNEL32.dll"]);
+        let oob_name_rva: u32 = 0x99999999;
+        pe_bad_name_rva[512 + 12..512 + 16].copy_from_slice(&oob_name_rva.to_le_bytes());
+        assert_eq!(
+            scan_pe_imports(&pe_bad_name_rva),
+            Err(PeScanError::InvalidImportTable)
+        );
+
+        // Unterminated DLL name string (fill string buffer to EOF with non-zero bytes)
+        let mut pe_unterminated_str = build_synthetic_pe(&["KERNEL32.dll"]);
+        let str_start = 512 + 40;
+        for b in &mut pe_unterminated_str[str_start..] {
+            *b = b'A';
+        }
+        assert_eq!(
+            scan_pe_imports(&pe_unterminated_str),
+            Err(PeScanError::InvalidImportTable)
+        );
+
+        // Empty DLL name string (first byte at name offset is null)
+        let mut pe_empty_str = build_synthetic_pe(&["KERNEL32.dll"]);
+        pe_empty_str[str_start] = 0;
+        assert_eq!(
+            scan_pe_imports(&pe_empty_str),
+            Err(PeScanError::InvalidImportTable)
+        );
+    }
+
+    #[test]
+    fn prohibited_crt_import_predicate_matches_canonical_families_and_stems() {
+        assert!(is_prohibited_crt_import("VCRUNTIME140.dll"));
+        assert!(is_prohibited_crt_import("vcruntime140_1.dll"));
+        assert!(is_prohibited_crt_import("MSVCP140.DLL"));
+        assert!(is_prohibited_crt_import("msvcp140_atomic_wait.dll"));
+        assert!(is_prohibited_crt_import("UCRTBASE.dll"));
+        assert!(is_prohibited_crt_import("ucrtbased.dll"));
+        assert!(is_prohibited_crt_import(
+            "api-ms-win-crt-runtime-l1-1-0.dll"
+        ));
+        assert!(is_prohibited_crt_import("api-ms-win-crt-stdio-l1-1-0.dll"));
+
+        // Match without .dll suffix as well
+        assert!(is_prohibited_crt_import("vcruntime140"));
+        assert!(is_prohibited_crt_import("MSVCP140"));
+        assert!(is_prohibited_crt_import("ucrtbase"));
+
+        // Clean system DLLs must not match
+        assert!(!is_prohibited_crt_import("KERNEL32.dll"));
+        assert!(!is_prohibited_crt_import("USER32.dll"));
+        assert!(!is_prohibited_crt_import("ADVAPI32.dll"));
+        assert!(!is_prohibited_crt_import("SHELL32.dll"));
+        assert!(!is_prohibited_crt_import("ntdll.dll"));
     }
 
     #[test]

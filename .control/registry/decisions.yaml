@@ -841,7 +841,7 @@ decisions:
 
   - id: DEC-034
     title: Autopilot mandate for SPEC-20 delivery
-    status: accepted
+    status: applied
     file: decisions/DEC-034-autopilot-mandate-for-spec-20-delivery.md
     created: '2026-09-14'
     touches:
@@ -852,6 +852,9 @@ decisions:
       - .control/registry/specs.yaml
       - .scratch/spec-20-static-crt-and-software-renderer/SPEC.md
       - .scratch/spec-20-static-crt-and-software-renderer/issues/01-defect-def-22-static-crt-settings-renderer.md
+      - 3p.md
+      - docs/3p.md
+      - NOTICE
       - crates/settings/Cargo.toml
       - Cargo.lock
       - .cargo/config.toml

@@ -54,7 +54,7 @@ silently never fires.
 | Crate | Version | Note |
 | --- | --- | --- |
 | `windows-sys` | 0.52 | Raw C-FFI only. The full `windows` crate's COM metadata is deliberately avoided |
-| `slint` | 1.17 | `settings` only, `default-features = false` plus `backend-winit`, `renderer-skia`, `accessibility`, `compat-1-2`. Paired with `i-slint-backend-winit`, `slint-build` (a build dependency), and `i-slint-backend-testing` (a dev dependency) — bump all four together, never one |
+| `slint` | 1.17 | `settings` only, `default-features = false` plus `backend-winit`, `renderer-software`, `accessibility`, `compat-1-2`. Paired with `i-slint-backend-winit` (`default-features = false`), `slint-build` (a build dependency), and `i-slint-backend-testing` (a dev dependency) — bump all four together, never one. Migrated from `renderer-skia` (`DEF-22`, `DEC-034`) to eliminate native C++ runtime dependencies (`skia-bindings`) and allow target-scoped `+crt-static` linking across the workspace |
 | `winit` | 0.30 | `settings` only, and it MUST match the version `i-slint-backend-winit` 1.17 resolves to; the window handle the titlebar and elevation path need is reached through it |
 | `toml` | 1.1 | Moved from 0.8 by #5 |
 | `serde` | 1.0 | `derive`. `settings` also carries `serde_json` for the update check |

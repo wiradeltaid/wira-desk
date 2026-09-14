@@ -34,6 +34,11 @@ jobs:
       - name: Release build
         run: cargo build --workspace --release --locked
 
+      - name: Verify release binary dependencies
+        shell: pwsh
+        run: |
+          .\scripts\verify-release-binary.ps1 -Path target\release
+
       # The installer is compiled on every push, not only on a version tag. A packaging
       # script that is only exercised at release time is a script that breaks at release
       # time, when the tag is already pushed and the fix costs a retag. The Inno pin, the

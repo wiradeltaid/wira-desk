@@ -1066,7 +1066,7 @@ defects:
 
   - id: DEF-22
     title: Dynamic MSVC CRT dependency in Settings crashes executables on clean Windows and fails WinGet automated validation
-    status: open
+    status: fixed
     severity: high
     component: settings
     violates: [NFR-1, DEC-024]
@@ -1074,6 +1074,21 @@ defects:
     found_by: WinGet automated validation bot on microsoft/winget-pkgs#426321 (reproduced locally with PE import scan)
     tests:
       - shared::tests::msvc_target_compiles_with_crt_static
+      - binary::tests::pe_import_scanner_detects_all_dynamic_msvc_crt_families
+      - binary::tests::pe_import_scanner_rejects_malformed_pe_input
+      - binary::tests::pe_import_scanner_passes_clean_static_binary
+      - binary::tests::prohibited_crt_import_predicate_matches_canonical_families_and_stems
+    fixed_in: SPEC-20-01
+    fixed_by: >-
+      Replaced Slint renderer-skia feature with renderer-software in crates/settings/Cargo.toml and
+      set default-features = false on i-slint-backend-winit, eliminating native C++ skia-bindings from
+      the dependency tree. Configured target-feature=+crt-static for x86_64-pc-windows-msvc in
+      .cargo/config.toml across the entire workspace. Removed dormant vc_redist.x64.exe Files and Run
+      entries from packaging/wiradesk.iss. Hardened scripts/verify-release-binary.ps1 and crates/shared/src/binary.rs
+      to fail closed on all prohibited MSVC CRT families (vcruntime*, msvcp*, ucrtbase*, api-ms-win-crt-*)
+      and malformed PE files, removing the -AllowDynamicCrtIfBundled bypass and integrating the strict scanner
+      into ci.yml and release.yml. Asserted cfg!(target_feature = "crt-static") unconditionally on MSVC in
+      crates/shared/src/lib.rs, updated AD-11a in SDD-settings.md, codebase-stack-guide.md, deny.toml, and NOTICE.
     summary: >-
       On a clean Windows installation without pre-installed Visual C++ Redistributables, running either
       wiradesk.exe or wiradesk-settings.exe encounters STATUS_DLL_NOT_FOUND (0xC0000135, exit code -1073741515)

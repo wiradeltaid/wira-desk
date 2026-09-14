@@ -1,7 +1,7 @@
 ---
 type: mandate
 id: DEC-034
-status: accepted
+status: applied
 touches:
   - .control/decisions/DEC-034-autopilot-mandate-for-spec-20-delivery.md
   - .control/memlog/autopilot-DEC-034.md
@@ -11,6 +11,8 @@ touches:
   - .scratch/spec-20-static-crt-and-software-renderer/SPEC.md
   - .scratch/spec-20-static-crt-and-software-renderer/issues/01-defect-def-22-static-crt-settings-renderer.md
   - 3p.md
+  - docs/3p.md
+  - NOTICE
   - crates/settings/Cargo.toml
   - Cargo.lock
   - .cargo/config.toml
