@@ -1071,6 +1071,82 @@ impl SettingsModel {
         self.last_capture = None;
     }
 
+    /// Restore all shortcut-owned fields to factory defaults (SPEC-25-01).
+    ///
+    /// Staged mutation only: does not write configuration or signal the daemon.
+    /// Preserves General, visual-switcher, mouse, and VM-bypass preferences.
+    pub fn restore_shortcuts_defaults(&mut self) {
+        self.cancel_capture();
+        self.last_capture = None;
+        self.feedback = SaveFeedback::None;
+
+        let default_cfg = Config::default();
+
+        for field in ShortcutField::ALL {
+            field.set(&mut self.draft, field.get(&default_cfg).to_string());
+            field.set_enabled(&mut self.draft, field.is_enabled(&default_cfg));
+        }
+
+        self.draft.snapping.percent_left = default_cfg.snapping.percent_left;
+        self.draft.snapping.percent_right = default_cfg.snapping.percent_right;
+        self.draft.snapping.percent_top = default_cfg.snapping.percent_top;
+        self.draft.snapping.percent_bottom = default_cfg.snapping.percent_bottom;
+        self.draft.layout.stack_width_percent = default_cfg.layout.stack_width_percent;
+    }
+
+    /// Check if the known legacy collision between enabled Stack and Snap Bottom is present.
+    pub fn has_legacy_stack_conflict(&self) -> bool {
+        let stack = ShortcutField::Stack;
+        let snap_bottom = ShortcutField::SnapPercentBottom;
+        stack.is_enabled(&self.draft)
+            && snap_bottom.is_enabled(&self.draft)
+            && stack.get(&self.draft) == snap_bottom.get(&self.draft)
+    }
+
+    /// Check if the known legacy Stack conflict can be safely repaired with one click.
+    ///
+    /// Available only when the target default chord `Ctrl+Alt+Shift+S` is not held by
+    /// any other enabled action.
+    pub fn can_fix_stack_conflict(&self) -> bool {
+        if !self.has_legacy_stack_conflict() {
+            return false;
+        }
+        let default_cfg = Config::default();
+        let stack_default = ShortcutField::Stack.get(&default_cfg);
+        !ShortcutField::ALL.into_iter().any(|f| {
+            f != ShortcutField::Stack
+                && f.is_enabled(&self.draft)
+                && f.get(&self.draft) == stack_default
+        })
+    }
+
+    /// Repair the legacy Stack/Snap Bottom collision by assigning Stack its DEC-011 default.
+    pub fn fix_stack_conflict(&mut self) {
+        if !self.can_fix_stack_conflict() {
+            return;
+        }
+        self.cancel_capture();
+        self.last_capture = None;
+        let default_cfg = Config::default();
+        ShortcutField::Stack.set(
+            &mut self.draft,
+            ShortcutField::Stack.get(&default_cfg).to_string(),
+        );
+        self.feedback = SaveFeedback::None;
+    }
+
+    /// Restore all settings across every configuration section to factory defaults (SPEC-25-02).
+    ///
+    /// Staged mutation only: updates `draft` in-memory and leaves `saved` untouched.
+    /// Disk I/O and daemon signaling happen only when the user chooses Save Changes.
+    pub fn factory_reset_defaults(&mut self) {
+        self.draft = Config::default();
+        self.capture = CaptureState::Idle;
+        self.sync_capture_lease();
+        self.last_capture = None;
+        self.feedback = SaveFeedback::None;
+    }
+
     /// Validate, persist, and signal reload.
     pub fn save(&mut self, path: &std::path::Path) {
         match save_and_notify(&self.draft, path) {
@@ -3030,8 +3106,17 @@ mod tests {
 
             assert_eq!(window.get_current_pane(), 4);
 
-            let repo_btn = find_about_element(&window, "Source code & issue tracker on GitHub");
-            assert!(repo_btn.is_some(), "Source code button found in About pane");
+            let repo_btn = find_about_element(&window, "GitHub repository");
+            assert!(
+                repo_btn.is_some(),
+                "GitHub repository button found in About pane"
+            );
+
+            let issues_btn = find_about_element(&window, "Issue Tracker");
+            assert!(
+                issues_btn.is_some(),
+                "Issue Tracker button found in About pane"
+            );
 
             let pub_btn = find_about_element(&window, "Publisher website (wiradigital.id)");
             assert!(
@@ -3061,6 +3146,7 @@ mod tests {
             window.invoke_open_publisher_url();
             window.invoke_open_source_url();
             window.invoke_open_support_url();
+            window.invoke_open_issues_url();
 
             let _ = std::fs::remove_file(&save_path);
         });
@@ -3352,5 +3438,210 @@ mod tests {
                 }
             }
         }
+    }
+
+    // ── SPEC-25 Tests ───────────────────────────────────────────────────────
+
+    #[test]
+    fn restore_shortcuts_defaults_every_field_and_preserves_non_shortcut_preferences() {
+        let mut m = model();
+        // Mutate shortcuts
+        m.draft.snapping.snap_half_left = "ctrl+alt+z".to_string();
+        m.draft.snapping.snap_half_left_enabled = false;
+        m.draft.snapping.percent_left = 80;
+        m.draft.layout.stack_width_percent = 90;
+
+        // Mutate non-shortcuts
+        m.draft.general.auto_start = true;
+        m.draft.switcher.visual_enabled = true;
+        m.draft.switcher.visual_hold_delay_ms = 450;
+        m.draft.mouse.enabled = true;
+        m.draft.mouse.thumb_back = "maximize".to_string();
+        m.draft
+            .vm_bypass
+            .bypass_processes
+            .push("notepad.exe".to_string());
+
+        m.restore_shortcuts_defaults();
+
+        let default_cfg = Config::default();
+        // Check every shortcut field has default value and enabled state
+        for field in ShortcutField::ALL {
+            assert_eq!(field.get(&m.draft), field.get(&default_cfg));
+            assert_eq!(field.is_enabled(&m.draft), field.is_enabled(&default_cfg));
+        }
+        assert_eq!(
+            m.draft.snapping.percent_left,
+            default_cfg.snapping.percent_left
+        );
+        assert_eq!(
+            m.draft.snapping.percent_right,
+            default_cfg.snapping.percent_right
+        );
+        assert_eq!(
+            m.draft.snapping.percent_top,
+            default_cfg.snapping.percent_top
+        );
+        assert_eq!(
+            m.draft.snapping.percent_bottom,
+            default_cfg.snapping.percent_bottom
+        );
+        assert_eq!(
+            m.draft.layout.stack_width_percent,
+            default_cfg.layout.stack_width_percent
+        );
+
+        // Check non-shortcut preferences are preserved
+        assert!(m.draft.general.auto_start);
+        assert!(m.draft.switcher.visual_enabled);
+        assert_eq!(m.draft.switcher.visual_hold_delay_ms, 450);
+        assert!(m.draft.mouse.enabled);
+        assert_eq!(m.draft.mouse.thumb_back, "maximize");
+        assert!(m
+            .draft
+            .vm_bypass
+            .bypass_processes
+            .contains(&"notepad.exe".to_string()));
+    }
+
+    #[test]
+    fn restore_shortcuts_is_dirty_only_when_draft_differs_from_saved() {
+        // When saved is already default
+        let mut m = model();
+        m.restore_shortcuts_defaults();
+        assert!(
+            !m.is_dirty(),
+            "Restoring defaults on an already default config must stay clean"
+        );
+
+        // When saved has custom shortcut
+        let mut cfg = Config::default();
+        cfg.snapping.snap_half_left = "ctrl+alt+z".to_string();
+        let mut m2 = SettingsModel::new(cfg, false);
+        assert!(!m2.is_dirty());
+        m2.restore_shortcuts_defaults();
+        assert!(
+            m2.is_dirty(),
+            "Restoring defaults on customized shortcuts must be dirty"
+        );
+    }
+
+    #[test]
+    fn revert_after_shortcut_restore_returns_to_the_saved_legacy_configuration() {
+        let mut cfg = Config::default();
+        cfg.layout.stack_shortcut = "ctrl+alt+shift+down".to_string();
+        let mut m = SettingsModel::new(cfg, false);
+
+        m.restore_shortcuts_defaults();
+        assert_eq!(m.draft.layout.stack_shortcut, "ctrl+alt+shift+s");
+        assert!(m.is_dirty());
+
+        m.revert();
+        assert!(!m.is_dirty());
+        assert_eq!(m.draft.layout.stack_shortcut, "ctrl+alt+shift+down");
+    }
+
+    #[test]
+    fn fix_stack_conflict_requires_the_exact_pair_and_never_creates_a_third_conflict() {
+        let mut cfg = Config::default();
+        cfg.layout.stack_shortcut = "ctrl+alt+shift+down".to_string();
+        cfg.snapping.snap_percent_bottom = "ctrl+alt+shift+down".to_string();
+        let mut m = SettingsModel::new(cfg, false);
+
+        // Case A: exact pair, target free
+        assert!(m.has_legacy_stack_conflict());
+        assert!(m.can_fix_stack_conflict());
+        m.fix_stack_conflict();
+        assert_eq!(m.draft.layout.stack_shortcut, "ctrl+alt+shift+s");
+        assert!(!m.has_legacy_stack_conflict());
+
+        // Case B: one is disabled -> no conflict to fix
+        let mut cfg_disabled = Config::default();
+        cfg_disabled.layout.stack_shortcut = "ctrl+alt+shift+down".to_string();
+        cfg_disabled.snapping.snap_percent_bottom = "ctrl+alt+shift+down".to_string();
+        cfg_disabled.layout.stack_shortcut_enabled = false;
+        let m_disabled = SettingsModel::new(cfg_disabled, false);
+        assert!(!m_disabled.has_legacy_stack_conflict());
+        assert!(!m_disabled.can_fix_stack_conflict());
+
+        // Case C: target chord is occupied by another enabled action
+        let mut cfg_occupied = Config::default();
+        cfg_occupied.layout.stack_shortcut = "ctrl+alt+shift+down".to_string();
+        cfg_occupied.snapping.snap_percent_bottom = "ctrl+alt+shift+down".to_string();
+        cfg_occupied.snapping.snap_maximize = "ctrl+alt+shift+s".to_string();
+        let mut m_occupied = SettingsModel::new(cfg_occupied, false);
+        assert!(m_occupied.has_legacy_stack_conflict());
+        assert!(!m_occupied.can_fix_stack_conflict());
+        m_occupied.fix_stack_conflict();
+        assert_eq!(
+            m_occupied.draft.layout.stack_shortcut, "ctrl+alt+shift+down",
+            "Must not mutate draft when target chord is occupied"
+        );
+    }
+
+    #[test]
+    fn factory_reset_restores_every_config_section_in_the_draft() {
+        let mut m = model();
+        m.draft.general.auto_start = true;
+        m.draft.switcher.visual_enabled = true;
+        m.draft.switcher.visual_hold_delay_ms = 400;
+        m.draft.snapping.snap_half_left = "ctrl+alt+x".to_string();
+        m.draft.snapping.percent_left = 75;
+        m.draft.layout.stack_shortcut = "ctrl+alt+s".to_string();
+        m.draft.layout.stack_width_percent = 80;
+        m.draft.mouse.enabled = true;
+        m.draft
+            .vm_bypass
+            .bypass_processes
+            .push("app.exe".to_string());
+
+        m.factory_reset_defaults();
+
+        assert_eq!(m.draft, Config::default());
+    }
+
+    #[test]
+    fn factory_reset_is_draft_only_and_revert_restores_saved_preferences() {
+        let mut cfg = Config::default();
+        cfg.general.auto_start = true;
+        cfg.snapping.snap_half_left = "ctrl+alt+x".to_string();
+        let mut m = SettingsModel::new(cfg.clone(), false);
+
+        m.factory_reset_defaults();
+        assert_eq!(m.saved, cfg);
+        assert!(m.is_dirty());
+
+        m.revert();
+        assert!(!m.is_dirty());
+        assert_eq!(m.draft, cfg);
+    }
+
+    #[test]
+    fn about_pane_renders_three_independent_action_buttons() {
+        crate::shortcut_row_slint_snapshot::tests::run_on_ui_thread(|| {
+            let (window, model, save_path) =
+                crate::shortcut_row_slint_snapshot::tests::setup_shortcuts_window();
+
+            model.borrow_mut().set_pane(Pane::About);
+            crate::sync_model_to_ui(&window, &model.borrow());
+
+            assert_eq!(window.get_current_pane(), 4);
+
+            let support = find_about_element(&window, "Support development");
+            assert!(support.is_some(), "Support development button found");
+
+            let issues = find_about_element(&window, "Issue Tracker");
+            assert!(issues.is_some(), "Issue Tracker button found");
+
+            let repo = find_about_element(&window, "GitHub repository");
+            assert!(repo.is_some(), "GitHub repository button found");
+
+            // Verify all three callbacks can be invoked
+            window.invoke_open_support_url();
+            window.invoke_open_issues_url();
+            window.invoke_open_source_url();
+
+            let _ = std::fs::remove_file(&save_path);
+        });
     }
 }

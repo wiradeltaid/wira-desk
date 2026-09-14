@@ -3,7 +3,7 @@ id: SPEC-25-01
 component: settings
 satisfies: [UC-4]
 blocked_by: []
-status: ready-for-agent
+status: done
 tests:
   - app::tests::restore_shortcuts_defaults_every_field_and_preserves_non_shortcut_preferences
   - app::tests::restore_shortcuts_is_dirty_only_when_draft_differs_from_saved

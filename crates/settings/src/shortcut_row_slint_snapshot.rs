@@ -2143,4 +2143,328 @@ pub(crate) mod tests {
             let _ = std::fs::remove_file(&save_path);
         });
     }
+
+    fn find_element_scrolling(window: &crate::MainWindow, label: &str) -> Option<ElementHandle> {
+        let scroll_by = |delta_y: f32| {
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::PointerScrolled {
+                    position: slint::LogicalPosition::new(300.0, 300.0),
+                    delta_x: 0.0,
+                    delta_y,
+                });
+        };
+
+        scroll_by(1200.0);
+        if let Some(el) = ElementHandle::find_by_accessible_label(window, label).next() {
+            return Some(el);
+        }
+        for delta_y in [-200.0, -400.0, -600.0, -800.0, -1000.0] {
+            scroll_by(delta_y);
+            if let Some(el) = ElementHandle::find_by_accessible_label(window, label).next() {
+                return Some(el);
+            }
+        }
+        None
+    }
+
+    #[test]
+    fn header_restore_shortcuts_button_updates_the_draft() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+
+            // Scroll to top of Shortcuts pane
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::PointerScrolled {
+                    position: slint::LogicalPosition::new(300.0, 300.0),
+                    delta_x: 0.0,
+                    delta_y: 1200.0,
+                });
+
+            // Mutate draft shortcuts
+            model.borrow_mut().draft.snapping.snap_half_left = "ctrl+alt+z".to_string();
+            model.borrow_mut().draft.snapping.percent_left = 85;
+            sync_model_to_ui(&window, &model.borrow());
+
+            assert!(model.borrow().is_dirty());
+
+            // Click the Restore shortcuts button in the header
+            let restore_btn =
+                ElementHandle::find_by_accessible_label(&window, "Restore shortcuts to defaults")
+                    .next()
+                    .expect("Restore shortcuts button found");
+            restore_btn.invoke_accessible_default_action();
+
+            let default_cfg = Config::default();
+            assert_eq!(
+                model.borrow().draft.snapping.snap_half_left,
+                default_cfg.snapping.snap_half_left
+            );
+            assert_eq!(
+                model.borrow().draft.snapping.percent_left,
+                default_cfg.snapping.percent_left
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn restore_shortcuts_discards_pending_percentage_and_cancels_capture() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+
+            // 1. Begin capture on Switcher
+            window.invoke_start_capture(ShortcutField::Switcher as i32);
+            assert!(matches!(
+                model.borrow().capture,
+                crate::app::CaptureState::Listening(ShortcutField::Switcher)
+            ));
+
+            // 2. Type an uncommitted percentage '88'
+            let field = ElementHandle::find_by_accessible_label(&window, "Snap percentage field")
+                .next()
+                .expect("Snap percentage field element found");
+            field.invoke_accessible_default_action();
+
+            let input = ElementHandle::find_by_accessible_label(&window, "Snap percentage input")
+                .next()
+                .expect("Snap percentage input element found");
+            input.set_accessible_value("88");
+
+            // Scroll to top so header button is reachable
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::PointerScrolled {
+                    position: slint::LogicalPosition::new(300.0, 300.0),
+                    delta_x: 0.0,
+                    delta_y: 1200.0,
+                });
+
+            // 3. Click Restore shortcuts
+            let restore_btn =
+                ElementHandle::find_by_accessible_label(&window, "Restore shortcuts to defaults")
+                    .next()
+                    .expect("Restore shortcuts button found");
+            restore_btn.invoke_accessible_default_action();
+
+            // Capture must be cancelled to Idle
+            assert_eq!(model.borrow().capture, crate::app::CaptureState::Idle);
+
+            // Pending percentage '88' must be discarded, draft restored to default
+            assert_eq!(
+                model.borrow().draft.snapping.percent_left,
+                shared::constants::DEFAULT_SNAP_PERCENT
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn legacy_stack_conflict_banner_repairs_only_when_safe() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+
+            // Scroll to top so banner is in view
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::PointerScrolled {
+                    position: slint::LogicalPosition::new(300.0, 300.0),
+                    delta_x: 0.0,
+                    delta_y: 1200.0,
+                });
+
+            // Set up legacy Stack/Snap Bottom collision
+            model.borrow_mut().draft.layout.stack_shortcut = "ctrl+alt+shift+down".to_string();
+            model.borrow_mut().draft.snapping.snap_percent_bottom =
+                "ctrl+alt+shift+down".to_string();
+            sync_model_to_ui(&window, &model.borrow());
+
+            assert!(model.borrow().has_legacy_stack_conflict());
+            assert!(model.borrow().can_fix_stack_conflict());
+
+            // Banner title must be present
+            let banner_title =
+                ElementHandle::find_by_accessible_label(&window, "Update a conflicting shortcut")
+                    .next();
+            assert!(
+                banner_title.is_some(),
+                "Conflict banner title must be present"
+            );
+
+            // Update shortcut button is present and clickable
+            let update_btn = ElementHandle::find_by_accessible_label(&window, "Update shortcut")
+                .next()
+                .expect("Update shortcut button found");
+            update_btn.invoke_accessible_default_action();
+
+            // Stack is now repaired to ctrl+alt+shift+s
+            assert_eq!(
+                model.borrow().draft.layout.stack_shortcut,
+                "ctrl+alt+shift+s"
+            );
+            assert!(!model.borrow().has_legacy_stack_conflict());
+
+            // Now test unsafe repair: when target chord is occupied by another action
+            model.borrow_mut().draft.layout.stack_shortcut = "ctrl+alt+shift+down".to_string();
+            model.borrow_mut().draft.snapping.snap_maximize = "ctrl+alt+shift+s".to_string();
+            sync_model_to_ui(&window, &model.borrow());
+
+            assert!(model.borrow().has_legacy_stack_conflict());
+            assert!(!model.borrow().can_fix_stack_conflict());
+
+            let update_btn_unsafe =
+                ElementHandle::find_by_accessible_label(&window, "Update shortcut").next();
+            assert!(
+                update_btn_unsafe.is_none(),
+                "Update shortcut button must NOT be present when target chord is occupied"
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn factory_reset_confirmation_cancels_without_mutation() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+
+            // Set up non-default preference in draft
+            model.borrow_mut().draft.general.auto_start = true;
+
+            // 1. Verify Escape cancels
+            window.set_factory_reset_dialog_open(true);
+            assert!(window.get_factory_reset_dialog_open());
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::Escape.into(),
+                });
+            assert!(
+                !window.get_factory_reset_dialog_open(),
+                "Dialog must close on Escape"
+            );
+            assert!(
+                model.borrow().draft.general.auto_start,
+                "Draft must not be mutated on Escape"
+            );
+
+            // 2. Switch to About pane to test Reset button and Cancel button
+            model.borrow_mut().set_pane(Pane::About);
+            sync_model_to_ui(&window, &model.borrow());
+
+            let reset_btn = find_element_scrolling(&window, "Reset all settings to defaults")
+                .expect("Reset all settings button found");
+            reset_btn.invoke_accessible_default_action();
+
+            assert!(window.get_factory_reset_dialog_open());
+
+            // Click Cancel
+            let cancel_btn = ElementHandle::find_by_accessible_label(&window, "Cancel")
+                .next()
+                .expect("Cancel button found in reset dialog");
+            cancel_btn.invoke_accessible_default_action();
+
+            assert!(!window.get_factory_reset_dialog_open());
+            assert!(
+                model.borrow().draft.general.auto_start,
+                "Draft must not be mutated on cancel"
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn factory_reset_confirmation_stages_defaults_and_blocks_background_actions() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+
+            model.borrow_mut().set_pane(Pane::About);
+            model.borrow_mut().draft.general.auto_start = true;
+            model.borrow_mut().draft.snapping.percent_left = 80;
+            sync_model_to_ui(&window, &model.borrow());
+
+            let initial_saved = model.borrow().saved.clone();
+            let initial_draft = model.borrow().draft.clone();
+
+            let reset_btn = find_element_scrolling(&window, "Reset all settings to defaults")
+                .expect("Reset all settings button found");
+            reset_btn.invoke_accessible_default_action();
+            assert!(window.get_factory_reset_dialog_open());
+
+            // 1. Verify background actions are blocked while dialog is open:
+            // Attempting to Save while dialog is open must be a no-op
+            window.invoke_save_clicked();
+            assert_eq!(
+                model.borrow().saved,
+                initial_saved,
+                "Background Save must be blocked while dialog is open"
+            );
+
+            // Attempting to Revert while dialog is open must be a no-op
+            window.invoke_revert_clicked();
+            assert_eq!(
+                model.borrow().draft,
+                initial_draft,
+                "Background Revert must be blocked while dialog is open"
+            );
+
+            // Attempting pane navigation while dialog is open must be blocked
+            window.invoke_pane_selected(0);
+            assert_eq!(
+                model.borrow().pane,
+                Pane::About,
+                "Background pane navigation must be blocked while dialog is open"
+            );
+
+            // Attempting capture while dialog is open must be blocked
+            window.invoke_start_capture(0);
+            assert_eq!(
+                model.borrow().capture,
+                crate::app::CaptureState::Idle,
+                "Background capture must be blocked while dialog is open"
+            );
+
+            // Attempting shortcut toggles while dialog is open must be blocked
+            window.invoke_shortcut_enabled_toggled(0, false);
+            assert!(
+                model.borrow().draft.switcher.shortcut_enabled,
+                "Background shortcut toggle must be blocked while dialog is open"
+            );
+
+            // Attempting auto_start toggle while dialog is open must be blocked
+            window.invoke_auto_start_toggled(false);
+            assert!(
+                model.borrow().draft.general.auto_start,
+                "Background auto_start toggle must be blocked while dialog is open"
+            );
+
+            // Attempting restore shortcuts while dialog is open must be blocked
+            window.invoke_restore_shortcuts_clicked();
+            assert_eq!(
+                model.borrow().draft.snapping.percent_left,
+                80,
+                "Background restore shortcuts must be blocked while dialog is open"
+            );
+
+            // 2. While dialog is open, confirm reset
+            let confirm_btn = ElementHandle::find_by_accessible_label(
+                &window,
+                "Confirm reset all preferences to defaults",
+            )
+            .next()
+            .expect("Confirm reset button found in dialog");
+            confirm_btn.invoke_accessible_default_action();
+
+            assert!(!window.get_factory_reset_dialog_open());
+
+            // Entire draft is restored to Config::default()
+            assert_eq!(model.borrow().draft, Config::default());
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
 }

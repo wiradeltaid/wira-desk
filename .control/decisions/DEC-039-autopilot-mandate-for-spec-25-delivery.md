@@ -1,7 +1,7 @@
 ---
 type: mandate
 id: DEC-039
-status: accepted
+status: applied
 touches:
   - .control/decisions/DEC-039-autopilot-mandate-for-spec-25-delivery.md
   - .control/memlog/autopilot-DEC-039.md
@@ -10,6 +10,12 @@ touches:
   - .scratch/spec-25-restore-defaults-and-about-shortcuts-polish/SPEC.md
   - .scratch/spec-25-restore-defaults-and-about-shortcuts-polish/issues/01-shortcuts-restore-conflict-banner-and-tip-cleanup.md
   - .scratch/spec-25-restore-defaults-and-about-shortcuts-polish/issues/02-about-pane-action-buttons-and-factory-reset.md
+  - crates/settings/ui/panes/shortcuts_pane.slint
+  - crates/settings/ui/panes/about_pane.slint
+  - crates/settings/ui/main_window.slint
+  - crates/settings/src/app.rs
+  - crates/settings/src/main.rs
+  - crates/settings/src/shortcut_row_slint_snapshot.rs
   - 3p.md
   - docs/3p.md
 supersedes: null

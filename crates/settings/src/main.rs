@@ -295,6 +295,10 @@ pub(crate) fn sync_model_to_ui(window: &MainWindow, model: &SettingsModel) {
         };
         window.set_listening_field(listening_idx);
 
+        // Legacy Stack/Snap Bottom conflict banner (SPEC-25-01)
+        window.set_show_stack_conflict_banner(model.has_legacy_stack_conflict());
+        window.set_can_fix_stack_conflict(model.can_fix_stack_conflict());
+
         // KeyCheck Diagnostic State
         sync_key_check(window, model);
 
@@ -424,6 +428,9 @@ pub(crate) fn bind_callbacks(
         let uncommitted_pct = Rc::clone(&uncommitted_percent);
         main_window.on_pane_selected(move |idx| {
             if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
                 w.set_dropdown_open(false);
             }
             let mut m = model_rc.borrow_mut();
@@ -445,6 +452,11 @@ pub(crate) fn bind_callbacks(
         let model_rc = Rc::clone(model);
         let window_weak = main_window.as_weak();
         main_window.on_auto_start_toggled(move |val| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             m.draft.general.auto_start = val;
             if let Some(w) = window_weak.upgrade() {
@@ -456,6 +468,11 @@ pub(crate) fn bind_callbacks(
         let model_rc = Rc::clone(model);
         let window_weak = main_window.as_weak();
         main_window.on_visual_switcher_toggled(move |val| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             m.draft.switcher.visual_enabled = val;
             if let Some(w) = window_weak.upgrade() {
@@ -467,6 +484,11 @@ pub(crate) fn bind_callbacks(
         let model_rc = Rc::clone(model);
         let window_weak = main_window.as_weak();
         main_window.on_visual_hold_delay_changed(move |val| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             let clamped = val.clamp(100, 500) as u32;
             m.draft.switcher.visual_hold_delay_ms = clamped;
@@ -482,6 +504,11 @@ pub(crate) fn bind_callbacks(
         let window_weak = main_window.as_weak();
         let uncommitted_pct = Rc::clone(&uncommitted_percent);
         main_window.on_start_capture(move |idx| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             if let Some((field, val)) = uncommitted_pct.borrow_mut().take() {
                 if let Some((min, max)) = field.percent_bounds() {
@@ -506,6 +533,11 @@ pub(crate) fn bind_callbacks(
         let window_weak = main_window.as_weak();
         let uncommitted_pct = Rc::clone(&uncommitted_percent);
         main_window.on_swap_shortcuts(move |idx| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             if let Some((field, val)) = uncommitted_pct.borrow_mut().take() {
                 if let Some((min, max)) = field.percent_bounds() {
@@ -528,6 +560,11 @@ pub(crate) fn bind_callbacks(
         let window_weak = main_window.as_weak();
         let uncommitted_pct = Rc::clone(&uncommitted_percent);
         main_window.on_percent_changed(move |idx, val| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             let field = ShortcutField::from_index(idx);
             if let Some((pending_field, pending_val)) = uncommitted_pct.borrow_mut().take() {
@@ -556,6 +593,11 @@ pub(crate) fn bind_callbacks(
         let model_rc = Rc::clone(model);
         let window_weak = main_window.as_weak();
         main_window.on_shortcut_enabled_toggled(move |idx, val| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             let field = ShortcutField::from_index(idx);
             m.set_action_enabled(field, val);
@@ -564,12 +606,73 @@ pub(crate) fn bind_callbacks(
             }
         });
     }
+    {
+        let model_rc = Rc::clone(model);
+        let window_weak = main_window.as_weak();
+        let uncommitted_pct = Rc::clone(&uncommitted_percent);
+        main_window.on_restore_shortcuts_clicked(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
+            *uncommitted_pct.borrow_mut() = None;
+            let mut m = model_rc.borrow_mut();
+            m.restore_shortcuts_defaults();
+            if let Some(w) = window_weak.upgrade() {
+                w.set_revert_generation(w.get_revert_generation() + 1);
+                sync_model_to_ui(&w, &m);
+            }
+        });
+    }
+    {
+        let model_rc = Rc::clone(model);
+        let window_weak = main_window.as_weak();
+        let uncommitted_pct = Rc::clone(&uncommitted_percent);
+        main_window.on_fix_stack_conflict_clicked(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
+            *uncommitted_pct.borrow_mut() = None;
+            let mut m = model_rc.borrow_mut();
+            m.fix_stack_conflict();
+            if let Some(w) = window_weak.upgrade() {
+                w.set_revert_generation(w.get_revert_generation() + 1);
+                sync_model_to_ui(&w, &m);
+            }
+        });
+    }
+    {
+        let model_rc = Rc::clone(model);
+        let window_weak = main_window.as_weak();
+        let uncommitted_pct = Rc::clone(&uncommitted_percent);
+        main_window.on_factory_reset_confirmed(move || {
+            *uncommitted_pct.borrow_mut() = None;
+            let mut m = model_rc.borrow_mut();
+            m.factory_reset_defaults();
+            if let Some(w) = window_weak.upgrade() {
+                w.set_revert_generation(w.get_revert_generation() + 1);
+                sync_model_to_ui(&w, &m);
+            }
+        });
+    }
+    main_window.on_open_issues_url(|| {});
+    main_window.on_open_source_url(|| {});
+    main_window.on_open_support_url(|| {});
+    main_window.on_open_publisher_url(|| {});
 
     // Callbacks: Mouse
     {
         let model_rc = Rc::clone(model);
         let window_weak = main_window.as_weak();
         main_window.on_toggle_mouse_navigation(move |val| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             m.draft.mouse.enabled = val;
             if let Some(w) = window_weak.upgrade() {
@@ -581,6 +684,11 @@ pub(crate) fn bind_callbacks(
         let model_rc = Rc::clone(model);
         let window_weak = main_window.as_weak();
         main_window.on_thumb_back_changed(move |idx| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             if let Some(preset) = shared::MouseActionPreset::from_index(idx as usize) {
                 m.draft.mouse.thumb_back = preset.as_str().to_string();
@@ -594,6 +702,11 @@ pub(crate) fn bind_callbacks(
         let model_rc = Rc::clone(model);
         let window_weak = main_window.as_weak();
         main_window.on_thumb_forward_changed(move |idx| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             if let Some(preset) = shared::MouseActionPreset::from_index(idx as usize) {
                 m.draft.mouse.thumb_forward = preset.as_str().to_string();
@@ -607,6 +720,11 @@ pub(crate) fn bind_callbacks(
         let model_rc = Rc::clone(model);
         let window_weak = main_window.as_weak();
         main_window.on_tilt_left_changed(move |idx| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             if let Some(preset) = shared::MouseActionPreset::from_index(idx as usize) {
                 m.draft.mouse.tilt_left = preset.as_str().to_string();
@@ -620,6 +738,11 @@ pub(crate) fn bind_callbacks(
         let model_rc = Rc::clone(model);
         let window_weak = main_window.as_weak();
         main_window.on_tilt_right_changed(move |idx| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             if let Some(preset) = shared::MouseActionPreset::from_index(idx as usize) {
                 m.draft.mouse.tilt_right = preset.as_str().to_string();
@@ -633,6 +756,11 @@ pub(crate) fn bind_callbacks(
         let model_rc = Rc::clone(model);
         let window_weak = main_window.as_weak();
         main_window.on_preset_selected(move |slot, slug| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             let slug_str = slug.as_str().to_string();
             match slot {
@@ -656,6 +784,11 @@ pub(crate) fn bind_callbacks(
         let target_path = custom_save_path.unwrap_or_else(config_path);
         let uncommitted_pct = Rc::clone(&uncommitted_percent);
         main_window.on_save_clicked(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let mut m = model_rc.borrow_mut();
             if let Some((field, val)) = uncommitted_pct.borrow_mut().take() {
                 m.set_percent(field, val);
@@ -671,6 +804,11 @@ pub(crate) fn bind_callbacks(
         let window_weak = main_window.as_weak();
         let uncommitted_pct = Rc::clone(&uncommitted_percent);
         main_window.on_revert_clicked(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             *uncommitted_pct.borrow_mut() = None;
             let mut m = model_rc.borrow_mut();
             m.revert();
@@ -1276,6 +1414,9 @@ fn main() -> Result<(), slint::PlatformError> {
     });
     main_window.on_open_support_url(|| {
         update::open_in_browser("https://wiradigital.id/wira-desk");
+    });
+    main_window.on_open_issues_url(|| {
+        update::open_in_browser("https://github.com/wiradigitalid/wira-desk/issues");
     });
 
     let update_timer = slint::Timer::default();

@@ -276,10 +276,10 @@ rtm:
   - shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_the_draft
   - shortcut_row_slint_snapshot::tests::restore_shortcuts_discards_pending_percentage_and_cancels_capture
   - shortcut_row_slint_snapshot::tests::legacy_stack_conflict_banner_repairs_only_when_safe
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-5
   FR: FR-18
@@ -1478,10 +1478,10 @@ rtm:
   - shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_the_draft
   - shortcut_row_slint_snapshot::tests::restore_shortcuts_discards_pending_percentage_and_cancels_capture
   - shortcut_row_slint_snapshot::tests::legacy_stack_conflict_banner_repairs_only_when_safe
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-3
   FR: FR-7
