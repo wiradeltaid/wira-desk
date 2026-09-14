@@ -1676,5 +1676,29 @@ specs:
           - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
           - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
 
+  - id: SPEC-19
+    release: "0.4.0"
+    prd: [wira-desk]
+    size: S
+    status: open
+    depends_on: [SPEC-18]
+    spec_folder: .scratch/spec-19-visual-switcher-mouse-selection-and-hold-threshold/
+    spec_reviewed:
+      date: '2026-09-14'
+      sha: '3850073'
+      lenses: [structure, prose, edge-case-hunter]
+    fr: [FR-1, FR-2]
+    tickets:
+      - id: SPEC-19-01
+        title: "Defect DEF-21 — Visual switcher mouse click selection synchronization and default hold delay threshold 300 ms"
+        spec_folder: .scratch/spec-19-visual-switcher-mouse-selection-and-hold-threshold/
+        component: window-management
+        satisfies: [UC-1]
+        depends_on: []
+        tests:
+          - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
+          - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
+          - switcher::tests::default_hold_delay_threshold_is_300ms
+
 
 

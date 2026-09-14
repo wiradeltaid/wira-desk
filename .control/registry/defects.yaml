@@ -1023,3 +1023,36 @@ defects:
       worker tests driving the full command sequence (SwitcherArmPrev -> SwitcherDisarm -> CyclePrev) across consecutive taps
       against a dynamic self-mutating Z-order.
     owner: repo owner
+
+  - id: DEF-21
+    title: Visual switcher mouse click does not activate the clicked window due to SwitcherController selection desynchronization
+    status: open
+    severity: high
+    component: window-management
+    violates: [DEC-013, UC-1]
+    found_in: "0.4.0"
+    found_by: Owner live manual desktop testing of SPEC-18, 2026-09-14
+    tests:
+      - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
+      - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
+      - switcher::tests::default_hold_delay_threshold_is_300ms
+    summary: >-
+      When clicking a window card in the visual switcher overlay using the mouse cursor, the clicked
+      window is not consistently activated as the foreground focus. While keyboard navigation updates both
+      SwitcherController.selected_index and SwitcherOverlay.selected_index, mouse hover and click inside
+      SwitcherOverlay's window procedure only updates overlay.selected_index. On SwitcherCommit,
+      sw.candidates_from_selection() reads SwitcherController.selected_index which remains stuck on the
+      initial keyboard selection, ignoring the clicked card.
+    why_it_hid: >-
+      Existing unit tests asserted selection functions (select_next, select_prev, select_up, select_down)
+      and candidate ordering in isolation, but no test verified that mouse selection on the overlay window
+      propagated to candidates_from_selection() on SwitcherController.
+    impact: >-
+      Users clicking a window card in the visual switcher overlay with the mouse activate the wrong window
+      (the one initially selected by the keyboard chord) instead of the card they clicked.
+    fix_direction: >-
+      Ensure SwitcherController.candidates_from_selection() uses the true selected index from SwitcherOverlay
+      (or synchronize selected_index whenever overlay selection changes, including mouse hover and click).
+      Update default visual hold delay threshold (visual_hold_delay_ms) from 150ms to 300ms in shared
+      SwitcherConfig, Settings UI, and companion test assertions.
+    owner: repo owner
