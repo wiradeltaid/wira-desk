@@ -265,6 +265,23 @@ rtm:
   FR: FR-18
   DEC: []
   UC: UC-4
+  ticket: SPEC-25-01
+  spec: SPEC-25
+  release: 0.2.0
+  test:
+  - app::tests::restore_shortcuts_sets_defaults_and_marks_dirty
+  - app::tests::fix_stack_conflict_updates_shortcut_and_clears_conflict
+  - shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_draft
+  - shortcut_row_slint_snapshot::tests::conflict_banner_appears_on_stack_collision_and_resolves_on_click
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-2
+  CAP: CAP-5
+  FR: FR-18
+  DEC: []
+  UC: UC-4
   ticket: SPEC-4-01
   spec: SPEC-4
   release: 0.5.0
@@ -1442,6 +1459,23 @@ rtm:
   exempt: false
   green: true
   broken_at: ''
+- BG: BG-2
+  CAP: CAP-3
+  FR: FR-7
+  DEC: []
+  UC: UC-4
+  ticket: SPEC-25-01
+  spec: SPEC-25
+  release: 0.2.0
+  test:
+  - app::tests::restore_shortcuts_sets_defaults_and_marks_dirty
+  - app::tests::fix_stack_conflict_updates_shortcut_and_clears_conflict
+  - shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_draft
+  - shortcut_row_slint_snapshot::tests::conflict_banner_appears_on_stack_collision_and_resolves_on_click
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
 - BG: BG-2
   CAP: CAP-3
   FR: FR-7
