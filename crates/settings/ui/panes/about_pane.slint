@@ -385,6 +385,21 @@ export component AboutPane inherits VerticalLayout {
                     color: Palette.text_tertiary;
                     wrap: word-wrap;
                 }
+
+                // Copyright line and third-party notice pointer.
+                //
+                // The notice pointer is a licence obligation rather than tidiness: most of the
+                // dependency licences listed in NOTICE require their notices to travel with the
+                // BINARY, and someone who installed from the setup executable never opens the
+                // repository. The installer places NOTICE.txt beside the executable, so name the
+                // file they actually have rather than a URL they would have to go and find.
+                Text {
+                    text: "Copyright © 2026 Wira Digital Indonesia. Third-party components and their licences are listed in NOTICE.txt, in this application's install folder.";
+                    font-family: Typography.font_family;
+                    font-size: Typography.size_caption;
+                    color: Palette.text_tertiary;
+                    wrap: word-wrap;
+                }
             }
         }
     }

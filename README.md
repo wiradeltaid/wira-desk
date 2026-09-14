@@ -173,6 +173,19 @@ carries, so no separate disclosure obligation applies the way the royalty-free t
 Contributions are welcome via pull request - see [CONTRIBUTING.md](CONTRIBUTING.md) for the checks
 CI runs and the conventions this repository follows.
 
+## The name and the icon
+
+The GPL grants rights over code. It says nothing about names or logos, and it does not oblige the
+studio to hand over either — so the licence above covers this repository's code, not the name
+**Wira Desk**, not **Wira Digital Indonesia**, and not the icon or wordmark.
+
+You may use those names to refer to this project: "based on Wira Desk", "a fork of Wira Desk",
+"compatible with Wira Desk". You may not use them as the name of your own product, or in a way that
+suggests you are this project or endorsed by it.
+
+If you publish a modified build, please give it your own name and your own icon, so the people using
+it know whom to ask when it breaks. The code is yours to take; the name is not.
+
 ## License
 
 GPL-3.0-only - see [LICENSE](LICENSE). Third-party dependency licences are listed in [NOTICE](NOTICE),

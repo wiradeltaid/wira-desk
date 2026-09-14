@@ -1,5 +1,7 @@
 # Privacy
 
+**Last updated:** 2026-09-14
+
 Wira Desk sends **no telemetry, ever** — no analytics, no crash reporting, no account,
 and no identifier of any kind. Exactly **one** thing in the product touches the network,
 and the next section describes it in full rather than summarising it. Configuration and optional log files are stored locally under
