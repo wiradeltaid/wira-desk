@@ -96,10 +96,8 @@ $env:WIRADESK_SETTINGS_ALLOW_NO_DAEMON = '1'
 
 $wiraDeskDir = Join-Path $env:APPDATA 'WiraDesk'
 $configPath = Join-Path $wiraDeskDir 'config.toml'
-$legacyDir = Join-Path $env:APPDATA 'WinTick'
 $backup = "$configPath.verify-backup"
 $wiraDeskBackup = "$wiraDeskDir.verify-backup"
-$legacyBackup = "$legacyDir.verify-backup"
 
 function Restore-Config {
     if (Test-Path $wiraDeskBackup) {
@@ -111,17 +109,8 @@ function Restore-Config {
         Move-Item $backup $configPath -Force
         Write-Step 'Original config.toml restored.'
     }
-    if (Test-Path $legacyBackup) {
-        Move-Item $legacyBackup $legacyDir -Force
-        Write-Step 'Legacy WinTick appdata directory restored.'
-    }
 }
 
-# First-run needs neither WiraDesk nor legacy WinTick appdata present (H9 Hypothesis B).
-if (Test-Path $legacyDir) {
-    Move-Item $legacyDir $legacyBackup -Force
-    Write-Step 'Legacy WinTick appdata moved aside for first-run isolation.'
-}
 if (Test-Path $wiraDeskDir) {
     Move-Item $wiraDeskDir $wiraDeskBackup -Force
     Write-Step 'WiraDesk appdata moved aside for first-run isolation.'

@@ -3,10 +3,11 @@ id: SPEC-23-01
 component: settings
 satisfies: []
 blocked_by: []
-status: ready-for-agent
+status: closed
 tests:
   - scripts/verify-installer-safety.ps1
-  - ci::build::installer-safety
+  - scripts/verify-settings-runtime.ps1
+  - config::tests::clean_default_configuration_with_legacy_residue_present
 ---
 
 # 01: Defect DEF-25 — Ready memo brevity and legacy WinTick migration retirement
@@ -31,12 +32,12 @@ tests:
 
 **Blocked by:** none
 
-**Status:** ready-for-agent
+**Status:** closed
 
 ## Acceptance Criteria
 
-- [ ] **Concise Ready Memo Copy:** `packaging/wiradesk.iss` `UpdateReadyMemo` presents exactly `Preserved across updates; clean installs start fresh.` for Configuration and logs, without the retired multi-line internal runtime explanation or an unconditional uninstall-preservation claim.
-- [ ] **Safety Harness Verification:** `scripts/verify-installer-safety.ps1` requires the concise Ready memo wording, rejects the retired verbose wording, preserves the zero-bundling assertion, and passes cleanly without regression.
-- [ ] **Complete Legacy WinTick Migration Retirement:** All WinTick shims (`M-01` in `crates/shared/src/migrate.rs`, `M-02` and `M-03` in `crates/daemon/src/legacy.rs`) and their startup calls are removed from production code. No production code references `WinTick` paths, registry keys, scheduled tasks, or mutexes.
-- [ ] **Clean Default Configuration with Legacy Residue Present:** With `%APPDATA%\WiraDesk` absent even when `%APPDATA%\WinTick` exists, Wira Desk follows the standard first-run/default-configuration path with modern bindings (`ctrl+alt+left`, `ctrl+alt+right`, `ctrl+alt+shift+s`) and imports no legacy log content.
-- [ ] **Workspace Integrity:** `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace` pass cleanly.
+- [x] **Concise Ready Memo Copy:** `packaging/wiradesk.iss` `UpdateReadyMemo` presents exactly `Preserved across updates; clean installs start fresh.` for Configuration and logs, without the retired multi-line internal runtime explanation or an unconditional uninstall-preservation claim.
+- [x] **Safety Harness Verification:** `scripts/verify-installer-safety.ps1` requires the concise Ready memo wording, rejects the retired verbose wording, preserves the zero-bundling assertion, and passes cleanly without regression.
+- [x] **Complete Legacy WinTick Migration Retirement:** All WinTick shims (`M-01` in `crates/shared/src/migrate.rs`, `M-02` and `M-03` in `crates/daemon/src/legacy.rs`) and their startup calls are removed from production code. No production code references `WinTick` paths, registry keys, scheduled tasks, or mutexes.
+- [x] **Clean Default Configuration with Legacy Residue Present:** With `%APPDATA%\WiraDesk` absent even when `%APPDATA%\WinTick` exists, Wira Desk follows the standard first-run/default-configuration path with modern bindings (`ctrl+alt+left`, `ctrl+alt+right`, `ctrl+alt+shift+s`) and imports no legacy log content.
+- [x] **Workspace Integrity:** `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace` pass cleanly.

@@ -4,7 +4,7 @@
 | --- | --- | --- | --- |
 | **daemon** | `wiradesk.exe` | Rust, `windows-sys`, Win32 API | Installs global `WH_KEYBOARD_LL` and `WH_MOUSE_LL` hooks, maintains lock-free command ring buffer, executes stateless Z-order window cycling and DPI-aware snapping, manages tray icon / context menu, monitors hook health (10s heartbeat). Runs elevated (`requireAdministrator`). |
 | **settings** | `wiradesk-settings.exe` | Rust, `slint` (`accessibility` feature), `i-slint-backend-winit` | Provides accessible GUI for editing shortcut bindings, mouse navigation presets, VM bypass list, snapping preferences, and auto-start. Hosts first-run onboarding tutorial. Writes `config.toml` atomically and dispatches `WM_APP_RELOAD_CONFIG` to daemon. |
-| **shared** | (library crate) | Rust, `serde`, `toml` | Single source of truth for config schema, default bindings, `u8` command enum, IPC message IDs, APPDATA paths, and legacy WinTick migration logic. |
+| **shared** | (library crate) | Rust, `serde`, `toml` | Single source of truth for config schema, default bindings, `u8` command enum, IPC message IDs, and APPDATA paths. |
 
 ## Product Components per container
 
