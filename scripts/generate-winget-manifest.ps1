@@ -94,14 +94,15 @@ PublisherUrl: https://github.com/wiradigitalid
 PublisherSupportUrl: https://github.com/$repo/issues
 PackageName: Wira Desk
 PackageUrl: https://github.com/$repo
-License: MIT
+License: GPL-3.0-only
 LicenseUrl: https://github.com/$repo/blob/main/LICENSE
+Copyright: Copyright (c) 2026 Wira Digital Indonesia
 PrivacyUrl: https://github.com/$repo/blob/main/PRIVACY.md
 ShortDescription: Lightweight desktop tools for Windows - same-app window switching and window arrangement via a tray daemon.
 Description: |-
-  Wira Desk runs as an elevated system-tray daemon with a global low-level keyboard hook for
-  same-app window switching and window arrangement, plus a Settings companion app for
-  configuring shortcuts.
+  Wira Desk runs as an elevated system-tray daemon with global low-level keyboard and mouse
+  hooks for same-app window switching, window arrangement, and driver-free mouse button
+  mapping, plus a Settings companion app for configuring shortcuts.
 
   The installer requires Administrator and installs to %ProgramFiles%, which is deliberate:
   auto-start runs the daemon elevated at every logon with no prompt, so a directory only
@@ -114,6 +115,7 @@ Tags:
   - keyboard-shortcuts
   - tray
   - hotkeys
+  - mouse
 ManifestType: defaultLocale
 ManifestVersion: 1.10.0
 "@ | Set-Content -Encoding utf8 (Join-Path $outDir "$identifier.locale.en-US.yaml")

@@ -1,8 +1,8 @@
 # Wira Desk
 
 Windows doesn't have macOS's `` ⌘+` `` same-app window cycling — Alt+Tab piles every app's windows
-together instead. Wira Desk adds that, plus fast one-key window snapping and arranging, to
-Windows 11 as one lightweight, keyboard-driven tray daemon.
+together instead. Wira Desk adds that, plus fast one-key window snapping and arranging and
+driver-free mouse button mapping, to Windows 11 as one lightweight tray daemon.
 
 ## Why
 
@@ -34,6 +34,31 @@ All of these are remappable, and can be individually turned on or off, from the 
 | `Ctrl+Alt+Enter` | Maximize the window to full screen |
 | `Ctrl+Alt+Shift+Enter` | Move the window to the next monitor (multi-monitor setups) |
 | `Ctrl+Alt+Shift+S` | Stack 3 windows at a configurable width each — useful on a small monitor when you still want another window visible |
+
+## Mouse buttons, without the vendor software
+
+If your mouse has thumb buttons or a tilting wheel, Wira Desk can map them — no driver, no vendor
+utility, no second tray app. This is on by default and can be switched off in Settings.
+
+| Button | Default action |
+|---|---|
+| Thumb back (`XBUTTON1`) | Previous virtual desktop |
+| Thumb forward (`XBUTTON2`) | Next virtual desktop |
+| Wheel tilt left | Show desktop |
+| Wheel tilt right | Task View |
+
+Each of the four is remappable to any of 20 presets: the virtual-desktop and Task View actions
+above, every snap in the table above (halves, thirds, per-edge percentage, maximize, stack,
+move-to-monitor), same-app cycling, and `passthrough` to hand the button back to the application
+untouched.
+
+Nothing here is brand-specific — it reads the standard Windows mouse messages, so it works with any
+mouse that sends them.
+
+**What this means for privacy:** the daemon watches mouse events to do this. Cursor movement is
+passed through on the callback's first line, and the pointer coordinates are never read at all —
+only the message type and which button it was. [`PRIVACY.md`](PRIVACY.md) sets out both hooks in
+full.
 
 ## About
 
@@ -105,11 +130,15 @@ Requires Rust (stable) and the MSVC toolchain on Windows.
 
 Binaries: `target\release\wiradesk.exe` and `target\release\wiradesk-settings.exe`.
 
-## Administrator and keyboard hook
+## Administrator, keyboard hook and mouse hook
 
 Wira Desk requests Administrator because it installs `WH_KEYBOARD_LL` and must activate windows
-across integrity levels (UIPI). The hook observes key events to match configured shortcuts; it
-does not log keystroke contents to disk. See `SECURITY.md` and `PRIVACY.md`.
+across integrity levels (UIPI). The keyboard hook observes key events to match configured
+shortcuts; it does not log keystroke contents to disk.
+
+It installs `WH_MOUSE_LL` as well, for the mouse button mapping above. That hook passes cursor
+movement through on its first line and never reads the pointer coordinates — only the message type
+and which button it was. See `SECURITY.md` and `PRIVACY.md`, which set out both in full.
 
 ## Data on disk
 

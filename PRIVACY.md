@@ -37,6 +37,31 @@ configured shortcuts, and **records none of it** — not to the log file, not to
 trace, not anywhere that outlives the event. No logging call in the codebase takes a
 virtual-key value as an argument.
 
+## Mouse events
+
+The daemon installs a global low-level mouse hook as well, because the auxiliary mouse navigation
+(thumb buttons and wheel tilt) is on by default. So it observes every mouse event on the desktop,
+and what it does with them is narrower than that sentence sounds.
+
+**Cursor movement is passed straight through.** `WM_MOUSEMOVE` returns on the first line of the
+callback, before any lock, any allocation, and any other read. Movement is the overwhelming
+majority of mouse events, and none of it is looked at.
+
+**The cursor position is never read at all.** Windows hands the callback a structure holding the
+pointer coordinates alongside the button data. Two values are taken out of it: the message type,
+and the button identifier — which thumb button, which tilt direction. The coordinate field is not
+read anywhere in the codebase, so where you click, and where your pointer was, do not exist inside
+this program even for the duration of the event.
+
+That distinction carries more than it looks. Button identity says "the back thumb button was
+pressed" and nothing else. Coordinates would have said what you were pointing at.
+
+**Nothing is recorded**, on the same terms as the keyboard hook: not to the log file, not to the
+debug trace, not anywhere that outlives the event.
+
+**Turning it off.** Auxiliary mouse navigation can be switched off in Settings. With it off the
+mappings stop; nothing else about the daemon changes.
+
 ## Window metadata
 
 To choose a switching or arrangement target the daemon reads window class names, visibility

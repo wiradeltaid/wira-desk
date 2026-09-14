@@ -1,8 +1,9 @@
 # Security Policy
 
-Wira Desk runs elevated, installs a global low-level keyboard hook (`WH_KEYBOARD_LL`), can
-register a logon task that starts it elevated without a prompt, and enumerates top-level
-windows to implement switching and snapping. Those properties deserve scrutiny, so
+Wira Desk runs elevated, installs global low-level keyboard **and mouse** hooks
+(`WH_KEYBOARD_LL`, `WH_MOUSE_LL`), can register a logon task that starts it elevated without a
+prompt, and enumerates top-level windows to implement switching and snapping. Those properties
+deserve scrutiny, so
 `docs/threat-model.md` documents the trust boundaries, the reason for each privilege, and the
 risks that remain after mitigation. Read that first if you are evaluating whether to trust
 this software.
@@ -12,6 +13,11 @@ Two facts most people want up front:
 - **No keystroke content is recorded.** The hook reads virtual-key codes to match the two
   configured shortcuts and writes none of them to disk, to the log, or to the debug trace.
   No logging call in the codebase takes a key value as an argument.
+- **No cursor position is read, and no mouse activity is recorded.** The mouse hook exists for the
+  thumb-button and wheel-tilt mappings, which are on by default. Cursor movement returns on the
+  callback's first line, before any lock or allocation. Of the event structure Windows supplies,
+  only the message type and the button identifier are taken out — **the coordinate field is not
+  read anywhere in the codebase**, so where you click never enters the program at all.
 - **No telemetry, no user account, no background updater service.** The application makes two
   distinct outbound HTTPS requests to GitHub under `github.com/wiradigitalid/wira-desk`:
   1. An update check request (automated or on-demand) fetching version descriptor `latest.json`.
@@ -42,8 +48,8 @@ trade-offs rather than unreported bugs.
 
 ## Supported versions
 
-Only the latest release receives fixes. This is version 0.1.0, the initial public source
-release; there is no long-term support branch.
+Only the latest release receives fixes. There is no long-term support branch — this is a
+small project, not a commercial product with an SLA.
 
 ## Release integrity
 
