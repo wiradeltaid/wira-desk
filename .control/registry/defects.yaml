@@ -1145,4 +1145,27 @@ defects:
     fixed_in: "0.2.0"
     fixed_by: "SPEC-21-01 (packaging/wiradesk.iss, scripts/verify-installer-safety.ps1, .github/workflows/ci.yml)"
 
+  - id: DEF-24
+    title: Installer rejection dialog text breaks partial sentence onto separate newline
+    status: open
+    severity: low
+    component: settings
+    violates: [NFR-1]
+    found_in: "0.2.0"
+    found_by: Owner manual installation and downgrade verification (2026-09-14)
+    summary: >-
+      In packaging/wiradesk.iss, the interactive MsgBox error dialogs for downgrade refusal and invalid
+      installed version formatting break sentences prematurely with #13#10 before "version first." and
+      "version before continuing.", leaving orphaned partial sentences on separate lines.
+    why_it_hid: >-
+      Automated CI and safety harness tests run /VERYSILENT, suppressing interactive MsgBox dialogs to prevent
+      hanging unattended test runners.
+    impact: >-
+      Interactive users attempting an unsupported version downgrade or hitting corrupted registry records see
+      visually fragmented, awkward dialog phrasing.
+    fix_direction: >-
+      Join the sentence clauses in packaging/wiradesk.iss so sentences wrap naturally without premature #13#10
+      line breaks. Ensure verify-installer-safety.ps1 asserts the joined phrasing in packaging/wiradesk.iss.
+    owner: repo owner
+
 
