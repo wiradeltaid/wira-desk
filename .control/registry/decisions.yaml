@@ -839,6 +839,44 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-033.md
 
+  - id: DEC-034
+    title: Autopilot mandate for SPEC-20 delivery
+    status: accepted
+    file: decisions/DEC-034-autopilot-mandate-for-spec-20-delivery.md
+    created: '2026-09-14'
+    touches:
+      - .control/decisions/DEC-034-autopilot-mandate-for-spec-20-delivery.md
+      - .control/memlog/autopilot-DEC-034.md
+      - .control/registry/decisions.yaml
+      - .control/registry/defects.yaml
+      - .control/registry/specs.yaml
+      - .scratch/spec-20-static-crt-and-software-renderer/SPEC.md
+      - .scratch/spec-20-static-crt-and-software-renderer/issues/01-defect-def-22-static-crt-settings-renderer.md
+      - crates/settings/Cargo.toml
+      - Cargo.lock
+      - .cargo/config.toml
+      - packaging/wiradesk.iss
+      - scripts/verify-release-binary.ps1
+      - .github/workflows/release.yml
+      - .github/workflows/ci.yml
+      - crates/shared/src/lib.rs
+      - crates/shared/src/binary.rs
+      - .how/settings/SDD-settings.md
+      - .constitution/project/codebase-stack-guide.md
+      - deny.toml
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-21'
+      run_branch: autopilot/DEC-034
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-034.md
+
+
 
 
 
