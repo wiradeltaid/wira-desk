@@ -1796,3 +1796,29 @@ specs:
           - scripts/verify-settings-runtime.ps1
           - config::tests::clean_default_configuration_with_legacy_residue_present
 
+  - id: SPEC-24
+    release: "0.2.0"
+    prd: [wira-desk]
+    size: S
+    status: open
+    depends_on: []
+    spec_folder: .scratch/spec-24-snap-to-edge-default-percentage-to-67/
+    spec_reviewed:
+      date: '2026-09-14'
+      sha: 'feaa26a'
+      lenses: [structure, prose, edge-case-hunter]
+    fr: [FR-26]
+    tickets:
+      - id: SPEC-24-01
+        title: "Update custom-percentage edge snap default percentage to 67%"
+        spec_folder: .scratch/spec-24-snap-to-edge-default-percentage-to-67/
+        component: settings
+        satisfies: [UC-9]
+        depends_on: []
+        tests:
+          - config::tests::default_snapping_percentages_are_67
+          - config::tests::partial_snapping_percentages_preserve_explicit_values_and_default_omitted_fields
+          - config::tests::percent_snap_fields_roundtrip_through_toml
+          - persistence::tests::default_config_uses_frozen_shortcuts
+          - persistence::tests::an_out_of_range_percentage_is_rejected_before_save
+

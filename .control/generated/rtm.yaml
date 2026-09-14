@@ -721,6 +721,24 @@ rtm:
   FR: FR-26
   DEC: []
   UC: UC-9
+  ticket: SPEC-24-01
+  spec: SPEC-24
+  release: 0.2.0
+  test:
+  - config::tests::default_snapping_percentages_are_67
+  - config::tests::partial_snapping_percentages_preserve_explicit_values_and_default_omitted_fields
+  - config::tests::percent_snap_fields_roundtrip_through_toml
+  - persistence::tests::default_config_uses_frozen_shortcuts
+  - persistence::tests::an_out_of_range_percentage_is_rejected_before_save
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-3
+  CAP: CAP-14
+  FR: FR-26
+  DEC: []
+  UC: UC-9
   ticket: SPEC-4-02
   spec: SPEC-4
   release: 0.5.0
