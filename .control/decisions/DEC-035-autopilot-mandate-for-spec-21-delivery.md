@@ -1,7 +1,7 @@
 ---
 type: mandate
 id: DEC-035
-status: accepted
+status: applied
 touches:
   - .control/decisions/DEC-035-autopilot-mandate-for-spec-21-delivery.md
   - .control/memlog/autopilot-DEC-035.md

@@ -881,7 +881,7 @@ decisions:
 
   - id: DEC-035
     title: Autopilot mandate for SPEC-21 delivery
-    status: accepted
+    status: applied
     file: decisions/DEC-035-autopilot-mandate-for-spec-21-delivery.md
     created: '2026-09-14'
     touches:
