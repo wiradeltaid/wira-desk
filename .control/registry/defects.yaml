@@ -1113,3 +1113,33 @@ defects:
       from .github/workflows/release.yml, adding strict PE import verification into ci.yml as well. Update SDD-settings.md
       AD-11a to document the software renderer and verify visual/theme/DPI fidelity.
     owner: repo owner
+
+  - id: DEF-23
+    title: Installer permits silent version downgrade, lacks installation path summary confirmation, and fails open on locked processes
+    status: open
+    severity: medium
+    component: settings
+    violates: [NFR-1]
+    found_in: "0.2.0"
+    found_by: Owner comparative audit against Snapdown installer patterns (2026-09-14)
+    summary: >-
+      The Wira Desk Windows installer (packaging/wiradesk.iss) does not verify whether a newer version of
+      the application is already installed in HKLM registry before proceeding with file extraction, permitting
+      unintended downgrades that could corrupt schema or state. Additionally, the Ready to Install wizard page
+      does not summarize application data paths or scheduled tasks, PrepareToInstall fails open if process
+      termination fails, and compile-time version extraction lacks a 3-component SemVer guard.
+    why_it_hid: >-
+      Standard installs and automated CI builds typically install fresh or upgrade forward. Downgrades were
+      untested, and Inno Setup defaults to overwriting files without comparing registry DisplayVersion unless
+      an explicit SemVer comparison routine is authored in [Code].
+    impact: >-
+      Users accidentally running an older installer on a system with a newer Wira Desk build could downgrade
+      binaries without confirmation, risking configuration drift or crashes.
+    fix_direction: >-
+      Adopt proven installer patterns from Snapdown:
+      1. Add InitializeSetup with ParseVersion and CompareVersions reading HKLM DisplayVersion to reject downgrades.
+      2. Implement UpdateReadyMemo to summarize destination {app}, %APPDATA%\WiraDesk, and auto-start Task Scheduler task.
+      3. Make PrepareToInstall fail closed with an informative message if daemon or settings processes cannot be stopped.
+      4. Add compile-time ISPP macro checking that AppVersion has exactly 3 components.
+    owner: repo owner
+

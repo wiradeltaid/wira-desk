@@ -74,6 +74,11 @@ work_progress:
   tickets_done: 1
   tickets_total: 1
   work_progress: 100%
+- spec: SPEC-21
+  status: open
+  tickets_done: 0
+  tickets_total: 1
+  work_progress: 0%
 - spec: SPEC-3
   status: closed
   tickets_done: 2
@@ -135,7 +140,7 @@ validators_skipped:
   custom-room-declared: the `.constitution/project/` room is empty, and that is a valid state — a generic
     rule MUST NOT be moved here just to give the room content
   review-trace: 'advisory — trace stale, re-run before the next gate or spec close: .how/_platform/ARCHITECTURE-SPINE.md
-    (changed at f7c2739, reviewed at 67d9fb5), .how/settings/SDD-settings.md (changed at f7c2739, reviewed
+    (changed at f7c2739, reviewed at 67d9fb5), .how/settings/SDD-settings.md (changed at db78043, reviewed
     at 3b9d51c), .how/window-management/SDD-window-management.md (changed at f7c2739, reviewed at f989238),
     .what/settings/SRS-settings.md (changed at 5584de6, reviewed at f989238), .what/window-management/SRS-window-management.md
     (changed at f7c2739, reviewed at f989238)'
