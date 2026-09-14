@@ -269,10 +269,13 @@ rtm:
   spec: SPEC-25
   release: 0.2.0
   test:
-  - app::tests::restore_shortcuts_sets_defaults_and_marks_dirty
-  - app::tests::fix_stack_conflict_updates_shortcut_and_clears_conflict
-  - shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_draft
-  - shortcut_row_slint_snapshot::tests::conflict_banner_appears_on_stack_collision_and_resolves_on_click
+  - app::tests::restore_shortcuts_defaults_every_field_and_preserves_non_shortcut_preferences
+  - app::tests::restore_shortcuts_is_dirty_only_when_draft_differs_from_saved
+  - app::tests::revert_after_shortcut_restore_returns_to_the_saved_legacy_configuration
+  - app::tests::fix_stack_conflict_requires_the_exact_pair_and_never_creates_a_third_conflict
+  - shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_the_draft
+  - shortcut_row_slint_snapshot::tests::restore_shortcuts_discards_pending_percentage_and_cancels_capture
+  - shortcut_row_slint_snapshot::tests::legacy_stack_conflict_banner_repairs_only_when_safe
   status: ready-for-agent
   exempt: false
   green: false
@@ -1468,10 +1471,13 @@ rtm:
   spec: SPEC-25
   release: 0.2.0
   test:
-  - app::tests::restore_shortcuts_sets_defaults_and_marks_dirty
-  - app::tests::fix_stack_conflict_updates_shortcut_and_clears_conflict
-  - shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_draft
-  - shortcut_row_slint_snapshot::tests::conflict_banner_appears_on_stack_collision_and_resolves_on_click
+  - app::tests::restore_shortcuts_defaults_every_field_and_preserves_non_shortcut_preferences
+  - app::tests::restore_shortcuts_is_dirty_only_when_draft_differs_from_saved
+  - app::tests::revert_after_shortcut_restore_returns_to_the_saved_legacy_configuration
+  - app::tests::fix_stack_conflict_requires_the_exact_pair_and_never_creates_a_third_conflict
+  - shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_the_draft
+  - shortcut_row_slint_snapshot::tests::restore_shortcuts_discards_pending_percentage_and_cancels_capture
+  - shortcut_row_slint_snapshot::tests::legacy_stack_conflict_banner_repairs_only_when_safe
   status: ready-for-agent
   exempt: false
   green: false

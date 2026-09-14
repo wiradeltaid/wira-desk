@@ -997,6 +997,34 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-038.md
 
+  - id: DEC-039
+    title: Autopilot mandate for SPEC-25 delivery
+    status: accepted
+    file: decisions/DEC-039-autopilot-mandate-for-spec-25-delivery.md
+    created: '2026-09-15'
+    touches:
+      - .control/decisions/DEC-039-autopilot-mandate-for-spec-25-delivery.md
+      - .control/memlog/autopilot-DEC-039.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+      - .scratch/spec-25-restore-defaults-and-about-shortcuts-polish/SPEC.md
+      - .scratch/spec-25-restore-defaults-and-about-shortcuts-polish/issues/01-shortcuts-restore-conflict-banner-and-tip-cleanup.md
+      - .scratch/spec-25-restore-defaults-and-about-shortcuts-polish/issues/02-about-pane-action-buttons-and-factory-reset.md
+      - 3p.md
+      - docs/3p.md
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-22'
+      run_branch: autopilot/DEC-039
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-039.md
+
+
 
 
 
