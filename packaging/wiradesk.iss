@@ -457,8 +457,7 @@ begin
       MsgBox(
         'An existing {#AppName} installation was found, but its version information' + #13#10 +
         'is missing or invalid (' + InstalledVer + ').' + #13#10#13#10 +
-        'Setup cannot verify version compatibility. Please uninstall the current' + #13#10 +
-        'version before continuing.',
+        'Setup cannot verify version compatibility. Please uninstall the current version before continuing.',
         mbError, MB_OK
       );
     end;
@@ -474,8 +473,7 @@ begin
       MsgBox(
         'A newer version of {#AppName} (' + InstalledVer + ') is already installed.' + #13#10 +
         'Downgrading to version ' + CurrentVer + ' is not permitted.' + #13#10#13#10 +
-        'If you wish to install an older version, please uninstall the current' + #13#10 +
-        'version first.',
+        'If you wish to install an older version, please uninstall the current version first.',
         mbError, MB_OK
       );
     end;
@@ -494,7 +492,10 @@ begin
   S := 'Destination location:' + NewLine +
        Space + ExpandConstant('{app}') + NewLine + NewLine +
        'Configuration and logs:' + NewLine +
-       Space + ExpandConstant('{userappdata}\WiraDesk') + NewLine + NewLine +
+       Space + ExpandConstant('{userappdata}\WiraDesk') + NewLine +
+       Space + 'Preserved if present; Setup never bundles or overwrites user state.' + NewLine +
+       Space + 'A missing config.toml opens first-run onboarding; completing it writes a fresh default configuration.' + NewLine +
+       Space + 'The log file is created on first demand when the daemon writes a log entry.' + NewLine + NewLine +
        'Auto-start task:' + NewLine +
        Space + '{#TaskName} (optional elevated logon task)' + NewLine +
        Space + 'Setup does not create or enable auto-start.' + NewLine +

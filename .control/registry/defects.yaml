@@ -1167,5 +1167,8 @@ defects:
       Join the sentence clauses in packaging/wiradesk.iss so sentences wrap naturally without premature #13#10
       line breaks. Ensure verify-installer-safety.ps1 asserts the joined phrasing in packaging/wiradesk.iss.
     owner: repo owner
+    status: fixed
+    fixed_in: "0.2.0"
+    fixed_by: "SPEC-22-01 (packaging/wiradesk.iss, scripts/verify-installer-safety.ps1)"
 
 
