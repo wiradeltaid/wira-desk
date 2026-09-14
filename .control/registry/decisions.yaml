@@ -967,6 +967,36 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-037.md
 
+  - id: DEC-038
+    title: Autopilot mandate for SPEC-24 delivery
+    status: accepted
+    file: decisions/DEC-038-autopilot-mandate-for-spec-24-delivery.md
+    created: '2026-09-14'
+    touches:
+      - .control/decisions/DEC-038-autopilot-mandate-for-spec-24-delivery.md
+      - .control/memlog/autopilot-DEC-038.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+      - .control/registry/requirements-wira-desk.yaml
+      - .scratch/spec-24-snap-to-edge-default-percentage-to-67/issues/01-feature-default-snap-percentage-to-67.md
+      - crates/shared/src/constants.rs
+      - crates/shared/src/config.rs
+      - .what/window-management/04-usecases/UC-9-snap-window-custom-percentage.md
+      - .how/settings/05-model/data-model.md
+      - 3p.md
+      - docs/3p.md
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-21'
+      run_branch: autopilot/DEC-038
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-038.md
+
 
 
 
