@@ -1700,5 +1700,28 @@ specs:
           - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
           - switcher::tests::default_hold_delay_threshold_is_300ms
 
-
+  - id: SPEC-20
+    release: "0.3.0"
+    prd: [wira-desk]
+    size: S
+    status: open
+    depends_on: []
+    spec_folder: .scratch/spec-20-static-crt-and-software-renderer/
+    spec_reviewed:
+      date: '2026-09-14'
+      sha: 'c2ad4ea'
+      lenses: [structure, prose, edge-case-hunter]
+    fr: []
+    tickets:
+      - id: SPEC-20-01
+        title: "Defect DEF-22 — Static CRT linking via Slint software renderer migration and installer cleanup"
+        spec_folder: .scratch/spec-20-static-crt-and-software-renderer/
+        component: settings
+        satisfies: []
+        depends_on: []
+        tests:
+          - shared::tests::msvc_target_compiles_with_crt_static
+          - binary::tests::pe_import_scanner_detects_all_dynamic_msvc_crt_families
+          - binary::tests::pe_import_scanner_rejects_malformed_pe_input
+          - binary::tests::pe_import_scanner_passes_clean_static_binary
 

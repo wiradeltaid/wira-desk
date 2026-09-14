@@ -1063,3 +1063,38 @@ defects:
       Update default visual hold delay threshold (visual_hold_delay_ms) from 150ms to 300ms in shared
       SwitcherConfig, Settings UI, and companion test assertions.
     owner: repo owner
+
+  - id: DEF-22
+    title: Dynamic MSVC CRT dependency in Settings crashes executables on clean Windows and fails WinGet automated validation
+    status: open
+    severity: high
+    component: settings
+    violates: [NFR-1, DEC-024]
+    found_in: "0.2.0"
+    found_by: WinGet automated validation bot on microsoft/winget-pkgs#426321 (reproduced locally with PE import scan)
+    tests:
+      - shared::tests::msvc_target_compiles_with_crt_static
+    summary: >-
+      On a clean Windows installation without pre-installed Visual C++ Redistributables, running either
+      wiradesk.exe or wiradesk-settings.exe encounters STATUS_DLL_NOT_FOUND (0xC0000135, exit code -1073741515)
+      due to missing VCRUNTIME140.dll and MSVCP140.dll. This caused automated package validation to fail on
+      microsoft/winget-pkgs#426321 and renders portable .zip and Scoop distributions non-functional on bare OS installs.
+    why_it_hid: >-
+      Developer and CI environments already possess Visual Studio and MSVC runtime redistributables.
+      Furthermore, SPEC-11-02's binary guard verify-release-binary.ps1 had a switch -AllowDynamicCrtIfBundled
+      that evaluated a text regex match against packaging/wiradesk.iss ("vc_redist.x64.exe") instead of verifying
+      physical presence of the staged redistributable payload. In reality, CI never downloaded or staged vc_redist.x64.exe,
+      and Inno Setup silently skipped bundling it via skipifsourcedoesntexist. The daemon itself is pure Rust and
+      links cleanly with +crt-static, but crates/settings pulled in Slint's renderer-skia, whose C++ skia-bindings
+      has no prebuilt static CRT binary for Windows MSVC, preventing workspace-wide +crt-static.
+    impact: >-
+      Release executables cannot launch on clean Windows machines without prior installation of VC++ Redistributable.
+      Automated WinGet submissions fail validation. Portable ZIP distribution is broken on clean machines.
+    fix_direction: >-
+      Option A (confirmed by owner): In crates/settings/Cargo.toml, replace renderer-skia with renderer-software
+      (pure-Rust CPU rasterizer), eliminating skia-bindings and C++ runtime requirements. Add target-scoped
+      .cargo/config.toml enabling target-feature=+crt-static for x86_64-pc-windows-msvc across the entire workspace.
+      Remove dormant vc_redist.x64.exe bundling lines from packaging/wiradesk.iss and remove -AllowDynamicCrtIfBundled
+      from .github/workflows/release.yml, adding strict PE import verification into ci.yml as well. Update SDD-settings.md
+      AD-11a to document the software renderer and verify visual/theme/DPI fidelity.
+    owner: repo owner
