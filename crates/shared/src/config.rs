@@ -99,13 +99,13 @@ pub struct SnappingConfig {
     /// Snap the active window to the right third of the work area.
     pub snap_third_right: String,
     pub snap_third_right_enabled: bool,
-    /// Percentage of work-area width for left-edge snap (default 50).
+    /// Percentage of work-area width for left-edge snap (default 67).
     pub percent_left: u32,
-    /// Percentage of work-area width for right-edge snap (default 50).
+    /// Percentage of work-area width for right-edge snap (default 67).
     pub percent_right: u32,
-    /// Percentage of work-area height for top-edge snap (default 50).
+    /// Percentage of work-area height for top-edge snap (default 67).
     pub percent_top: u32,
-    /// Percentage of work-area height for bottom-edge snap (default 50).
+    /// Percentage of work-area height for bottom-edge snap (default 67).
     pub percent_bottom: u32,
 }
 
@@ -599,6 +599,35 @@ mod tests {
     }
 
     #[test]
+    fn default_snapping_percentages_are_67() {
+        let cfg = Config::default();
+        assert_eq!(cfg.snapping.percent_left, 67);
+        assert_eq!(cfg.snapping.percent_right, 67);
+        assert_eq!(cfg.snapping.percent_top, 67);
+        assert_eq!(cfg.snapping.percent_bottom, 67);
+    }
+
+    #[test]
+    fn partial_snapping_percentages_preserve_explicit_values_and_default_omitted_fields() {
+        let toml = r#"
+            [snapping]
+            percent_left = 50
+        "#;
+        let cfg = Config::from_toml_str(toml).unwrap();
+        assert_eq!(cfg.snapping.percent_left, 50);
+        assert_eq!(cfg.snapping.percent_right, 67);
+        assert_eq!(cfg.snapping.percent_top, 67);
+        assert_eq!(cfg.snapping.percent_bottom, 67);
+
+        let serialized = cfg.to_toml_string().unwrap();
+        let parsed = Config::from_toml_str(&serialized).unwrap();
+        assert_eq!(parsed.snapping.percent_left, 50);
+        assert_eq!(parsed.snapping.percent_right, 67);
+        assert_eq!(parsed.snapping.percent_top, 67);
+        assert_eq!(parsed.snapping.percent_bottom, 67);
+    }
+
+    #[test]
     fn percent_snap_fields_roundtrip_through_toml() {
         let mut cfg = Config::default();
         cfg.snapping.snap_percent_left = "ctrl+alt+shift+left".to_string();
@@ -746,10 +775,10 @@ mod tests {
         assert!(cfg.snap_third_left_enabled);
         assert!(cfg.snap_third_middle_enabled);
         assert!(cfg.snap_third_right_enabled);
-        assert_eq!(cfg.percent_left, 50);
-        assert_eq!(cfg.percent_right, 50);
-        assert_eq!(cfg.percent_top, 50);
-        assert_eq!(cfg.percent_bottom, 50);
+        assert_eq!(cfg.percent_left, 67);
+        assert_eq!(cfg.percent_right, 67);
+        assert_eq!(cfg.percent_top, 67);
+        assert_eq!(cfg.percent_bottom, 67);
     }
 
     #[test]

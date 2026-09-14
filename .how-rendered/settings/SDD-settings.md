@@ -592,10 +592,10 @@ declared sequence above and cannot collide with anything (FR-26).
 
 | Column | Type | Nullable | Meaning |
 | --- | --- | --- | --- |
-| percent_left | u8 | no | Percentage of work-area width, left edge. Default `50` |
-| percent_right | u8 | no | Percentage of work-area width, right edge. Default `50` |
-| percent_top | u8 | no | Percentage of work-area height, top edge. Default `50` |
-| percent_bottom | u8 | no | Percentage of work-area height, bottom edge. Default `50` |
+| percent_left | u8 | no | Percentage of work-area width, left edge. Default `67` |
+| percent_right | u8 | no | Percentage of work-area width, right edge. Default `67` |
+| percent_top | u8 | no | Percentage of work-area height, top edge. Default `67` |
+| percent_bottom | u8 | no | Percentage of work-area height, bottom edge. Default `67` |
 
 #### onboarding-completion
 

@@ -386,7 +386,7 @@ The user can request an update check at any time from the About pane; when a new
 
 #### FR-26 — Snap the active window to a screen edge at a percentage the user configures per direction, instead of the fixed half.
 
-The system can snap and resize the active window against the left, right, top, or bottom edge of the current monitor's working area at a percentage the user sets independently per direction in Settings (default 50%, matching `FR-14`/`FR-22` until changed), using dedicated keyboard shortcuts (`Ctrl + Alt + Shift + Left/Right/Up/Down`), scaled to the target monitor's DPI.
+The system can snap and resize the active window against the left, right, top, or bottom edge of the current monitor's working area at a percentage the user sets independently per direction in Settings (default 67%, instead of the fixed half), using dedicated keyboard shortcuts (`Ctrl + Alt + Shift + Left/Right/Up/Down`), scaled to the target monitor's DPI.
 
 **Proof of done:** With the left-edge percentage set to 70% in Settings, pressing `Ctrl + Alt + Shift + Left` resizes and aligns the active window to exactly 70% of the working area's width from the left edge of the current monitor, taking display scaling into account.  
 **Capability:** `CAP-14`  

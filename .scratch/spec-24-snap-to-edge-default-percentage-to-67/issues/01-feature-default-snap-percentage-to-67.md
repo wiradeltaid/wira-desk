@@ -3,7 +3,7 @@ id: SPEC-24-01
 component: settings
 satisfies: [UC-9, FR-26]
 blocked_by: []
-status: ready-for-agent
+status: closed
 tests:
   - config::tests::default_snapping_percentages_are_67
   - config::tests::partial_snapping_percentages_preserve_explicit_values_and_default_omitted_fields

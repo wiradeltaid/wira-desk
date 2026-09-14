@@ -2260,14 +2260,14 @@ mod tests {
         } else {
             panic!("expected SaveFeedback::Error");
         }
-        assert_eq!(m.saved.snapping.percent_left, 50);
+        assert_eq!(m.saved.snapping.percent_left, 67);
         let _ = std::fs::remove_file(&path);
     }
 
     #[test]
     fn percent_get_and_set_updates_draft_and_marks_dirty() {
         let mut m = model();
-        assert_eq!(ShortcutField::SnapPercentLeft.percent(&m.draft), Some(50));
+        assert_eq!(ShortcutField::SnapPercentLeft.percent(&m.draft), Some(67));
         assert_eq!(ShortcutField::Switcher.percent(&m.draft), None);
 
         ShortcutField::SnapPercentLeft.set_percent(&mut m.draft, 70);

@@ -969,7 +969,7 @@ decisions:
 
   - id: DEC-038
     title: Autopilot mandate for SPEC-24 delivery
-    status: accepted
+    status: applied
     file: decisions/DEC-038-autopilot-mandate-for-spec-24-delivery.md
     created: '2026-09-14'
     touches:

@@ -1800,7 +1800,7 @@ specs:
     release: "0.2.0"
     prd: [wira-desk]
     size: S
-    status: open
+    status: closed
     depends_on: []
     spec_folder: .scratch/spec-24-snap-to-edge-default-percentage-to-67/
     spec_reviewed:
