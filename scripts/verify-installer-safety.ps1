@@ -198,13 +198,19 @@ Write-Pass "Production installer verified: $stdSetup"
 # Helper function to compile custom-version installer into test-only directory
 function Build-CustomVersionInstaller([string]$Ver, [string]$OutFileName) {
     $tempIss = Join-Path $tempRoot "temp_$OutFileName.iss"
-    $rep = "#define AppVersion `"$Ver`"`n#define OutputBaseFilename `"$OutFileName`""
+    $rep = "#define AppVersion `"$Ver`""
     $mod = $realIssContent.Replace($targetVerLine, $rep)
     [System.IO.File]::WriteAllText($tempIss, $mod)
     try {
-        & $iscc /Q "/DSTAGE_DIR=$resolvedStage" "/DOUT_DIR=$testArtifactsDir" $tempIss *>$null
+        & $iscc /Q "/DSTAGE_DIR=$resolvedStage" "/DOUT_DIR=$testArtifactsDir" "/F$OutFileName" $tempIss *>$null
         if ($LASTEXITCODE -ne 0) { throw "Failed to compile custom installer for $Ver" }
-        return (Join-Path $testArtifactsDir "$OutFileName.exe")
+        $expectedPath = Join-Path $testArtifactsDir "$OutFileName.exe"
+        if (-not (Test-Path $expectedPath)) {
+            $altPath = Join-Path $testArtifactsDir "WiraDesk-$Ver-x64-setup.exe"
+            if (Test-Path $altPath) { return $altPath }
+            throw "Custom installer binary not found at $expectedPath or $altPath"
+        }
+        return $expectedPath
     } finally {
         if (Test-Path $tempIss) { [System.IO.File]::Delete($tempIss) }
     }
