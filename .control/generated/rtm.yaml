@@ -730,10 +730,10 @@ rtm:
   - config::tests::percent_snap_fields_roundtrip_through_toml
   - persistence::tests::default_config_uses_frozen_shortcuts
   - persistence::tests::an_out_of_range_percentage_is_rejected_before_save
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-3
   CAP: CAP-14
   FR: FR-26

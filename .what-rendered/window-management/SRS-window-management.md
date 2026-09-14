@@ -737,8 +737,7 @@ right, top, or bottom (shipped defaults `Ctrl + Alt + Shift + Left`, `Ctrl + Alt
 
 - Wira Desk daemon is running with active low-level keyboard hook.
 - Foreground window is a standard resizable top-level application window on an active physical monitor.
-- The pressed edge has a percentage configured in Settings (default 50%, matching the fixed half-snap
-  until the user changes it).
+- The pressed edge has a percentage configured in Settings (default 67%).
 
 #### Main Flow
 

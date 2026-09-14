@@ -68,7 +68,7 @@ pub(crate) mod tests {
                 .as_nanos()
         ));
         let mut cfg = Config::default();
-        cfg.snapping.percent_left = 50;
+        cfg.snapping.percent_left = 67;
         let model = Rc::new(RefCell::new(SettingsModel::new(cfg, false)));
         model.borrow_mut().set_pane(Pane::Shortcuts);
 
@@ -102,7 +102,7 @@ pub(crate) mod tests {
             // Must NOT commit prematurely before departure
             assert_eq!(
                 model.borrow().draft.snapping.percent_left,
-                50,
+                67,
                 "Value must not commit to draft before departure"
             );
 
@@ -183,7 +183,7 @@ pub(crate) mod tests {
             // Must NOT commit prematurely before departure
             assert_eq!(
                 model.borrow().draft.snapping.percent_left,
-                50,
+                67,
                 "Value must not commit to draft before departure"
             );
 
@@ -221,7 +221,7 @@ pub(crate) mod tests {
 
             assert_eq!(
                 model.borrow().draft.snapping.percent_left,
-                50,
+                67,
                 "Value must not commit to draft before departure"
             );
 
@@ -302,7 +302,7 @@ pub(crate) mod tests {
 
             assert_eq!(
                 model.borrow().draft.snapping.percent_left,
-                50,
+                67,
                 "a typed value must not commit before departure"
             );
 
@@ -513,21 +513,21 @@ pub(crate) mod tests {
                     .next()
                     .expect("Snap percentage input element found after revert");
 
-            // The field must return to the saved value 50, NOT retain 75
+            // The field must return to the saved value 67, NOT retain 75
             let reverted_val = input_after.accessible_value().unwrap_or_default();
             assert_eq!(
                 reverted_val.as_str(),
-                "50",
+                "67",
                 "Clicking Revert must restore saved value in the field even while focused; got {reverted_val:?}"
             );
 
             // Now blur the field (e.g. by advancing focus or clicking elsewhere)
             window.invoke_start_capture(ShortcutField::Switcher as i32);
 
-            // The draft must still be 50, NOT 75
+            // The draft must still be 67, NOT 75
             assert_eq!(
                 model.borrow().draft.snapping.percent_left,
-                50,
+                67,
                 "Subsequent blur must not commit the abandoned typed value 75"
             );
 
@@ -568,7 +568,7 @@ pub(crate) mod tests {
             );
             assert_eq!(
                 model.borrow().saved.snapping.percent_left,
-                50,
+                67,
                 "a refused value must leave the saved config untouched"
             );
 
@@ -610,8 +610,8 @@ pub(crate) mod tests {
                 );
             }
 
-            // Saved config remains untouched at 50
-            assert_eq!(model.borrow().saved.snapping.percent_left, 50);
+            // Saved config remains untouched at 67
+            assert_eq!(model.borrow().saved.snapping.percent_left, 67);
 
             let _ = std::fs::remove_file(&save_path);
         });
@@ -641,7 +641,7 @@ pub(crate) mod tests {
             // Verify Row A's draft has not committed yet before departure
             assert_eq!(
                 model.borrow().draft.snapping.percent_left,
-                50,
+                67,
                 "Row A value must not commit to draft before departure"
             );
 
@@ -657,7 +657,7 @@ pub(crate) mod tests {
             row_b_plus.invoke_accessible_default_action();
 
             // Row A's pending typed value '70' must survive and commit to the draft,
-            // while Row B's value is stepped (50 + 1 = 51)
+            // while Row B's value is stepped (67 + 1 = 68)
             assert_eq!(
                 model.borrow().draft.snapping.percent_left,
                 70,
@@ -665,8 +665,8 @@ pub(crate) mod tests {
             );
             assert_eq!(
                 model.borrow().draft.snapping.percent_right,
-                51,
-                "Row B stepped value must be 51"
+                68,
+                "Row B stepped value must be 68"
             );
 
             // Save is clicked afterwards: both values must be saved to disk
@@ -678,8 +678,8 @@ pub(crate) mod tests {
             );
             assert_eq!(
                 model.borrow().saved.snapping.percent_right,
-                51,
-                "Row B value (51) must be saved to config"
+                68,
+                "Row B value (68) must be saved to config"
             );
 
             let _ = std::fs::remove_file(&save_path);
@@ -1895,7 +1895,7 @@ pub(crate) mod tests {
                     text: slint::platform::Key::Return.into(),
                 });
 
-            // On Enter, out-of-range value 101 must revert to previous percent (50)
+            // On Enter, out-of-range value 101 must revert to previous percent (67)
             field.invoke_accessible_default_action();
             let input_refocused =
                 ElementHandle::find_by_accessible_label(&window, "Snap percentage input")
@@ -1904,15 +1904,15 @@ pub(crate) mod tests {
             let reverted = input_refocused.accessible_value().unwrap_or_default();
             assert_eq!(
                 reverted.as_str(),
-                "50",
-                "Out-of-range typed percentage (101) must revert to previous value (50) on Enter"
+                "67",
+                "Out-of-range typed percentage (101) must revert to previous value (67) on Enter"
             );
 
-            // Draft must remain 50 (no percent_changed signal fired for out-of-range value)
+            // Draft must remain 67 (no percent_changed signal fired for out-of-range value)
             assert_eq!(
                 model.borrow().draft.snapping.percent_left,
-                50,
-                "Draft must remain untouched at 50 after out-of-range Enter departure"
+                67,
+                "Draft must remain untouched at 67 after out-of-range Enter departure"
             );
 
             let _ = std::fs::remove_file(&save_path);
@@ -1953,7 +1953,7 @@ pub(crate) mod tests {
                     text: slint::platform::Key::Return.into(),
                 });
 
-            // On Enter, below-min value 0 must revert to previous percent (50)
+            // On Enter, below-min value 0 must revert to previous percent (67)
             field.invoke_accessible_default_action();
             let input_refocused =
                 ElementHandle::find_by_accessible_label(&window, "Snap percentage input")
@@ -1962,15 +1962,15 @@ pub(crate) mod tests {
             let reverted = input_refocused.accessible_value().unwrap_or_default();
             assert_eq!(
                 reverted.as_str(),
-                "50",
-                "Below-min typed percentage (0) must revert to previous value (50) on Enter"
+                "67",
+                "Below-min typed percentage (0) must revert to previous value (67) on Enter"
             );
 
-            // Draft must remain 50
+            // Draft must remain 67
             assert_eq!(
                 model.borrow().draft.snapping.percent_left,
-                50,
-                "Draft must remain untouched at 50 after below-min Enter departure"
+                67,
+                "Draft must remain untouched at 67 after below-min Enter departure"
             );
 
             let _ = std::fs::remove_file(&save_path);
@@ -2007,7 +2007,7 @@ pub(crate) mod tests {
             // Move focus away to trigger blur (`changed has-focus => if !self.has-focus`)
             window.invoke_start_capture(ShortcutField::Switcher as i32);
 
-            // On blur, out-of-range value 120 must revert to previous percent (50)
+            // On blur, out-of-range value 120 must revert to previous percent (67)
             field.invoke_accessible_default_action();
             let input_refocused =
                 ElementHandle::find_by_accessible_label(&window, "Snap percentage input")
@@ -2016,15 +2016,15 @@ pub(crate) mod tests {
             let reverted = input_refocused.accessible_value().unwrap_or_default();
             assert_eq!(
                 reverted.as_str(),
-                "50",
-                "Out-of-range typed percentage (120) must revert to previous value (50) on blur"
+                "67",
+                "Out-of-range typed percentage (120) must revert to previous value (67) on blur"
             );
 
-            // Draft must remain 50
+            // Draft must remain 67
             assert_eq!(
                 model.borrow().draft.snapping.percent_left,
-                50,
-                "Draft must remain untouched at 50 after out-of-range blur departure"
+                67,
+                "Draft must remain untouched at 67 after out-of-range blur departure"
             );
 
             let _ = std::fs::remove_file(&save_path);
