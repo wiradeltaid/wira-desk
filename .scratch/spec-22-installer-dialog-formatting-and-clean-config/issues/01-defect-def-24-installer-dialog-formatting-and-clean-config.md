@@ -3,7 +3,7 @@ id: SPEC-22-01
 component: settings
 satisfies: []
 blocked_by: []
-status: ready-for-agent
+status: done
 tests:
   - scripts/verify-installer-safety.ps1
   - ci::build::installer-safety
@@ -27,14 +27,14 @@ tests:
 
 **Blocked by:** none
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] **Joined Downgrade Refusal Text:** `packaging/wiradesk.iss` contains `'If you wish to install an older version, please uninstall the current version first.'` on a single continuous string without a mid-sentence `#13#10` before `version first.`.
-- [ ] **Joined Invalid Version Refusal Text:** `packaging/wiradesk.iss` contains `'Setup cannot verify version compatibility. Please uninstall the current version before continuing.'` on a single continuous string without a mid-sentence `#13#10` before `version before continuing.`.
-- [ ] **Ready Memo Lifecycle Disclosure:** `UpdateReadyMemo` states that `%APPDATA%\WiraDesk` is preserved if present and that Setup never bundles or overwrites user state.
-- [ ] **Runtime Initialization Boundary:** The implementation-facing copy distinguishes the runtime lifecycle: a missing configuration opens first-run onboarding, completion writes a fresh default `config.toml`, and `wiradesk.log` is created only when the daemon writes a log entry. It does not claim that Setup or application startup eagerly creates a log file.
-- [ ] **Zero Bundled Config Invariant:** `packaging/wiradesk.iss` `[Files]` section continues to install only `wiradesk.exe`, `wiradesk-settings.exe`, `LICENSE.txt`, and `NOTICE.txt` (never bundling `config.toml` or `wiradesk.log`).
-- [ ] **Safety Harness Verification:** `scripts/verify-installer-safety.ps1` checks the joined dialog strings, the two absent orphaned-linebreak patterns, the Ready-page preservation disclosure, and the `[Files]` zero-bundling invariant, then passes cleanly without regression.
-- [ ] **Workspace Integrity:** `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace` pass cleanly.
+- [x] **Joined Downgrade Refusal Text:** `packaging/wiradesk.iss` contains `'If you wish to install an older version, please uninstall the current version first.'` on a single continuous string without a mid-sentence `#13#10` before `version first.`.
+- [x] **Joined Invalid Version Refusal Text:** `packaging/wiradesk.iss` contains `'Setup cannot verify version compatibility. Please uninstall the current version before continuing.'` on a single continuous string without a mid-sentence `#13#10` before `version before continuing.`.
+- [x] **Ready Memo Lifecycle Disclosure:** `UpdateReadyMemo` states that `%APPDATA%\WiraDesk` is preserved if present and that Setup never bundles or overwrites user state.
+- [x] **Runtime Initialization Boundary:** The implementation-facing copy distinguishes the runtime lifecycle: a missing configuration opens first-run onboarding, completion writes a fresh default `config.toml`, and `wiradesk.log` is created only when the daemon writes a log entry. It does not claim that Setup or application startup eagerly creates a log file.
+- [x] **Zero Bundled Config Invariant:** `packaging/wiradesk.iss` `[Files]` section continues to install only `wiradesk.exe`, `wiradesk-settings.exe`, `LICENSE.txt`, and `NOTICE.txt` (never bundling `config.toml` or `wiradesk.log`).
+- [x] **Safety Harness Verification:** `scripts/verify-installer-safety.ps1` checks the joined dialog strings, the two absent orphaned-linebreak patterns, the Ready-page preservation disclosure, and the `[Files]` zero-bundling invariant, then passes cleanly without regression.
+- [x] **Workspace Integrity:** `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace` pass cleanly.

@@ -910,6 +910,34 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-035.md
 
+  - id: DEC-036
+    title: Autopilot mandate for SPEC-22 delivery
+    status: applied
+    file: decisions/DEC-036-autopilot-mandate-for-spec-22-delivery.md
+    created: '2026-09-14'
+    touches:
+      - .control/decisions/DEC-036-autopilot-mandate-for-spec-22-delivery.md
+      - .control/memlog/autopilot-DEC-036.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+      - .scratch/spec-22-installer-dialog-formatting-and-clean-config/issues/01-defect-def-24-installer-dialog-formatting-and-clean-config.md
+      - packaging/wiradesk.iss
+      - scripts/verify-installer-safety.ps1
+      - 3p.md
+      - docs/3p.md
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-21'
+      run_branch: autopilot/DEC-036
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-036.md
+
+
 
 
 

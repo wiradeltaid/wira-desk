@@ -134,16 +134,21 @@ foreach ($tc in $isppTestCases) {
 Write-Pass "All 12 candidate version test cases verified directly against production packaging\wiradesk.iss."
 
 # ----------------------------------------------------------------------------
-# 4. Check Packaging Safety Directives
+# 4. Check Packaging Safety Directives and Invariants
 # ----------------------------------------------------------------------------
-Write-Step "Checking packaging\wiradesk.iss for required safety directives..."
+Write-Step "Checking packaging\wiradesk.iss for required safety directives and invariants..."
 $requiredPatterns = @(
     @{ Pattern = 'UpdateReadyMemo'; Description = 'UpdateReadyMemo function implemented' },
     @{ Pattern = '\{userappdata\}\\WiraDesk'; Description = 'User configuration and log path displayed' },
+    @{ Pattern = 'Preserved if present; Setup never bundles or overwrites user state\.'; Description = 'Ready memo user state preservation disclosure' },
+    @{ Pattern = 'A missing config\.toml opens first-run onboarding; completing it writes a fresh default configuration\.'; Description = 'Ready memo clean install onboarding config initialization' },
+    @{ Pattern = 'The log file is created on first demand when the daemon writes a log entry\.'; Description = 'Ready memo on-demand log initialization disclosure' },
     @{ Pattern = '\{#TaskName\} \(optional elevated logon task\)'; Description = 'Explicit task identification without service claim' },
     @{ Pattern = 'Setup does not create or enable auto-start'; Description = 'Auto-start non-creation disclaimer' },
     @{ Pattern = 'RegKeyExists\(HKEY_LOCAL_MACHINE_64'; Description = 'Explicit 64-bit HKLM registry check' },
     @{ Pattern = 'RegQueryStringValue\(HKEY_LOCAL_MACHINE_64'; Description = 'Explicit 64-bit HKLM DisplayVersion query' },
+    @{ Pattern = 'If you wish to install an older version, please uninstall the current version first\.'; Description = 'Joined downgrade refusal sentence without mid-sentence linebreak' },
+    @{ Pattern = 'Setup cannot verify version compatibility\. Please uninstall the current version before continuing\.'; Description = 'Joined invalid version refusal sentence without mid-sentence linebreak' },
     @{ Pattern = 'PROCESS_STATE_ERROR'; Description = 'Fail-closed process probe verification' },
     @{ Pattern = 'StopDaemonAndSettings'; Description = 'Fail-closed process termination implemented' }
 )
@@ -154,7 +159,33 @@ foreach ($rp in $requiredPatterns) {
         exit 1
     }
 }
-Write-Pass "packaging\wiradesk.iss contains all required safety directives."
+
+# Assert absence of orphaned mid-sentence linebreaks
+$prohibitedPatterns = @(
+    @{ Pattern = 'please uninstall the current'' \+ #13#10 \+\s*''version first\.'; Description = 'Orphaned linebreak before "version first."' },
+    @{ Pattern = 'Please uninstall the current'' \+ #13#10 \+\s*''version before continuing\.'; Description = 'Orphaned linebreak before "version before continuing."' }
+)
+
+foreach ($pp in $prohibitedPatterns) {
+    if ($realIssContent -match $pp.Pattern) {
+        Write-Fail "packaging\wiradesk.iss contains prohibited pattern: $($pp.Description)"
+        exit 1
+    }
+}
+
+# Assert [Files] section zero-bundling invariant (never bundles config.toml or wiradesk.log)
+$filesMatch = [regex]::Match($realIssContent, '(?ms)\[Files\]\s*(.*?)(?=\r?\n\[[A-Za-z]+\])')
+if (-not $filesMatch.Success) {
+    Write-Fail "packaging\wiradesk.iss is missing [Files] section."
+    exit 1
+}
+$filesSection = $filesMatch.Groups[1].Value
+if ($filesSection -match 'config\.toml' -or $filesSection -match 'wiradesk\.log') {
+    Write-Fail "packaging\wiradesk.iss [Files] section bundles user state (config.toml or wiradesk.log found)."
+    exit 1
+}
+Write-Pass "packaging\wiradesk.iss [Files] section zero-bundling invariant confirmed (no config.toml or wiradesk.log)."
+Write-Pass "packaging\wiradesk.iss contains all required safety directives and joined dialog formatting."
 
 # ----------------------------------------------------------------------------
 # 5. Real Installer Compilation and 64-bit HKLM Registry Decision Table Tests
