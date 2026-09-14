@@ -879,6 +879,37 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-034.md
 
+  - id: DEC-035
+    title: Autopilot mandate for SPEC-21 delivery
+    status: accepted
+    file: decisions/DEC-035-autopilot-mandate-for-spec-21-delivery.md
+    created: '2026-09-14'
+    touches:
+      - .control/decisions/DEC-035-autopilot-mandate-for-spec-21-delivery.md
+      - .control/memlog/autopilot-DEC-035.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+      - .scratch/spec-21-installer-hardening-and-downgrade-prevention/SPEC.md
+      - .scratch/spec-21-installer-hardening-and-downgrade-prevention/issues/01-defect-def-23-installer-downgrade-prevention-and-safety.md
+      - packaging/wiradesk.iss
+      - scripts/verify-installer-safety.ps1
+      - .github/workflows/ci.yml
+      - .how/settings/SDD-settings.md
+      - .what/settings/SRS-settings.md
+      - 3p.md
+      - docs/3p.md
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-21'
+      run_branch: autopilot/DEC-035
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-035.md
+
 
 
 
