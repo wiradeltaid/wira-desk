@@ -46,10 +46,10 @@ rtm:
   - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
   - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
   - switcher::tests::default_hold_delay_threshold_is_300ms
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-1
@@ -565,10 +565,10 @@ rtm:
   - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
   - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
   - switcher::tests::default_hold_delay_threshold_is_300ms
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-7
   FR: FR-2
@@ -910,10 +910,10 @@ rtm:
   - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
   - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
   - switcher::tests::default_hold_delay_threshold_is_300ms
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-8
   FR: FR-3
@@ -1255,10 +1255,10 @@ rtm:
   - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
   - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
   - switcher::tests::default_hold_delay_threshold_is_300ms
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-4
@@ -1319,10 +1319,10 @@ rtm:
   - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
   - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
   - switcher::tests::default_hold_delay_threshold_is_300ms
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-5
@@ -1383,10 +1383,10 @@ rtm:
   - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
   - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
   - switcher::tests::default_hold_delay_threshold_is_300ms
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-6

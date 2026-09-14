@@ -35,7 +35,6 @@ pub struct SwitcherController {
     overlay: SwitcherOverlay,
     origin_foreground: WindowId,
     candidates: Vec<WindowId>,
-    selected_index: usize,
     open_time_ms: u64,
 }
 
@@ -51,7 +50,6 @@ impl SwitcherController {
             overlay: SwitcherOverlay::new(Arc::new(Mutex::new(DwmThumbnailSink))),
             origin_foreground: WindowId(0),
             candidates: Vec::new(),
-            selected_index: 0,
             open_time_ms: 0,
         }
     }
@@ -75,7 +73,6 @@ impl SwitcherController {
     ) {
         self.origin_foreground = origin;
         self.candidates = candidates;
-        self.selected_index = selected_index;
         self.open_time_ms = crate::hook::tick_ms();
         self.overlay.show(
             work_area,
@@ -92,10 +89,9 @@ impl SwitcherController {
         }
         let (idx, _) = selection::select_next(
             self.candidates.len(),
-            self.selected_index,
+            self.overlay.selected_index(),
             self.overlay.per_page(),
         );
-        self.selected_index = idx;
         self.overlay.set_selected_index(idx);
     }
 
@@ -105,10 +101,9 @@ impl SwitcherController {
         }
         let (idx, _) = selection::select_prev(
             self.candidates.len(),
-            self.selected_index,
+            self.overlay.selected_index(),
             self.overlay.per_page(),
         );
-        self.selected_index = idx;
         self.overlay.set_selected_index(idx);
     }
 
@@ -118,11 +113,10 @@ impl SwitcherController {
         }
         let idx = selection::select_up(
             self.candidates.len(),
-            self.selected_index,
+            self.overlay.selected_index(),
             &self.overlay.layout().cards,
             self.overlay.page_start(),
         );
-        self.selected_index = idx;
         self.overlay.set_selected_index(idx);
     }
 
@@ -132,16 +126,29 @@ impl SwitcherController {
         }
         let idx = selection::select_down(
             self.candidates.len(),
-            self.selected_index,
+            self.overlay.selected_index(),
             &self.overlay.layout().cards,
             self.overlay.page_start(),
         );
-        self.selected_index = idx;
         self.overlay.set_selected_index(idx);
     }
 
+    pub fn selected_index(&self) -> usize {
+        self.overlay.selected_index()
+    }
+
+    pub fn set_selected_index(&mut self, idx: usize) {
+        if idx < self.candidates.len() {
+            self.overlay.set_selected_index(idx);
+        }
+    }
+
+    pub fn overlay_mut(&mut self) -> &mut SwitcherOverlay {
+        &mut self.overlay
+    }
+
     pub fn selected_window(&self) -> Option<WindowId> {
-        self.candidates.get(self.selected_index).copied()
+        self.candidates.get(self.overlay.selected_index()).copied()
     }
 
     /// Returns candidate targets starting from `selected_index` for fallback activation.
@@ -149,11 +156,12 @@ impl SwitcherController {
         if self.candidates.is_empty() {
             return Vec::new();
         }
+        let selected_index = self.overlay.selected_index();
         let mut res = Vec::with_capacity(self.candidates.len());
-        for i in self.selected_index..self.candidates.len() {
+        for i in selected_index..self.candidates.len() {
             res.push(self.candidates[i]);
         }
-        for i in 0..self.selected_index {
+        for i in 0..selected_index {
             res.push(self.candidates[i]);
         }
         res
@@ -166,7 +174,6 @@ impl SwitcherController {
     pub fn dismiss(&mut self) {
         self.overlay.dismiss();
         self.candidates.clear();
-        self.selected_index = 0;
         self.open_time_ms = 0;
     }
 }
@@ -293,5 +300,112 @@ pub mod tests {
         assert_eq!(card_order[0], active.foreground);
         let cycle_rest = cycle_order(&candidates, &active);
         assert_eq!(&card_order[1..], cycle_rest.as_slice());
+    }
+
+    #[test]
+    fn mouse_click_selection_updates_controller_candidate_selection() {
+        let mut sw = SwitcherController::new();
+        let work_area = Rect::new(0, 0, 1920, 1080);
+        let candidates = vec![WindowId(10), WindowId(20), WindowId(30), WindowId(40)];
+        let aspects = vec![1.6, 1.6, 1.6, 1.6];
+
+        sw.open(WindowId(10), work_area, candidates, &aspects, 96, 0);
+        assert_eq!(sw.selected_index(), 0);
+        assert_eq!(sw.selected_window(), Some(WindowId(10)));
+
+        // Simulate mouse clicking card index 2 (WindowId(30))
+        sw.overlay_mut().set_selected_index(2);
+
+        assert_eq!(sw.selected_index(), 2);
+        assert_eq!(sw.selected_window(), Some(WindowId(30)));
+
+        let targets = sw.candidates_from_selection();
+        assert_eq!(
+            targets[0],
+            WindowId(30),
+            "First candidate target must be the clicked window"
+        );
+        assert_eq!(
+            targets,
+            vec![WindowId(30), WindowId(40), WindowId(10), WindowId(20)]
+        );
+
+        // Multi-page test: test with 12 candidates across pages
+        let multi_candidates: Vec<WindowId> = (1..=12).map(WindowId).collect();
+        let multi_aspects = vec![1.6; 12];
+        sw.open(
+            WindowId(1),
+            work_area,
+            multi_candidates,
+            &multi_aspects,
+            96,
+            0,
+        );
+
+        // Click a card on subsequent page (e.g. candidate index 7)
+        sw.overlay_mut().set_selected_index(7);
+        assert_eq!(sw.selected_index(), 7);
+        assert_eq!(sw.selected_window(), Some(WindowId(8)));
+        let multi_targets = sw.candidates_from_selection();
+        assert_eq!(multi_targets[0], WindowId(8));
+
+        sw.dismiss();
+    }
+
+    #[test]
+    fn mouse_hover_updates_selection_for_subsequent_modifier_commit() {
+        let mut sw = SwitcherController::new();
+        let work_area = Rect::new(0, 0, 1920, 1080);
+        let candidates = vec![WindowId(100), WindowId(200), WindowId(300), WindowId(400)];
+        let aspects = vec![1.6; 4];
+
+        sw.open(WindowId(100), work_area, candidates, &aspects, 96, 0);
+
+        // User navigates once with keyboard to index 1 (WindowId(200))
+        sw.next();
+        assert_eq!(sw.selected_index(), 1);
+        assert_eq!(sw.selected_window(), Some(WindowId(200)));
+
+        // Mouse hovers over card 2 (WindowId(300))
+        sw.overlay_mut().set_selected_index(2);
+        assert_eq!(sw.selected_index(), 2);
+        assert_eq!(sw.selected_window(), Some(WindowId(300)));
+
+        // Keyboard modifier release triggers commit: targets must lead with hovered window
+        let targets = sw.candidates_from_selection();
+        assert_eq!(
+            targets[0],
+            WindowId(300),
+            "Subsequent modifier commit must target the hovered window"
+        );
+        assert_eq!(
+            targets,
+            vec![WindowId(300), WindowId(400), WindowId(100), WindowId(200)]
+        );
+
+        // Subsequent keyboard navigation continues seamlessly from hovered card (2 -> 3)
+        sw.next();
+        assert_eq!(sw.selected_index(), 3);
+        assert_eq!(sw.selected_window(), Some(WindowId(400)));
+
+        sw.dismiss();
+    }
+
+    #[test]
+    fn default_hold_delay_threshold_is_300ms() {
+        assert_eq!(
+            shared::config::SwitcherConfig::DEFAULT_HOLD_DELAY_MS,
+            300,
+            "Shared DEFAULT_HOLD_DELAY_MS must be 300 ms"
+        );
+        let default_config = shared::config::Config::default();
+        assert_eq!(
+            default_config.switcher.visual_hold_delay_ms, 300,
+            "Default config visual_hold_delay_ms must be 300 ms"
+        );
+        // Clamping preservation
+        assert_eq!(shared::config::SwitcherConfig::clamp_hold_delay(50), 100);
+        assert_eq!(shared::config::SwitcherConfig::clamp_hold_delay(300), 300);
+        assert_eq!(shared::config::SwitcherConfig::clamp_hold_delay(600), 500);
     }
 }

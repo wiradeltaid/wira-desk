@@ -190,6 +190,10 @@ impl SwitcherOverlay {
         self.layout.page_start
     }
 
+    pub fn selected_index(&self) -> usize {
+        self.selected_index
+    }
+
     /// Show the switcher overlay for the given candidates, aspects, dpi, and selected index.
     pub fn show(
         &mut self,
@@ -254,6 +258,8 @@ impl SwitcherOverlay {
             }
             self.hwnd = 0;
         }
+        self.candidates.clear();
+        self.selected_index = 0;
     }
 
     pub fn set_selected_index(&mut self, new_index: usize) {

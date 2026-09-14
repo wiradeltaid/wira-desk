@@ -807,6 +807,38 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-032.md
 
+  - id: DEC-033
+    title: Autopilot mandate for SPEC-19 delivery
+    status: applied
+    file: decisions/DEC-033-autopilot-mandate-for-spec-19-delivery.md
+    created: '2026-09-14'
+    touches:
+      - .control/decisions/DEC-033-autopilot-mandate-for-spec-19-delivery.md
+      - .control/memlog/autopilot-DEC-033.md
+      - .control/registry/decisions.yaml
+      - .control/registry/defects.yaml
+      - .control/registry/specs.yaml
+      - .scratch/smoke-dec-033.md
+      - .scratch/spec-19-visual-switcher-mouse-selection-and-hold-threshold/issues/01-defect-def-21-visual-switcher-mouse-selection-and-hold-threshold.md
+      - 3p.md
+      - crates/daemon/src/switcher/mod.rs
+      - crates/daemon/src/switcher/overlay.rs
+      - crates/settings/src/app.rs
+      - crates/settings/ui/main_window.slint
+      - crates/settings/ui/panes/general_pane.slint
+      - crates/shared/src/config.rs
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-21'
+      run_branch: autopilot/DEC-033
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-033.md
+
 
 
 

@@ -1680,7 +1680,7 @@ specs:
     release: "0.4.0"
     prd: [wira-desk]
     size: S
-    status: open
+    status: closed
     depends_on: [SPEC-18]
     spec_folder: .scratch/spec-19-visual-switcher-mouse-selection-and-hold-threshold/
     spec_reviewed:
