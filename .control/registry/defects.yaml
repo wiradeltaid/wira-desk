@@ -1147,7 +1147,6 @@ defects:
 
   - id: DEF-24
     title: Installer rejection dialog text breaks partial sentence onto separate newline
-    status: open
     severity: low
     component: settings
     violates: [NFR-1]
@@ -1171,4 +1170,34 @@ defects:
     fixed_in: "0.2.0"
     fixed_by: "SPEC-22-01 (packaging/wiradesk.iss, scripts/verify-installer-safety.ps1)"
 
-
+  - id: DEF-25
+    title: Ready memo verbosity and legacy WinTick migration obsolete shortcut and log resurrection
+    status: open
+    severity: medium
+    component: settings
+    violates: [NFR-1]
+    found_in: "0.2.0"
+    found_by: Owner manual installation and configuration verification (2026-09-14)
+    summary: >-
+      Two related configuration issues surfaced during manual testing: (1) In packaging/wiradesk.iss, the
+      Ready to Install memo's configuration section is overly verbose, displaying internal runtime onboarding
+      and log creation mechanics. (2) When testing a clean install by clearing %APPDATA%\WiraDesk,
+      shared::migrate_appdata silently copies legacy %APPDATA%\WinTick\config.toml and wintick.log from July 2026
+      prototype residue, resurrecting obsolete pre-DEC-008 shortcuts (ctrl+win+left) and historical logs instead of
+      clean modern defaults with no imported historical log content.
+    why_it_hid: >-
+      Automated CI and test runners execute in clean or isolated temporary environments without pre-existing %APPDATA%\WinTick
+      directories. Manual testing on long-lived development machines exposed that the legacy M-01 migration routine was
+      still actively running and overwriting clean install state.
+    impact: >-
+      Users or developers with historical WinTick folders attempting a clean install are silently downgraded to
+      obsolete shortcut bindings and noisy historical logs, and interactive installer users see cluttered implementation
+      details in the wizard summary.
+    fix_direction: >-
+      1. Simplify UpdateReadyMemo in packaging/wiradesk.iss to the concise, accurate summary
+         "Preserved across updates; clean installs start fresh." Do not claim unconditional preservation across uninstalls,
+         because the uninstaller can remove user state when the user requests it. Update verify-installer-safety.ps1 to require
+         the concise wording and reject the retired internal lifecycle prose.
+      2. Remove legacy WinTick migration (M-01) from crates/shared/src/migrate.rs and its startup calls in crates/daemon/src/main.rs
+         and crates/settings/src/main.rs so Wira Desk uses its modern default configuration and imports no historical WinTick log content.
+    owner: repo owner

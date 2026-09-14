@@ -1771,3 +1771,27 @@ specs:
         tests:
           - scripts/verify-installer-safety.ps1
           - ci::build::installer-safety
+
+  - id: SPEC-23
+    release: "0.2.0"
+    prd: [wira-desk]
+    size: S
+    status: open
+    depends_on: []
+    spec_folder: .scratch/spec-23-ready-memo-brevity-and-legacy-migration-retirement/
+    spec_reviewed:
+      date: '2026-09-14'
+      sha: '1b7c446'
+      lenses: [structure, prose, edge-case-hunter]
+    fr: []
+    tickets:
+      - id: SPEC-23-01
+        title: "Defect DEF-25 — Ready memo brevity and legacy WinTick migration retirement"
+        spec_folder: .scratch/spec-23-ready-memo-brevity-and-legacy-migration-retirement/
+        component: settings
+        satisfies: []
+        depends_on: []
+        tests:
+          - scripts/verify-installer-safety.ps1
+          - ci::build::installer-safety
+
