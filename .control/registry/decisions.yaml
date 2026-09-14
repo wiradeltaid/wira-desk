@@ -937,6 +937,36 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-036.md
 
+  - id: DEC-037
+    title: Autopilot mandate for SPEC-23 delivery
+    status: accepted
+    file: decisions/DEC-037-autopilot-mandate-for-spec-23-delivery.md
+    created: '2026-09-14'
+    touches:
+      - .control/decisions/DEC-037-autopilot-mandate-for-spec-23-delivery.md
+      - .control/memlog/autopilot-DEC-037.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+      - .scratch/spec-23-ready-memo-brevity-and-legacy-migration-retirement/issues/01-defect-def-25-ready-memo-brevity-and-legacy-migration-retirement.md
+      - packaging/wiradesk.iss
+      - scripts/verify-installer-safety.ps1
+      - crates/shared/src/migrate.rs
+      - crates/daemon/src/main.rs
+      - crates/settings/src/main.rs
+      - 3p.md
+      - docs/3p.md
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-21'
+      run_branch: autopilot/DEC-037
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-037.md
+
 
 
 
