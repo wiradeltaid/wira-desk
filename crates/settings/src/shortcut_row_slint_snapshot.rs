@@ -2728,20 +2728,35 @@ pub(crate) mod tests {
                 "Defaults button must not be visible when General settings match default"
             );
 
-            // 2. Mutate auto_start in draft -> button becomes visible
+            // 2. Mutate auto_start in draft -> button remains NOT visible (SPEC-27-02 isolation)
             model.borrow_mut().draft.general.auto_start = true;
             sync_model_to_ui(&window, &model.borrow());
 
-            let btn = find_element_scrolling(&window, "Restore General settings to defaults")
-                .expect("Defaults button must appear after General draft differs from default");
+            let btn_after_autostart =
+                find_element_scrolling(&window, "Restore General settings to defaults");
+            assert!(
+                btn_after_autostart.is_none(),
+                "Defaults button must NOT appear when only auto_start differs from default"
+            );
 
-            // 3. Click button -> restores draft and button disappears
+            // 3. Mutate visual_switcher_enabled in draft -> button becomes visible
+            model.borrow_mut().draft.switcher.visual_enabled = false;
+            sync_model_to_ui(&window, &model.borrow());
+
+            let btn = find_element_scrolling(&window, "Restore General settings to defaults")
+                .expect("Defaults button must appear after switcher settings differ from default");
+
+            // 4. Click button -> restores switcher settings while preserving auto_start, and button disappears
             btn.invoke_accessible_default_action();
 
-            assert_eq!(
+            assert!(
                 model.borrow().draft.general.auto_start,
-                Config::default().general.auto_start,
-                "Clicking Defaults must restore auto_start to default"
+                "Clicking Defaults must preserve auto_start (SPEC-27-02)"
+            );
+            assert_eq!(
+                model.borrow().draft.switcher.visual_enabled,
+                Config::default().switcher.visual_enabled,
+                "Clicking Defaults must restore visual_enabled to default"
             );
 
             let btn_after = find_element_scrolling(&window, "Restore General settings to defaults");
@@ -2875,6 +2890,154 @@ pub(crate) mod tests {
                 publisher.is_some(),
                 "Publisher website link found in Card 4"
             );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn settings_normal_window_height_is_560px() {
+        run_on_ui_thread(|| {
+            let (window, _, save_path) = setup_shortcuts_window();
+            assert_eq!(window.get_normal_width(), 760.0);
+            assert_eq!(window.get_normal_height(), 560.0);
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn about_pane_omits_troubleshooting_header() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+            model.borrow_mut().set_pane(Pane::About);
+            sync_model_to_ui(&window, &model.borrow());
+
+            assert!(
+                find_element_scrolling(&window, "Troubleshooting & Recovery").is_none(),
+                "Heading 'Troubleshooting & Recovery' must be omitted from About pane"
+            );
+            assert!(
+                find_element_scrolling(&window, "Restore all preferences to defaults").is_some(),
+                "Card section title 'Restore all preferences to defaults' must be present"
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn about_pane_card_3_geometry_encloses_reset_button_without_overflow() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+            model.borrow_mut().set_pane(Pane::About);
+            sync_model_to_ui(&window, &model.borrow());
+
+            let reset_btn = find_element_scrolling(&window, "Reset all settings to defaults")
+                .expect("Reset all settings button found");
+            let card3 = find_element_scrolling(&window, "Support and recovery card")
+                .expect("Support and recovery card found");
+
+            let btn_pos = reset_btn.absolute_position();
+            let btn_sz = reset_btn.size();
+            let card_pos = card3.absolute_position();
+            let card_sz = card3.size();
+
+            // All four bounds of the reset button must be strictly within Card 3's boundaries
+            assert!(
+                btn_pos.x > card_pos.x,
+                "Reset button left ({}) must be strictly inside Card 3 left ({})",
+                btn_pos.x,
+                card_pos.x
+            );
+            assert!(
+                btn_pos.x + btn_sz.width < card_pos.x + card_sz.width,
+                "Reset button right ({}) must be strictly inside Card 3 right ({})",
+                btn_pos.x + btn_sz.width,
+                card_pos.x + card_sz.width
+            );
+            assert!(
+                btn_pos.y > card_pos.y,
+                "Reset button top ({}) must be strictly inside Card 3 top ({})",
+                btn_pos.y,
+                card_pos.y
+            );
+            assert!(
+                btn_pos.y + btn_sz.height < card_pos.y + card_sz.height,
+                "Reset button bottom ({}) must be strictly inside Card 3 bottom ({})",
+                btn_pos.y + btn_sz.height,
+                card_pos.y + card_sz.height
+            );
+
+            // Invoking accessible default action opens the modal reset dialog
+            assert!(!window.get_factory_reset_dialog_open());
+            reset_btn.invoke_accessible_default_action();
+            assert!(
+                window.get_factory_reset_dialog_open(),
+                "Clicking Reset all settings button must open factory reset dialog"
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn modal_reset_dialog_matches_onboarding_styling_without_blue_outline() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+            model.borrow_mut().set_pane(Pane::About);
+            sync_model_to_ui(&window, &model.borrow());
+
+            window.set_factory_reset_dialog_open(true);
+            assert!(window.get_factory_reset_dialog_open());
+
+            // Source check: verify 12px border radius on dialog and non-outline focus on buttons
+            let main_window_slint = include_str!("../ui/main_window.slint");
+            let dialog_start = main_window_slint
+                .find("factory_reset_dialog_open : modal_focus := FocusScope")
+                .expect("modal dialog FocusScope found in source");
+            let dialog_end = main_window_slint[dialog_start..]
+                .find("confirm_reset_touch :=")
+                .expect("confirm_reset_touch found in source");
+            let dialog_block = &main_window_slint[dialog_start..dialog_start + dialog_end + 300];
+
+            assert!(
+                dialog_block.contains("border-radius: 12px;"),
+                "Modal dialog must have 12px border radius matching OnboardingModal"
+            );
+            assert!(
+                !dialog_block.contains("Palette.accent_primary"),
+                "Modal dialog buttons must not use 2px blue accent_primary outline"
+            );
+            assert!(
+                dialog_block.contains(
+                    "background: (modal_focus.focus_button == 0 || cancel_reset_touch.has_hover) ? Palette.bg_card_hover : Palette.bg_subtle;"
+                ),
+                "Cancel button must use visible non-outline bg_card_hover background when focused"
+            );
+            assert!(
+                dialog_block.contains(
+                    "background: (modal_focus.focus_button == 1 || confirm_reset_touch.has_hover) ?"
+                ),
+                "Confirm button must use visible non-outline background when focused"
+            );
+            assert!(
+                dialog_block.contains("border-width: 0px;"),
+                "Confirm button must have 0px border width without focus outline"
+            );
+
+            // Dialog navigation works cleanly with observable focus
+            let cancel_btn = ElementHandle::find_by_accessible_label(&window, "Cancel")
+                .next()
+                .expect("Cancel button found");
+            let confirm_btn = ElementHandle::find_by_accessible_label(
+                &window,
+                "Confirm reset all preferences to defaults",
+            )
+            .next()
+            .expect("Confirm button found");
+
+            assert!(cancel_btn.size().width > 0.0);
+            assert!(confirm_btn.size().width > 0.0);
 
             let _ = std::fs::remove_file(&save_path);
         });
