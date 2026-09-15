@@ -1030,6 +1030,41 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-039.md
 
+  - id: DEC-040
+    title: Autopilot mandate for SPEC-26 delivery
+    status: accepted
+    file: decisions/DEC-040-autopilot-mandate-for-spec-26-delivery.md
+    created: '2026-09-15'
+    touches:
+      - .control/decisions/DEC-040-autopilot-mandate-for-spec-26-delivery.md
+      - .control/memlog/autopilot-DEC-040.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+      - .scratch/spec-26-header-defaults-and-about-card-hierarchy/SPEC.md
+      - .scratch/spec-26-header-defaults-and-about-card-hierarchy/issues/01-pane-header-defaults-button-and-conditional-visibility.md
+      - .scratch/spec-26-header-defaults-and-about-card-hierarchy/issues/02-about-pane-card-hierarchy-and-troubleshooting-redesign.md
+      - crates/settings/ui/panes/shortcuts_pane.slint
+      - crates/settings/ui/panes/general_pane.slint
+      - crates/settings/ui/panes/mouse_pane.slint
+      - crates/settings/ui/panes/about_pane.slint
+      - crates/settings/ui/main_window.slint
+      - crates/settings/src/app.rs
+      - crates/settings/src/main.rs
+      - crates/settings/src/shortcut_row_slint_snapshot.rs
+      - 3p.md
+      - docs/3p.md
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-22'
+      run_branch: autopilot/DEC-040
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-040.md
+
 
 
 
