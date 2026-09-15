@@ -10,7 +10,7 @@ status: closed
 
 ## Problem Statement
 
-Wira Desk v0.2.0 encounters distribution, UI completeness, and security documentation blockers:
+Wira Desk v0.2.4 encounters distribution, UI completeness, and security documentation blockers:
 1. **Dynamic C-Runtime Linkage Blocker (WinGet Rejection):** Both compiled binaries (`wiradesk.exe` and `wiradesk-settings.exe`) dynamically link MSVC runtime libraries (`VCRUNTIME140.dll` and `MSVCP140.dll`). On clean Windows installations without pre-installed Visual C++ Redistributables, the executables crash with `STATUS_DLL_NOT_FOUND (0xC0000135)`. This caused Microsoft's automated package validation bot on `microsoft/winget-pkgs#426321` to reject the submission.
 2. **Untracked Binary Import Drift & Premature WinGet Release Notes:** The CI release workflow lacks an automated gate ensuring that release binaries are standalone. In addition, release notes prematurely print `winget install WiraDigitalIndonesia.WiraDesk` while PR #426321 is still pending approval, with no tracked mechanism to toggle between pending and live states.
 3. **Incomplete About Pane Application Surface:** The Settings About pane (`crates/settings/ui/panes/about_pane.slint`) displays version and typeface, but lacks official publisher attribution (Wira Digital Indonesia), links to the source repository and issue tracker, license disclosure, and a developer support navigation entry point.

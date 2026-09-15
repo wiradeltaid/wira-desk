@@ -18,6 +18,28 @@ owner decides.
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-09-15
+
+### Added
+
+- Visual Window Switcher: Same-app visual switcher overlay displaying live window tiles and thumbnails with adaptive layout, keyboard navigation (including Shift-held backward cycling), and mouse selection.
+- Driverless Mouse Desktop Navigation: Native mouse hook support mapping thumb back/forward buttons and horizontal tilt wheel left/right to desktop switching, snapping, and arrangement presets without manufacturer drivers.
+- Header Defaults Buttons: Pane-level `↺ Defaults` buttons in Shortcuts, General, and Mouse headers with conditional visibility appearing only when active draft differs from defaults.
+- Real-time Tray Warning Reset: Automatic clearance of the system tray warning indicator upon successful configuration reload, while maintaining critical hook error precedence.
+
+### Changed
+
+- Edge-snap default percentage updated from 50% to 67% (`Ctrl+Alt+Shift+Left/Right/Up/Down`).
+- General Defaults isolation: Restoring General settings to defaults now preserves the Windows auto-start preference.
+- Settings window & modal polish: Compact 560px window height, polished About pane card layout cleanly enclosing the Reset button, and redesigned modal confirmation dialog matching Onboarding aesthetics without blue focus outlines.
+- Installer safety & downgrade prevention: Inno Setup installer enforces 64-bit HKLM registry checks, strict SemVer downgrade rejection, zero-bundling invariant, and fail-closed process shutdown.
+
+### Fixed
+
+- Window candidate filtering: Sanitized switcher candidates to exclude WinUI 3 popup bridges, PopupHost helpers, and invisible assistant windows.
+- Start menu suppression during cycling and multi-window blind backward traversal stability.
+- Clean retirement of legacy migration shims.
+
 ## [0.2.0] - 2026-09-08
 
 ### Added
