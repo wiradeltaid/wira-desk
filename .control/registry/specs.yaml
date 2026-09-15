@@ -1944,6 +1944,10 @@ specs:
     prd: [wira-desk]
     size: S
     status: open
+    spec_reviewed:
+      date: '2026-09-15'
+      sha: 'f4e29c7'
+      lenses: [structure, prose, edge-case-hunter]
     depends_on: []
     spec_folder: .scratch/spec-28-modal-dialog-height-and-realtime-tray-warning-cleanup/
     fr: []

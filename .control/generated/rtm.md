@@ -325,6 +325,21 @@ rtm:
   FR: FR-18
   DEC: []
   UC: UC-4
+  ticket: SPEC-28-01
+  spec: SPEC-28
+  release: 0.2.4
+  test:
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
+  status: open
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-2
+  CAP: CAP-5
+  FR: FR-18
+  DEC: []
+  UC: UC-4
   ticket: SPEC-4-01
   spec: SPEC-4
   release: 0.5.0
@@ -1257,6 +1272,21 @@ rtm:
   FR: FR-32
   DEC: []
   UC: UC-14
+  ticket: SPEC-28-01
+  spec: SPEC-28
+  release: 0.2.4
+  test:
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
+  status: open
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-4
+  CAP: CAP-17
+  FR: FR-32
+  DEC: []
+  UC: UC-14
   ticket: SPEC-8-01
   spec: SPEC-8
   release: 0.3.0
@@ -1602,6 +1632,21 @@ rtm:
   exempt: false
   green: true
   broken_at: ''
+- BG: BG-2
+  CAP: CAP-3
+  FR: FR-7
+  DEC: []
+  UC: UC-4
+  ticket: SPEC-28-01
+  spec: SPEC-28
+  release: 0.2.4
+  test:
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
+  status: open
+  exempt: false
+  green: false
+  broken_at: status
 - BG: BG-2
   CAP: CAP-3
   FR: FR-7

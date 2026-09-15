@@ -1100,6 +1100,40 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-041.md
 
+  - id: DEC-042
+    title: Autopilot mandate for SPEC-28 delivery
+    status: accepted
+    file: decisions/DEC-042-autopilot-mandate-for-spec-28-delivery.md
+    created: '2026-09-15'
+    touches:
+      - .control/decisions/DEC-042-autopilot-mandate-for-spec-28-delivery.md
+      - .control/memlog/autopilot-DEC-042.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+      - .scratch/spec-28-modal-dialog-height-and-realtime-tray-warning-cleanup/SPEC.md
+      - .scratch/spec-28-modal-dialog-height-and-realtime-tray-warning-cleanup/issues/01-compact-modal-dialog-height.md
+      - .scratch/spec-28-modal-dialog-height-and-realtime-tray-warning-cleanup/issues/02-realtime-tray-warning-clearance-across-config-sources.md
+      - crates/settings/ui/main_window.slint
+      - crates/settings/src/shortcut_row_slint_snapshot.rs
+      - crates/daemon/src/tray.rs
+      - crates/daemon/src/hook.rs
+      - crates/daemon/src/log.rs
+      - crates/daemon/src/config.rs
+      - crates/daemon/src/autostart.rs
+      - 3p.md
+      - docs/3p.md
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-22'
+      run_branch: autopilot/DEC-042
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-042.md
+
 
 
 
