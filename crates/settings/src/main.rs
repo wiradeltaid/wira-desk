@@ -187,6 +187,7 @@ pub(crate) fn sync_model_to_ui(window: &MainWindow, model: &SettingsModel) {
         window.set_auto_start(model.draft.general.auto_start);
         window.set_visual_switcher_enabled(model.draft.switcher.visual_enabled);
         window.set_visual_hold_delay_ms(model.draft.switcher.visual_hold_delay_ms as i32);
+        window.set_show_general_defaults_button(model.general_differs_from_default());
 
         // Updates
         window.set_check_updates(model.draft.general.check_updates);
@@ -298,6 +299,7 @@ pub(crate) fn sync_model_to_ui(window: &MainWindow, model: &SettingsModel) {
         // Legacy Stack/Snap Bottom conflict banner (SPEC-25-01)
         window.set_show_stack_conflict_banner(model.has_legacy_stack_conflict());
         window.set_can_fix_stack_conflict(model.can_fix_stack_conflict());
+        window.set_show_shortcuts_defaults_button(model.shortcuts_differ_from_default());
 
         // KeyCheck Diagnostic State
         sync_key_check(window, model);
@@ -332,6 +334,7 @@ pub(crate) fn sync_model_to_ui(window: &MainWindow, model: &SettingsModel) {
         window.set_thumb_forward_label(find_preset_label(&model.draft.mouse.thumb_forward));
         window.set_tilt_left_label(find_preset_label(&model.draft.mouse.tilt_left));
         window.set_tilt_right_label(find_preset_label(&model.draft.mouse.tilt_right));
+        window.set_show_mouse_defaults_button(model.mouse_differs_from_default());
 
         window.set_dropdown_items(slint::ModelRc::new(slint::VecModel::from(
             build_dropdown_items(),
@@ -406,13 +409,19 @@ pub(crate) fn bind_callbacks(
     main_window: &MainWindow,
     model: &Rc<std::cell::RefCell<SettingsModel>>,
     custom_save_path: Option<std::path::PathBuf>,
-) {
+) -> Rc<std::cell::RefCell<Option<std::sync::mpsc::Receiver<update::Progress>>>> {
     let uncommitted_percent: Rc<std::cell::RefCell<Option<(ShortcutField, u32)>>> =
         Rc::new(std::cell::RefCell::new(None));
 
     {
         let uncommitted = Rc::clone(&uncommitted_percent);
+        let window_weak = main_window.as_weak();
         main_window.on_editing_percent_changed(move |idx, val| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
             let field = ShortcutField::from_index(idx);
             if field.has_percent() {
                 let uval = if val < 0 { 0 } else { val as u32 };
@@ -629,6 +638,44 @@ pub(crate) fn bind_callbacks(
         let model_rc = Rc::clone(model);
         let window_weak = main_window.as_weak();
         let uncommitted_pct = Rc::clone(&uncommitted_percent);
+        main_window.on_restore_general_defaults_clicked(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
+            *uncommitted_pct.borrow_mut() = None;
+            let mut m = model_rc.borrow_mut();
+            m.restore_general_defaults();
+            if let Some(w) = window_weak.upgrade() {
+                w.set_revert_generation(w.get_revert_generation() + 1);
+                sync_model_to_ui(&w, &m);
+            }
+        });
+    }
+    {
+        let model_rc = Rc::clone(model);
+        let window_weak = main_window.as_weak();
+        let uncommitted_pct = Rc::clone(&uncommitted_percent);
+        main_window.on_restore_mouse_defaults_clicked(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
+            *uncommitted_pct.borrow_mut() = None;
+            let mut m = model_rc.borrow_mut();
+            m.restore_mouse_defaults();
+            if let Some(w) = window_weak.upgrade() {
+                w.set_revert_generation(w.get_revert_generation() + 1);
+                sync_model_to_ui(&w, &m);
+            }
+        });
+    }
+    {
+        let model_rc = Rc::clone(model);
+        let window_weak = main_window.as_weak();
+        let uncommitted_pct = Rc::clone(&uncommitted_percent);
         main_window.on_fix_stack_conflict_clicked(move || {
             if let Some(w) = window_weak.upgrade() {
                 if w.get_factory_reset_dialog_open() {
@@ -658,10 +705,6 @@ pub(crate) fn bind_callbacks(
             }
         });
     }
-    main_window.on_open_issues_url(|| {});
-    main_window.on_open_source_url(|| {});
-    main_window.on_open_support_url(|| {});
-    main_window.on_open_publisher_url(|| {});
 
     // Callbacks: Mouse
     {
@@ -818,6 +861,139 @@ pub(crate) fn bind_callbacks(
             }
         });
     }
+
+    // ── Updates & External Links ─────────────────────────────────────────────
+    let update_rx: Rc<std::cell::RefCell<Option<std::sync::mpsc::Receiver<update::Progress>>>> =
+        Rc::new(std::cell::RefCell::new(None));
+
+    {
+        let model_rc = Rc::clone(model);
+        let window_weak = main_window.as_weak();
+        let rx_slot = Rc::clone(&update_rx);
+        main_window.on_check_updates_clicked(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
+            let mut m = model_rc.borrow_mut();
+            if m.update_busy {
+                return;
+            }
+            m.update_busy = true;
+            m.update_available = None;
+            m.update_status = "Checking…".to_owned();
+            *rx_slot.borrow_mut() = Some(update::spawn_check(env!("CARGO_PKG_VERSION").to_owned()));
+            if let Some(w) = window_weak.upgrade() {
+                sync_model_to_ui(&w, &m);
+            }
+        });
+    }
+    {
+        let model_rc = Rc::clone(model);
+        let window_weak = main_window.as_weak();
+        let rx_slot = Rc::clone(&update_rx);
+        main_window.on_install_update_clicked(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
+            let mut m = model_rc.borrow_mut();
+            if m.update_busy {
+                return;
+            }
+            let Some(release) = m.update_available.clone() else {
+                return;
+            };
+            m.update_busy = true;
+            m.update_status = "Downloading the update…".to_owned();
+            *rx_slot.borrow_mut() = Some(update::spawn_install(release));
+            if let Some(w) = window_weak.upgrade() {
+                sync_model_to_ui(&w, &m);
+            }
+        });
+    }
+    {
+        let model_rc = Rc::clone(model);
+        let window_weak = main_window.as_weak();
+        main_window.on_check_updates_toggled(move |val| {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
+            let mut m = model_rc.borrow_mut();
+            m.draft.general.check_updates = val;
+            if let Some(w) = window_weak.upgrade() {
+                sync_model_to_ui(&w, &m);
+            }
+        });
+    }
+
+    {
+        let model_rc = Rc::clone(model);
+        let window_weak = main_window.as_weak();
+        main_window.on_open_release_notes(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
+            let m = model_rc.borrow();
+            let Some(release) = m.update_available.as_ref() else {
+                return;
+            };
+            update::open_in_browser(&release.notes_url);
+        });
+    }
+
+    {
+        let window_weak = main_window.as_weak();
+        main_window.on_open_publisher_url(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
+            update::open_in_browser("https://wiradigital.id");
+        });
+    }
+    {
+        let window_weak = main_window.as_weak();
+        main_window.on_open_source_url(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
+            update::open_in_browser("https://github.com/wiradigitalid/wira-desk/");
+        });
+    }
+    {
+        let window_weak = main_window.as_weak();
+        main_window.on_open_support_url(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
+            update::open_in_browser("https://wiradigital.id/wira-desk");
+        });
+    }
+    {
+        let window_weak = main_window.as_weak();
+        main_window.on_open_issues_url(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
+            update::open_in_browser("https://github.com/wiradigitalid/wira-desk/issues");
+        });
+    }
+
+    update_rx
 }
 
 /// Close the window and end the process, for every path that means "the user is done".
@@ -964,7 +1140,7 @@ fn main() -> Result<(), slint::PlatformError> {
         });
     }
 
-    bind_callbacks(&main_window, &model, None);
+    let update_rx = bind_callbacks(&main_window, &model, None);
 
     // Callbacks: Onboarding Wizard
     {
@@ -1332,92 +1508,6 @@ fn main() -> Result<(), slint::PlatformError> {
             },
         );
     }
-
-    // ── Updates ─────────────────────────────────────────────────────────────
-    //
-    // The worker runs on its own thread and reports through a channel, which a UI-thread
-    // timer drains -- the same shape `hookbridge` already uses, and for the same reason:
-    // every model mutation stays on the thread that owns the model. A synchronous fetch on
-    // the UI thread would freeze the window for the length of a multi-megabyte download.
-    let update_rx: Rc<std::cell::RefCell<Option<std::sync::mpsc::Receiver<update::Progress>>>> =
-        Rc::new(std::cell::RefCell::new(None));
-
-    {
-        let model_rc = Rc::clone(&model);
-        let window_weak = main_window.as_weak();
-        let rx_slot = Rc::clone(&update_rx);
-        main_window.on_check_updates_clicked(move || {
-            let mut m = model_rc.borrow_mut();
-            if m.update_busy {
-                return;
-            }
-            m.update_busy = true;
-            m.update_available = None;
-            m.update_status = "Checking…".to_owned();
-            *rx_slot.borrow_mut() = Some(update::spawn_check(env!("CARGO_PKG_VERSION").to_owned()));
-            if let Some(w) = window_weak.upgrade() {
-                sync_model_to_ui(&w, &m);
-            }
-        });
-    }
-    {
-        let model_rc = Rc::clone(&model);
-        let window_weak = main_window.as_weak();
-        let rx_slot = Rc::clone(&update_rx);
-        main_window.on_install_update_clicked(move || {
-            let mut m = model_rc.borrow_mut();
-            if m.update_busy {
-                return;
-            }
-            let Some(release) = m.update_available.clone() else {
-                return;
-            };
-            m.update_busy = true;
-            m.update_status = "Downloading the update…".to_owned();
-            *rx_slot.borrow_mut() = Some(update::spawn_install(release));
-            if let Some(w) = window_weak.upgrade() {
-                sync_model_to_ui(&w, &m);
-            }
-        });
-    }
-    {
-        let model_rc = Rc::clone(&model);
-        let window_weak = main_window.as_weak();
-        main_window.on_check_updates_toggled(move |val| {
-            let mut m = model_rc.borrow_mut();
-            m.draft.general.check_updates = val;
-            if let Some(w) = window_weak.upgrade() {
-                sync_model_to_ui(&w, &m);
-            }
-        });
-    }
-
-    {
-        let model_rc = Rc::clone(&model);
-        main_window.on_open_release_notes(move || {
-            let m = model_rc.borrow();
-            let Some(release) = m.update_available.as_ref() else {
-                return;
-            };
-            // Handed to the shell rather than rendered here. Release notes are a web page,
-            // and a settings window is not a browser -- the one that is already the user's
-            // choice is a better place to read them than anything this could draw.
-            update::open_in_browser(&release.notes_url);
-        });
-    }
-
-    main_window.on_open_publisher_url(|| {
-        update::open_in_browser("https://wiradigital.id");
-    });
-    main_window.on_open_source_url(|| {
-        update::open_in_browser("https://github.com/wiradigitalid/wira-desk/");
-    });
-    main_window.on_open_support_url(|| {
-        update::open_in_browser("https://wiradigital.id/wira-desk");
-    });
-    main_window.on_open_issues_url(|| {
-        update::open_in_browser("https://github.com/wiradigitalid/wira-desk/issues");
-    });
 
     let update_timer = slint::Timer::default();
     {

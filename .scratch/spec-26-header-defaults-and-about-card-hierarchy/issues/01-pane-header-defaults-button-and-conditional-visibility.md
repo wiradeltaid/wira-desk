@@ -3,7 +3,7 @@ id: SPEC-26-01
 component: settings
 satisfies: [UC-4, UC-14]
 blocked_by: []
-status: ready-for-agent
+status: closed
 tests:
   - app::tests::restore_general_defaults_resets_only_general_preferences
   - app::tests::restore_mouse_defaults_resets_only_mouse_preferences

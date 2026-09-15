@@ -72,7 +72,7 @@ pub(crate) mod tests {
         let model = Rc::new(RefCell::new(SettingsModel::new(cfg, false)));
         model.borrow_mut().set_pane(Pane::Shortcuts);
 
-        bind_callbacks(&main_window, &model, Some(path.clone()));
+        let _update_rx = bind_callbacks(&main_window, &model, Some(path.clone()));
         sync_model_to_ui(&main_window, &model.borrow());
 
         main_window
@@ -2214,6 +2214,8 @@ pub(crate) mod tests {
     fn restore_shortcuts_discards_pending_percentage_and_cancels_capture() {
         run_on_ui_thread(|| {
             let (window, model, save_path) = setup_shortcuts_window();
+            model.borrow_mut().draft.snapping.snap_half_left = "ctrl+alt+z".to_string();
+            sync_model_to_ui(&window, &model.borrow());
 
             // 1. Begin capture on Switcher
             window.invoke_start_capture(ShortcutField::Switcher as i32);
@@ -2373,6 +2375,168 @@ pub(crate) mod tests {
                 "Draft must not be mutated on cancel"
             );
 
+            // 3. Test keyboard navigation:
+            // a) Return on initial focus (Cancel) dismisses dialog without mutation
+            window.set_factory_reset_dialog_open(true);
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::Return.into(),
+                });
+            assert!(!window.get_factory_reset_dialog_open());
+            assert!(
+                model.borrow().draft.general.auto_start,
+                "Draft must not be mutated on keyboard Return cancel"
+            );
+
+            // b) RightArrow isolated transition: moves from Cancel to Confirm, Return executes reset
+            window.set_factory_reset_dialog_open(true);
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::RightArrow.into(),
+                });
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::Return.into(),
+                });
+            assert!(!window.get_factory_reset_dialog_open());
+            assert_eq!(
+                model.borrow().draft,
+                Config::default(),
+                "RightArrow moved to Confirm and Return confirmed reset"
+            );
+
+            // c) DownArrow isolated transition: moves from Cancel to Confirm, Return executes reset
+            model.borrow_mut().draft.general.auto_start = true;
+            window.set_factory_reset_dialog_open(true);
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::DownArrow.into(),
+                });
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::Return.into(),
+                });
+            assert!(!window.get_factory_reset_dialog_open());
+            assert_eq!(
+                model.borrow().draft,
+                Config::default(),
+                "DownArrow moved to Confirm and Return confirmed reset"
+            );
+
+            // d) LeftArrow transition: from Confirm (after RightArrow), moves back to Cancel, Return cancels
+            model.borrow_mut().draft.general.auto_start = true;
+            window.set_factory_reset_dialog_open(true);
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::RightArrow.into(),
+                });
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::LeftArrow.into(),
+                });
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::Return.into(),
+                });
+            assert!(!window.get_factory_reset_dialog_open());
+            assert!(
+                model.borrow().draft.general.auto_start,
+                "LeftArrow returned to Cancel and Return dismissed without reset"
+            );
+
+            // e) UpArrow transition: from Confirm (after DownArrow), moves back to Cancel, Return cancels
+            window.set_factory_reset_dialog_open(true);
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::DownArrow.into(),
+                });
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::UpArrow.into(),
+                });
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::Return.into(),
+                });
+            assert!(!window.get_factory_reset_dialog_open());
+            assert!(
+                model.borrow().draft.general.auto_start,
+                "UpArrow returned to Cancel and Return dismissed without reset"
+            );
+
+            // f) Tab isolated transition: moves from Cancel to Confirm, Space executes reset
+            window.set_factory_reset_dialog_open(true);
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::Tab.into(),
+                });
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::SharedString::from(" "),
+                });
+            assert!(!window.get_factory_reset_dialog_open());
+            assert_eq!(
+                model.borrow().draft,
+                Config::default(),
+                "Tab moved to Confirm and Space confirmed reset"
+            );
+
+            // g) Double Tab wrap: from Cancel -> Confirm -> Cancel, Return cancels without mutation
+            model.borrow_mut().draft.general.auto_start = true;
+            window.set_factory_reset_dialog_open(true);
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::Tab.into(),
+                });
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::Tab.into(),
+                });
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::Return.into(),
+                });
+            assert!(!window.get_factory_reset_dialog_open());
+            assert!(
+                model.borrow().draft.general.auto_start,
+                "Double Tab wrapped to Cancel and Return dismissed without reset"
+            );
+
+            // h) Backtab wrap: from Cancel (initial) wraps backwards directly to Confirm, Return executes reset
+            window.set_factory_reset_dialog_open(true);
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::Backtab.into(),
+                });
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                    text: slint::platform::Key::Return.into(),
+                });
+            assert!(!window.get_factory_reset_dialog_open());
+            assert_eq!(
+                model.borrow().draft,
+                Config::default(),
+                "Backtab wrapped directly to Confirm and Return confirmed reset"
+            );
+
             let _ = std::fs::remove_file(&save_path);
         });
     }
@@ -2450,6 +2614,79 @@ pub(crate) mod tests {
                 "Background restore shortcuts must be blocked while dialog is open"
             );
 
+            // Attempting restore general defaults while dialog is open must be blocked
+            window.invoke_restore_general_defaults_clicked();
+            assert!(
+                model.borrow().draft.general.auto_start,
+                "Background restore general defaults must be blocked while dialog is open"
+            );
+
+            // Attempting restore mouse defaults while dialog is open must be blocked
+            model.borrow_mut().draft.mouse.enabled = false;
+            window.invoke_restore_mouse_defaults_clicked();
+            assert!(
+                !model.borrow().draft.mouse.enabled,
+                "Background restore mouse defaults must be blocked while dialog is open"
+            );
+
+            // Attempting check_updates toggle while dialog is open must be blocked
+            let initial_check = model.borrow().draft.general.check_updates;
+            window.invoke_check_updates_toggled(!initial_check);
+            assert_eq!(
+                model.borrow().draft.general.check_updates,
+                initial_check,
+                "Background check_updates toggle must be blocked while dialog is open"
+            );
+
+            // Attempting check_updates click while dialog is open must be blocked
+            window.invoke_check_updates_clicked();
+            assert!(
+                !model.borrow().update_busy,
+                "Background check_updates click must be blocked while dialog is open"
+            );
+
+            // Attempting install_update click while dialog is open must be blocked even when update is ready
+            model.borrow_mut().update_available = Some(shared::update::Release {
+                version: "0.9.9".to_string(),
+                released: "2026-09-15".to_string(),
+                notes_url: "https://github.com/wiradigitalid/wira-desk/releases/tag/v0.9.9"
+                    .to_string(),
+                setup_url: "https://example.com/installer.exe".to_string(),
+                setup_sha256: "0000000000000000000000000000000000000000000000000000000000000000"
+                    .to_string(),
+            });
+            window.invoke_install_update_clicked();
+            assert!(
+                !model.borrow().update_busy,
+                "Background install_update click must be blocked while dialog is open"
+            );
+            assert_ne!(
+                model.borrow().update_status,
+                "Downloading the update…",
+                "Update status must not change to downloading while dialog is open"
+            );
+
+            // Attempting editing_percent_changed while dialog is open must be blocked
+            window.invoke_editing_percent_changed(0, 99);
+            assert_eq!(
+                model.borrow().draft.snapping.percent_left,
+                80,
+                "Editing percent must be blocked during factory reset dialog; original 80 must be retained"
+            );
+
+            // Attempting external link calls while dialog is open must be blocked from launching browser
+            crate::update::reset_browser_launch_count();
+            window.invoke_open_issues_url();
+            window.invoke_open_source_url();
+            window.invoke_open_support_url();
+            window.invoke_open_publisher_url();
+            window.invoke_open_release_notes();
+            assert_eq!(
+                crate::update::browser_launch_count(),
+                0,
+                "No browser launch may occur while factory reset dialog is open"
+            );
+
             // 2. While dialog is open, confirm reset
             let confirm_btn = ElementHandle::find_by_accessible_label(
                 &window,
@@ -2463,6 +2700,181 @@ pub(crate) mod tests {
 
             // Entire draft is restored to Config::default()
             assert_eq!(model.borrow().draft, Config::default());
+
+            // 3. With dialog now closed, external links can execute normally
+            window.invoke_open_issues_url();
+            assert_eq!(
+                crate::update::browser_launch_count(),
+                1,
+                "Browser launch must succeed once dialog is dismissed"
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn general_pane_defaults_button_visibility_and_action() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+            model.borrow_mut().set_pane(Pane::General);
+            sync_model_to_ui(&window, &model.borrow());
+
+            // 1. Initially at default -> button NOT present
+            let btn_initial =
+                find_element_scrolling(&window, "Restore General settings to defaults");
+            assert!(
+                btn_initial.is_none(),
+                "Defaults button must not be visible when General settings match default"
+            );
+
+            // 2. Mutate auto_start in draft -> button becomes visible
+            model.borrow_mut().draft.general.auto_start = true;
+            sync_model_to_ui(&window, &model.borrow());
+
+            let btn = find_element_scrolling(&window, "Restore General settings to defaults")
+                .expect("Defaults button must appear after General draft differs from default");
+
+            // 3. Click button -> restores draft and button disappears
+            btn.invoke_accessible_default_action();
+
+            assert_eq!(
+                model.borrow().draft.general.auto_start,
+                Config::default().general.auto_start,
+                "Clicking Defaults must restore auto_start to default"
+            );
+
+            let btn_after = find_element_scrolling(&window, "Restore General settings to defaults");
+            assert!(
+                btn_after.is_none(),
+                "Defaults button must disappear after restore returns pane to default"
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn mouse_pane_defaults_button_visibility_and_action() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+            model.borrow_mut().set_pane(Pane::Mouse);
+            sync_model_to_ui(&window, &model.borrow());
+
+            // 1. Initially at default -> button NOT present
+            let btn_initial = find_element_scrolling(&window, "Restore Mouse settings to defaults");
+            assert!(
+                btn_initial.is_none(),
+                "Defaults button must not be visible when Mouse settings match default"
+            );
+
+            // 2. Mutate mouse.enabled in draft -> button appears
+            model.borrow_mut().draft.mouse.enabled = false;
+            sync_model_to_ui(&window, &model.borrow());
+
+            let btn = find_element_scrolling(&window, "Restore Mouse settings to defaults")
+                .expect("Defaults button must appear after Mouse draft differs from default");
+
+            // 3. Click button -> restores draft and button disappears
+            btn.invoke_accessible_default_action();
+
+            assert_eq!(
+                model.borrow().draft.mouse.enabled,
+                Config::default().mouse.enabled,
+                "Clicking Defaults must restore mouse settings to default"
+            );
+
+            let btn_after = find_element_scrolling(&window, "Restore Mouse settings to defaults");
+            assert!(
+                btn_after.is_none(),
+                "Defaults button must disappear after restore returns mouse pane to default"
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn shortcuts_pane_defaults_button_visibility_and_action() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+
+            // Scroll to top of Shortcuts pane
+            window
+                .window()
+                .dispatch_event(slint::platform::WindowEvent::PointerScrolled {
+                    position: slint::LogicalPosition::new(300.0, 300.0),
+                    delta_x: 0.0,
+                    delta_y: 1200.0,
+                });
+
+            // 1. Initially at default -> button NOT present
+            let btn_initial =
+                ElementHandle::find_by_accessible_label(&window, "Restore shortcuts to defaults")
+                    .next();
+            assert!(
+                btn_initial.is_none(),
+                "Defaults button must not be visible when shortcuts match default"
+            );
+
+            // 2. Mutate snap_half_left in draft -> button appears
+            model.borrow_mut().draft.snapping.snap_half_left = "ctrl+alt+z".to_string();
+            sync_model_to_ui(&window, &model.borrow());
+
+            let btn =
+                ElementHandle::find_by_accessible_label(&window, "Restore shortcuts to defaults")
+                    .next()
+                    .expect("Defaults button must appear after shortcuts differ from default");
+
+            // 3. Click button -> restores draft and button disappears
+            btn.invoke_accessible_default_action();
+
+            assert_eq!(
+                model.borrow().draft.snapping.snap_half_left,
+                Config::default().snapping.snap_half_left,
+                "Clicking Defaults must restore shortcuts to default"
+            );
+
+            let btn_after =
+                ElementHandle::find_by_accessible_label(&window, "Restore shortcuts to defaults")
+                    .next();
+            assert!(
+                btn_after.is_none(),
+                "Defaults button must disappear after restore returns shortcuts to default"
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn about_pane_merged_troubleshooting_card_renders_cleanly() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+            model.borrow_mut().set_pane(Pane::About);
+            sync_model_to_ui(&window, &model.borrow());
+
+            assert_eq!(window.get_current_pane(), 4);
+
+            // Card 3 elements
+            let support = find_element_scrolling(&window, "Support development");
+            assert!(support.is_some(), "Support development button found");
+
+            let issues = find_element_scrolling(&window, "Issue Tracker");
+            assert!(issues.is_some(), "Issue Tracker button found");
+
+            let repo = find_element_scrolling(&window, "GitHub repository");
+            assert!(repo.is_some(), "GitHub repository button found");
+
+            let reset_btn = find_element_scrolling(&window, "Reset all settings to defaults");
+            assert!(reset_btn.is_some(), "Reset all settings button found");
+
+            // Card 4 elements
+            let publisher = find_element_scrolling(&window, "Publisher website (wiradigital.id)");
+            assert!(
+                publisher.is_some(),
+                "Publisher website link found in Card 4"
+            );
 
             let _ = std::fs::remove_file(&save_path);
         });

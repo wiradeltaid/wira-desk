@@ -296,10 +296,10 @@ rtm:
   - shortcut_row_slint_snapshot::tests::general_pane_defaults_button_visibility_and_action
   - shortcut_row_slint_snapshot::tests::mouse_pane_defaults_button_visibility_and_action
   - shortcut_row_slint_snapshot::tests::shortcuts_pane_defaults_button_visibility_and_action
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-5
   FR: FR-18
@@ -1208,10 +1208,10 @@ rtm:
   - shortcut_row_slint_snapshot::tests::general_pane_defaults_button_visibility_and_action
   - shortcut_row_slint_snapshot::tests::mouse_pane_defaults_button_visibility_and_action
   - shortcut_row_slint_snapshot::tests::shortcuts_pane_defaults_button_visibility_and_action
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-4
   CAP: CAP-17
   FR: FR-32
@@ -1538,10 +1538,10 @@ rtm:
   - shortcut_row_slint_snapshot::tests::general_pane_defaults_button_visibility_and_action
   - shortcut_row_slint_snapshot::tests::mouse_pane_defaults_button_visibility_and_action
   - shortcut_row_slint_snapshot::tests::shortcuts_pane_defaults_button_visibility_and_action
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-3
   FR: FR-7

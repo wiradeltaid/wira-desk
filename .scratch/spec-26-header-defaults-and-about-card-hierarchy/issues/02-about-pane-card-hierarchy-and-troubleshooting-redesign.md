@@ -3,7 +3,7 @@ id: SPEC-26-02
 component: settings
 satisfies: []
 blocked_by: []
-status: ready-for-agent
+status: closed
 tests:
   - app::tests::about_pane_card_hierarchy_and_divider_structure
   - app::tests::about_pane_attribution_card_at_bottom

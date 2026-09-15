@@ -118,6 +118,7 @@ export component ShortcutsPane inherits VerticalLayout {
     in property <int> revert_generation: 0;
 
     in property <int> listening_field: -1; // -1 = idle, otherwise the action's index
+    in property <bool> show_defaults_button: false;
     in property <bool> show_stack_conflict_banner: false;
     in property <bool> can_fix_stack_conflict: false;
 
@@ -164,13 +165,13 @@ export component ShortcutsPane inherits VerticalLayout {
             }
         }
 
-        // Secondary Restore Shortcuts Action Button (SPEC-25-01)
-        HorizontalLayout {
+        // Secondary Restore Shortcuts Action Button (SPEC-25-01, SPEC-26-01)
+        if root.show_defaults_button : HorizontalLayout {
             alignment: end;
             padding-left: 12px;
 
             Rectangle {
-                width: 148px;
+                width: 96px;
                 height: 32px;
                 border-radius: 6px;
                 background: restore_touch.has_hover ? Palette.bg_card_hover : Palette.bg_subtle;
@@ -178,7 +179,7 @@ export component ShortcutsPane inherits VerticalLayout {
                 border-color: Palette.stroke_card;
 
                 Text {
-                    text: "↺ Restore shortcuts";
+                    text: "↺ Defaults";
                     font-family: Typography.font_family;
                     font-size: 12.5px;
                     font-weight: 600;

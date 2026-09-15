@@ -255,7 +255,7 @@ export component AboutPane inherits VerticalLayout {
         }
     }
 
-    // Publisher, Source Code, and Licensing Card (SPEC-11-03, SPEC-12-01, SPEC-14-01)
+    // 3. Support, Source Code, and Recovery Card (SPEC-25-02, SPEC-26-02)
     Card {
         VerticalLayout {
             padding: 0px;
@@ -354,153 +354,150 @@ export component AboutPane inherits VerticalLayout {
 
             CardDivider {}
 
-            // 2. Foundational Base: Attribution, License & In-Process Disclosure
+            // 2. Troubleshooting & Recovery Section (SPEC-26-02)
             VerticalLayout {
-                padding-left: 16px;
-                padding-right: 16px;
-                padding-top: 14px;
-                padding-bottom: 16px;
-                spacing: 6px;
+                padding: 16px;
+                spacing: 8px;
+
+                Text {
+                    text: "Troubleshooting & Recovery";
+                    font-family: Typography.font_family;
+                    font-size: Typography.size_caption;
+                    font-weight: 600;
+                    letter-spacing: 0.8px;
+                    color: Palette.text_secondary;
+                }
+
+                Text {
+                    text: "Restore all preferences to defaults";
+                    font-family: Typography.font_family;
+                    font-size: Typography.size_body;
+                    font-weight: 700;
+                    color: Palette.text_primary;
+                    accessible-role: text;
+                    accessible-label: "Restore all preferences to defaults";
+                }
+
+                Text {
+                    text: "Stages clean-install factory defaults for every section. No configuration file on disk, scheduled task, or running daemon will change until you choose Save Changes.";
+                    font-family: Typography.font_family;
+                    font-size: Typography.size_caption;
+                    color: Palette.text_secondary;
+                    wrap: word-wrap;
+                }
 
                 HorizontalLayout {
                     alignment: start;
-                    spacing: 0px;
 
-                    Text {
-                        text: "An open-source utility by ";
-                        font-family: Typography.font_family;
-                        font-size: Typography.size_caption;
-                        font-weight: 600;
-                        color: Palette.text_secondary;
-                        vertical-alignment: center;
-                    }
+                    Rectangle {
+                        width: 156px;
+                        height: 32px;
+                        border-radius: 6px;
+                        background: reset_touch.has_hover ? Palette.bg_card_hover : Palette.bg_subtle;
+                        border-width: 1px;
+                        border-color: Palette.stroke_card;
 
-                    inline_pub_touch := TouchArea {
-                        accessible-role: button;
-                        accessible-label: "Publisher website (wiradigital.id)";
-                        mouse-cursor: pointer;
-                        clicked => { root.open_publisher_url(); }
+                        Text {
+                            text: "Reset all settings…";
+                            font-family: Typography.font_family;
+                            font-size: 12.5px;
+                            font-weight: 600;
+                            color: Palette.signal_error;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
 
-                        HorizontalLayout {
-                            spacing: 4px;
-                            alignment: start;
-
-                            Text {
-                                text: "Wira Digital Indonesia";
-                                font-family: Typography.font_family;
-                                font-size: Typography.size_caption;
-                                font-weight: 600;
-                                color: inline_pub_touch.has_hover ? Palette.accent_hover : Palette.text_primary;
-                                vertical-alignment: center;
-                            }
-
-                            VerticalLayout {
-                                alignment: center;
-                                OpenLinkIcon {
-                                    icon_color: inline_pub_touch.has_hover ? Palette.accent_hover : Palette.text_primary;
-                                }
-                            }
+                        reset_touch := TouchArea {
+                            accessible-role: button;
+                            accessible-label: "Reset all settings to defaults";
+                            accessible-action-default => { root.reset_all_settings_clicked(); }
+                            mouse-cursor: pointer;
+                            clicked => { root.reset_all_settings_clicked(); }
                         }
                     }
-
-                    Text {
-                        text: " • Licensed under GPL-3.0";
-                        font-family: Typography.font_family;
-                        font-size: Typography.size_caption;
-                        font-weight: 600;
-                        color: Palette.text_secondary;
-                        vertical-alignment: center;
-                    }
-                }
-
-                Text {
-                    text: "No telemetry, no account, no separate background service.\nUpdate checks run entirely in-process against GitHub Releases, which you can switch off.";
-                    font-family: Typography.font_family;
-                    font-size: Typography.size_caption;
-                    color: Palette.text_tertiary;
-                    wrap: word-wrap;
-                }
-
-                // Copyright line and third-party notice pointer.
-                //
-                // The notice pointer is a licence obligation rather than tidiness: most of the
-                // dependency licences listed in NOTICE require their notices to travel with the
-                // BINARY, and someone who installed from the setup executable never opens the
-                // repository. The installer places NOTICE.txt beside the executable, so name the
-                // file they actually have rather than a URL they would have to go and find.
-                Text {
-                    text: "Copyright © 2026 Wira Digital Indonesia. Third-party components and their licences are listed in NOTICE.txt, in this application's install folder.";
-                    font-family: Typography.font_family;
-                    font-size: Typography.size_caption;
-                    color: Palette.text_tertiary;
-                    wrap: word-wrap;
                 }
             }
         }
     }
 
-    // Troubleshooting & Recovery Card (SPEC-25-02)
+    // 4. Standalone Attribution, License & In-Process Disclosure Card (SPEC-26-02)
     Card {
         VerticalLayout {
             padding: 16px;
-            spacing: 8px;
-
-            Text {
-                text: "Troubleshooting & Recovery";
-                font-family: Typography.font_family;
-                font-size: Typography.size_caption;
-                font-weight: 600;
-                letter-spacing: 0.8px;
-                color: Palette.text_secondary;
-            }
-
-            Text {
-                text: "Restore all preferences to defaults";
-                font-family: Typography.font_family;
-                font-size: Typography.size_body;
-                font-weight: 700;
-                color: Palette.text_primary;
-                accessible-role: text;
-                accessible-label: "Restore all preferences to defaults";
-            }
-
-            Text {
-                text: "Stages clean-install factory defaults for every section. No configuration file on disk, scheduled task, or running daemon will change until you choose Save Changes.";
-                font-family: Typography.font_family;
-                font-size: Typography.size_caption;
-                color: Palette.text_secondary;
-                wrap: word-wrap;
-            }
+            spacing: 6px;
 
             HorizontalLayout {
                 alignment: start;
+                spacing: 0px;
 
-                Rectangle {
-                    width: 156px;
-                    height: 32px;
-                    border-radius: 6px;
-                    background: reset_touch.has_hover ? Palette.bg_card_hover : Palette.bg_subtle;
-                    border-width: 1px;
-                    border-color: Palette.stroke_card;
+                Text {
+                    text: "An open-source utility by ";
+                    font-family: Typography.font_family;
+                    font-size: Typography.size_caption;
+                    font-weight: 600;
+                    color: Palette.text_secondary;
+                    vertical-alignment: center;
+                }
 
-                    Text {
-                        text: "Reset all settings…";
-                        font-family: Typography.font_family;
-                        font-size: 12.5px;
-                        font-weight: 600;
-                        color: Palette.signal_error;
-                        horizontal-alignment: center;
-                        vertical-alignment: center;
-                    }
+                inline_pub_touch := TouchArea {
+                    accessible-role: button;
+                    accessible-label: "Publisher website (wiradigital.id)";
+                    mouse-cursor: pointer;
+                    clicked => { root.open_publisher_url(); }
 
-                    reset_touch := TouchArea {
-                        accessible-role: button;
-                        accessible-label: "Reset all settings to defaults";
-                        accessible-action-default => { root.reset_all_settings_clicked(); }
-                        mouse-cursor: pointer;
-                        clicked => { root.reset_all_settings_clicked(); }
+                    HorizontalLayout {
+                        spacing: 4px;
+                        alignment: start;
+
+                        Text {
+                            text: "Wira Digital Indonesia";
+                            font-family: Typography.font_family;
+                            font-size: Typography.size_caption;
+                            font-weight: 600;
+                            color: inline_pub_touch.has_hover ? Palette.accent_hover : Palette.text_primary;
+                            vertical-alignment: center;
+                        }
+
+                        VerticalLayout {
+                            alignment: center;
+                            OpenLinkIcon {
+                                icon_color: inline_pub_touch.has_hover ? Palette.accent_hover : Palette.text_primary;
+                            }
+                        }
                     }
                 }
+
+                Text {
+                    text: " • Licensed under GPL-3.0";
+                    font-family: Typography.font_family;
+                    font-size: Typography.size_caption;
+                    font-weight: 600;
+                    color: Palette.text_secondary;
+                    vertical-alignment: center;
+                }
+            }
+
+            Text {
+                text: "No telemetry, no account, no separate background service.\nUpdate checks run entirely in-process against GitHub Releases, which you can switch off.";
+                font-family: Typography.font_family;
+                font-size: Typography.size_caption;
+                color: Palette.text_tertiary;
+                wrap: word-wrap;
+            }
+
+            // Copyright line and third-party notice pointer.
+            //
+            // The notice pointer is a licence obligation rather than tidiness: most of the
+            // dependency licences listed in NOTICE require their notices to travel with the
+            // BINARY, and someone who installed from the setup executable never opens the
+            // repository. The installer places NOTICE.txt beside the executable, so name the
+            // file they actually have rather than a URL they would have to go and find.
+            Text {
+                text: "Copyright © 2026 Wira Digital Indonesia. Third-party components and their licences are listed in NOTICE.txt, in this application's install folder.";
+                font-family: Typography.font_family;
+                font-size: Typography.size_caption;
+                color: Palette.text_tertiary;
+                wrap: word-wrap;
             }
         }
     }
