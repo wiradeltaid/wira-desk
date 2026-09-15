@@ -377,14 +377,15 @@ impl AutoStartControl for TaskSchedulerAutoStart {
     }
 }
 
-/// Tier-2 warning: log line plus a latched tray dot, never a popup.
-pub struct TrayWarn {
-    pub worker_hwnd: windows_sys::Win32::Foundation::HWND,
-}
+/// Tier-2 warning: log line written directly to `wiradesk.log`.
+/// The visual tray warning latch for configuration reload is managed strictly and
+/// synchronously by `WM_APP_RELOAD_CONFIG` via `handle_config_reload_outcome`, preventing
+/// asynchronous queue interleaving from re-latching warning state after a valid reload.
+pub struct TrayWarn;
 
 impl WarnSink for TrayWarn {
     fn warn(&mut self, message: &str) {
-        crate::log::warn(self.worker_hwnd, message);
+        crate::log::write_line(message);
     }
 }
 
@@ -403,12 +404,12 @@ pub fn update_check_enabled() -> bool {
 }
 
 pub fn handle_reload_message(
-    worker_hwnd: windows_sys::Win32::Foundation::HWND,
+    _worker_hwnd: windows_sys::Win32::Foundation::HWND,
     hook_thread_id: u32,
 ) -> ReloadOutcome {
     let mut sink = Win32Sink { hook_thread_id };
     let mut autostart = TaskSchedulerAutoStart;
-    let mut warn = TrayWarn { worker_hwnd };
+    let mut warn = TrayWarn;
     reload(&FileSource, &mut sink, &mut autostart, &mut warn)
 }
 
@@ -821,5 +822,14 @@ snap_half_bottom = \"ctrl+alt+up\"
             "Warning message must contain Task Manager, got: {}",
             warn.0[0]
         );
+    }
+
+    #[test]
+    fn reload_with_valid_config_returns_applied_outcome() {
+        let (outcome, sink, _, warn) = run(FakeSource(Ok(VALID.into())));
+        assert_eq!(outcome, ReloadOutcome::Applied { auto_start: false });
+        assert_eq!(sink.hook.borrow().len(), 1);
+        assert_eq!(sink.worker.borrow().len(), 1);
+        assert!(warn.0.is_empty());
     }
 }

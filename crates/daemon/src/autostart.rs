@@ -409,7 +409,7 @@ pub fn warn_if_location_replaceable(hwnd: HWND) {
         }
     };
     match crate::acl::replaceable_by_non_admin(&exe) {
-        crate::acl::Verdict::NonAdminWritable => crate::log::warn(
+        crate::acl::Verdict::NonAdminWritable => crate::log::warn_with_cause(
             hwnd,
             &format!(
                 "Auto-Start is registered from a location a non-administrator can overwrite: {}. \
@@ -418,6 +418,7 @@ pub fn warn_if_location_replaceable(hwnd: HWND) {
                  administrators can write, such as %ProgramFiles%, or turn Auto-Start off.",
                 exe.display()
             ),
+            crate::log::WARN_CAUSE_ACL_INSECURE,
         ),
         crate::acl::Verdict::Unknown => {
             debug_log("Wira Desk: autostart::warn_if_location_replaceable — DACL unreadable")

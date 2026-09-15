@@ -3,7 +3,7 @@ id: SPEC-27-01
 component: window-management
 satisfies: []
 blocked_by: []
-status: ready-for-agent
+status: closed
 tests:
   - tray::tests::successful_reload_clears_config_warning_and_restores_normal_tray_state
   - tray::tests::non_config_warning_persists_across_successful_reload
@@ -30,13 +30,13 @@ tests:
 
 **Blocked by:** None.
 
-**Status:** ready-for-agent
+**Status:** closed
 
 ## Acceptance Criteria
 
-- [ ] When a configuration reload succeeds with `ReloadOutcome::Applied`, the config-rejection warning cause is cleared (`data.warning_causes.config_rejected = false`).
-- [ ] If no other warning causes remain active and the tray is currently in `TrayState::Warning`, a successful reload immediately updates the icon to `TrayState::Normal`.
-- [ ] If another warning cause remains active (such as an insecure binary ACL), a successful config reload preserves the warning latch and does not downgrade the tray icon to `Normal`.
-- [ ] If the tray icon is in `TrayState::Critical`, a successful reload does not downgrade the icon to `Normal`.
-- [ ] If a reload fails with `ReloadOutcome::Rejected`, the config warning cause and `TrayState::Warning` remain active.
-- [ ] Tests named in frontmatter pass cleanly.
+- [x] When a configuration reload succeeds with `ReloadOutcome::Applied`, the config-rejection warning cause is cleared (`data.warning_causes.config_rejected = false`).
+- [x] If no other warning causes remain active and the tray is currently in `TrayState::Warning`, a successful reload immediately updates the icon to `TrayState::Normal`.
+- [x] If another warning cause remains active (such as an insecure binary ACL), a successful config reload preserves the warning latch and does not downgrade the tray icon to `Normal`.
+- [x] If the tray icon is in `TrayState::Critical`, a successful reload does not downgrade the icon to `Normal`.
+- [x] If a reload fails with `ReloadOutcome::Rejected`, the config warning cause and `TrayState::Warning` remain active.
+- [x] Tests named in frontmatter pass cleanly.
