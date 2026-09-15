@@ -88,14 +88,28 @@ pub enum TrayState {
     Critical,
 }
 
+/// Structured causes contributing to a latched Tier-2 Warning state.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct WarningCauses {
+    pub config_rejected: bool,
+    pub acl_insecure: bool,
+    pub simulated: bool,
+}
+
+impl WarningCauses {
+    pub fn any_active(&self) -> bool {
+        self.config_rejected || self.acl_insecure || self.simulated
+    }
+}
+
 /// State owned by the message loop (one instance, one thread). The pointer is stored in
 /// the window's `GWLP_USERDATA` so `WndProc` can access it.
-struct TrayData {
+pub struct TrayData {
     hwnd: HWND,
     icon_normal: HICON,
     icon_warning: HICON,
     icon_critical: HICON,
-    state: TrayState,
+    pub state: TrayState,
     /// Dynamic message id from `RegisterWindowMessageW("TaskbarCreated")`.
     /// Zero only when registration fails — that case is guarded in `wndproc`
     /// so it does not match `WM_NULL`.
@@ -110,7 +124,8 @@ struct TrayData {
     /// while this flag records that a warning is still "active" so that
     /// leaving Critical restores Warning (not Normal) instead of
     /// silently clearing the Tier-2 signal.
-    warning_latched: bool,
+    pub warning_latched: bool,
+    pub warning_causes: WarningCauses,
 }
 
 impl TrayData {
@@ -232,7 +247,59 @@ fn delete_icon(data: &TrayData) {
 fn set_state(data: &mut TrayData, state: TrayState) {
     if data.state != state {
         data.state = state;
-        modify_icon(data);
+        if data.hwnd != 0 {
+            modify_icon(data);
+        }
+    }
+}
+
+/// Apply configuration reload outcome to tray state and structured warning causes.
+/// Selective reset: a successful reload clears `config_rejected` and, if no other warning
+/// causes remain active, immediately returns the tray icon to `TrayState::Normal`.
+/// Preserves `TrayState::Critical` precedence so a dead hook is never downgraded.
+pub fn handle_config_reload_outcome(data: &mut TrayData, outcome: &crate::config::ReloadOutcome) {
+    match outcome {
+        crate::config::ReloadOutcome::Applied { .. } => {
+            data.warning_causes.config_rejected = false;
+        }
+        crate::config::ReloadOutcome::Rejected(_) => {
+            data.warning_causes.config_rejected = true;
+        }
+    }
+    data.warning_latched = data.warning_causes.any_active();
+    if !data.warning_latched && data.state == TrayState::Warning {
+        set_state(data, TrayState::Normal);
+        #[cfg(debug_assertions)]
+        debug_trace("RELOAD_CONFIG: Warning cleared → state→Normal");
+    } else if data.warning_causes.config_rejected && data.state != TrayState::Critical {
+        set_state(data, TrayState::Warning);
+    }
+}
+
+/// Apply log warning event to tray state and structured warning causes.
+/// Config rejection is a deliberate no-op here because its lifecycle is owned
+/// synchronously by `WM_APP_RELOAD_CONFIG` via `handle_config_reload_outcome`,
+/// preventing asynchronous message queue interleaving from re-latching warning state.
+pub fn handle_log_warning(data: &mut TrayData, cause: usize) {
+    match cause {
+        crate::log::WARN_CAUSE_CONFIG_REJECTED => {
+            // Deliberate no-op: config rejection is handled synchronously on
+            // WM_APP_RELOAD_CONFIG so delayed or out-of-order warning messages cannot
+            // re-latch Warning after a subsequent successful reload.
+        }
+        crate::log::WARN_CAUSE_ACL_INSECURE => {
+            data.warning_causes.acl_insecure = true;
+        }
+        crate::log::WARN_CAUSE_SIMULATED => {
+            data.warning_causes.simulated = true;
+        }
+        _ => {
+            data.warning_causes.simulated = true;
+        }
+    }
+    data.warning_latched = data.warning_causes.any_active();
+    if data.state != TrayState::Critical && data.warning_latched {
+        set_state(data, TrayState::Warning);
     }
 }
 
@@ -328,14 +395,11 @@ unsafe fn wndproc_impl(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: LPARAM) -> 
 
     match msg {
         // Tier 2 (Warning): red dot, no pop-up. Triggered by `log::warn` via
-        // PostMessage (no production call site in this module yet; see
-        // Watch-out #4). Separate warning latch and respect precedence: Critical
-        // (Tier 3) must NOT be downgraded to Warning.
+        // PostMessage. Configuration reload rejection state is owned strictly and
+        // synchronously by `WM_APP_RELOAD_CONFIG` via `handle_config_reload_outcome`
+        // to prevent asynchronous message queue interleaving.
         m if m == WM_APP_LOG_WARNING => {
-            data.warning_latched = true;
-            if data.state != TrayState::Critical {
-                set_state(data, TrayState::Warning);
-            }
+            handle_log_warning(data, wparam);
             0
         }
         m if m == WM_APP_COMMAND_READY => {
@@ -459,7 +523,7 @@ This will not be reported again until a check succeeds."
             let outcome = crate::config::handle_reload_message(hwnd, data.hook_thread_id);
             #[cfg(debug_assertions)]
             debug_trace(&format!("RELOAD_CONFIG: {outcome:?}"));
-            let _ = outcome;
+            handle_config_reload_outcome(data, &outcome);
             0
         }
         // Settings requests a capture lease (or disarms it). Forwarded to the
@@ -518,7 +582,11 @@ This will not be reported again until a check succeeds."
         }
         #[cfg(debug_assertions)]
         m if m == WM_APP_DEBUG_TRIGGER_WARN => {
-            crate::log::warn(hwnd, "debug: simulated Tier-2 warning");
+            crate::log::warn_with_cause(
+                hwnd,
+                "debug: simulated Tier-2 warning",
+                crate::log::WARN_CAUSE_SIMULATED,
+            );
             debug_trace("DEBUG_TRIGGER_WARN: log::warn called → expect red dot");
             0
         }
@@ -682,6 +750,7 @@ pub fn run_message_loop() -> i32 {
             health_shutdown,
             hook_dead_toast_sent: false,
             warning_latched: false,
+            warning_causes: WarningCauses::default(),
         });
         let data_ptr = Box::into_raw(data);
 
@@ -830,5 +899,163 @@ mod tests {
         // is still latched, otherwise Normal (do not drop the Tier-2 signal).
         assert_eq!(state_after_recovery(true), TrayState::Warning);
         assert_eq!(state_after_recovery(false), TrayState::Normal);
+    }
+
+    #[test]
+    fn successful_reload_clears_config_warning_and_restores_normal_tray_state() {
+        let mut data = TrayData {
+            hwnd: 0,
+            icon_normal: 0,
+            icon_warning: 0,
+            icon_critical: 0,
+            state: TrayState::Warning,
+            taskbar_created: 0,
+            hook_thread_id: 0,
+            hook_join: None,
+            health_shutdown: std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false)),
+            hook_dead_toast_sent: false,
+            warning_latched: true,
+            warning_causes: WarningCauses {
+                config_rejected: true,
+                acl_insecure: false,
+                simulated: false,
+            },
+        };
+        assert_eq!(data.state, TrayState::Warning);
+        assert!(data.warning_latched);
+
+        let outcome = crate::config::ReloadOutcome::Applied { auto_start: false };
+        handle_config_reload_outcome(&mut data, &outcome);
+
+        assert_eq!(data.state, TrayState::Normal);
+        assert!(!data.warning_causes.config_rejected);
+        assert!(!data.warning_latched);
+    }
+
+    #[test]
+    fn non_config_warning_persists_across_successful_reload() {
+        let mut data = TrayData {
+            hwnd: 0,
+            icon_normal: 0,
+            icon_warning: 0,
+            icon_critical: 0,
+            state: TrayState::Warning,
+            taskbar_created: 0,
+            hook_thread_id: 0,
+            hook_join: None,
+            health_shutdown: std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false)),
+            hook_dead_toast_sent: false,
+            warning_latched: true,
+            warning_causes: WarningCauses {
+                config_rejected: true,
+                acl_insecure: true,
+                simulated: false,
+            },
+        };
+        assert_eq!(data.state, TrayState::Warning);
+        assert!(data.warning_latched);
+
+        let outcome = crate::config::ReloadOutcome::Applied { auto_start: false };
+        handle_config_reload_outcome(&mut data, &outcome);
+
+        assert_eq!(data.state, TrayState::Warning);
+        assert!(!data.warning_causes.config_rejected);
+        assert!(data.warning_causes.acl_insecure);
+        assert!(data.warning_latched);
+    }
+
+    #[test]
+    fn successful_reload_does_not_downgrade_critical_state() {
+        let mut data = TrayData {
+            hwnd: 0,
+            icon_normal: 0,
+            icon_warning: 0,
+            icon_critical: 0,
+            state: TrayState::Critical,
+            taskbar_created: 0,
+            hook_thread_id: 0,
+            hook_join: None,
+            health_shutdown: std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false)),
+            hook_dead_toast_sent: false,
+            warning_latched: true,
+            warning_causes: WarningCauses {
+                config_rejected: true,
+                acl_insecure: false,
+                simulated: false,
+            },
+        };
+        assert_eq!(data.state, TrayState::Critical);
+        assert!(data.warning_latched);
+
+        let outcome = crate::config::ReloadOutcome::Applied { auto_start: false };
+        handle_config_reload_outcome(&mut data, &outcome);
+
+        assert_eq!(data.state, TrayState::Critical);
+        assert!(!data.warning_causes.config_rejected);
+        assert!(!data.warning_latched);
+
+        // Subsequent recovery from hook refresh restores to Normal since warning_latched is now false
+        let restored = state_after_recovery(data.warning_latched);
+        assert_eq!(restored, TrayState::Normal);
+    }
+
+    #[test]
+    fn stale_config_warning_dispatch_cannot_relatch_after_successful_reload() {
+        let mut data = TrayData {
+            hwnd: 0,
+            icon_normal: 0,
+            icon_warning: 0,
+            icon_critical: 0,
+            state: TrayState::Normal,
+            taskbar_created: 0,
+            hook_thread_id: 0,
+            hook_join: None,
+            health_shutdown: std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false)),
+            hook_dead_toast_sent: false,
+            warning_latched: false,
+            warning_causes: WarningCauses::default(),
+        };
+
+        // 1. Rejected reload causes Warning state
+        let rejected =
+            crate::config::ReloadOutcome::Rejected(crate::config::RejectReason::Malformed);
+        handle_config_reload_outcome(&mut data, &rejected);
+        assert_eq!(data.state, TrayState::Warning);
+        assert!(data.warning_causes.config_rejected);
+        assert!(data.warning_latched);
+
+        // 2. Subsequent successful reload restores Normal state
+        let applied = crate::config::ReloadOutcome::Applied { auto_start: false };
+        handle_config_reload_outcome(&mut data, &applied);
+        assert_eq!(data.state, TrayState::Normal);
+        assert!(!data.warning_causes.config_rejected);
+        assert!(!data.warning_latched);
+
+        // 3. Stale delayed config-warning dispatch arrives: must NOT re-latch Warning
+        handle_log_warning(&mut data, crate::log::WARN_CAUSE_CONFIG_REJECTED);
+        assert_eq!(data.state, TrayState::Normal);
+        assert!(!data.warning_causes.config_rejected);
+        assert!(!data.warning_latched);
+
+        // 4. Critical state interleaving: hook dead outranks config outcomes,
+        // and successful reload + stale warning dispatch safely preserves Critical then recovers to Normal
+        data.state = TrayState::Critical;
+        handle_config_reload_outcome(&mut data, &rejected);
+        assert_eq!(data.state, TrayState::Critical);
+        assert!(data.warning_causes.config_rejected);
+        assert!(data.warning_latched);
+
+        handle_config_reload_outcome(&mut data, &applied);
+        assert_eq!(data.state, TrayState::Critical);
+        assert!(!data.warning_causes.config_rejected);
+        assert!(!data.warning_latched);
+
+        handle_log_warning(&mut data, crate::log::WARN_CAUSE_CONFIG_REJECTED);
+        assert_eq!(data.state, TrayState::Critical);
+        assert!(!data.warning_causes.config_rejected);
+        assert!(!data.warning_latched);
+
+        let restored = state_after_recovery(data.warning_latched);
+        assert_eq!(restored, TrayState::Normal);
     }
 }

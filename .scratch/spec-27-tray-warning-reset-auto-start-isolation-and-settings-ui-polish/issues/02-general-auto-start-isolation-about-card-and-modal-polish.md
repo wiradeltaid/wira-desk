@@ -3,7 +3,7 @@ id: SPEC-27-02
 component: settings
 satisfies: [UC-4, UC-14]
 blocked_by: []
-status: ready-for-agent
+status: closed
 tests:
   - app::tests::general_differs_from_default_ignores_auto_start_state
   - app::tests::restore_general_defaults_preserves_auto_start_preference
@@ -39,15 +39,15 @@ tests:
 
 **Blocked by:** None.
 
-**Status:** ready-for-agent
+**Status:** closed
 
 ## Acceptance Criteria
 
-- [ ] Toggling `auto_start` on/off does not cause the General pane `↺ Defaults` button to appear when switcher preferences are at defaults.
-- [ ] Clicking `↺ Defaults` in General pane restores `visual_enabled` and `visual_hold_delay_ms` while preserving `auto_start`.
-- [ ] Full factory reset confirmation still resets all configuration fields including `auto_start` to `false`.
-- [ ] In About pane Card 3, the heading `"Troubleshooting & Recovery"` is removed.
-- [ ] Card 3 geometry test at 760x560 proves that all four bounds of `[Reset all settings…]` lie strictly within the card boundary without clipping or overflowing, and the button remains clickable.
-- [ ] Settings window normal height is 560px.
-- [ ] The Factory Reset modal dialog features 12px rounded corners, consistent Onboarding-like card styling, and buttons without 2px blue focus outlines, displaying observable non-outline focus on both Cancel and Confirm buttons.
-- [ ] Existing tests asserting previous behavior are updated, and all tests named in frontmatter pass cleanly.
+- [x] Toggling `auto_start` on/off does not cause the General pane `↺ Defaults` button to appear when switcher preferences are at defaults.
+- [x] Clicking `↺ Defaults` in General pane restores `visual_enabled` and `visual_hold_delay_ms` while preserving `auto_start`.
+- [x] Full factory reset confirmation still resets all configuration fields including `auto_start` to `false`.
+- [x] In About pane Card 3, the heading `"Troubleshooting & Recovery"` is removed.
+- [x] Card 3 geometry test at 760x560 proves that all four bounds of `[Reset all settings…]` lie strictly within the card boundary without clipping or overflowing, and the button remains clickable.
+- [x] Settings window normal height is 560px.
+- [x] The Factory Reset modal dialog features 12px rounded corners, consistent Onboarding-like card styling, and buttons without 2px blue focus outlines, displaying observable non-outline focus on both Cancel and Confirm buttons.
+- [x] Existing tests asserting previous behavior are updated, and all tests named in frontmatter pass cleanly.

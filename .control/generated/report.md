@@ -4,17 +4,15 @@
 
 Period: **the project's start → 2026-09-15**. This period has no left bound — there is no earlier report yet.
 
-Freshness: commit `e75be4bb1b62`. **The registry has uncommitted changes — the numbers below may not reflect what is on `main`.**
-
-> **Warning.** The following tickets have a status read from the working tree but have never been committed: `SPEC-27-01`, `SPEC-27-02`. They still count toward promise progress, but MUST NOT appear in the Proven section — there, the date must come from git. Commit them first, then run again.
+Freshness: commit `3556bdf0ab92`. **The registry has uncommitted changes — the numbers below may not reflect what is on `main`.**
 
 ## Promise progress — 100%
 
-This is the number that counts: green RTM rows divided by counted rows (96 out of 96; 8 excluded for having `no_uc`). It measures what is **proven**, not what has been worked on.
+This is the number that counts: green RTM rows divided by counted rows (99 out of 99; 8 excluded for having `no_uc`). It measures what is **proven**, not what has been worked on.
 
 | Other measure | Value | Answers |
 |---|---|---|
-| Work progress | SPEC-1 100%, SPEC-10 100%, SPEC-11 100%, SPEC-12 100%, SPEC-13 100%, SPEC-14 100%, SPEC-15 100%, SPEC-16 100%, SPEC-17 100%, SPEC-18 100%, SPEC-19 100%, SPEC-2 100%, SPEC-20 100%, SPEC-21 100%, SPEC-22 100%, SPEC-23 100%, SPEC-24 100%, SPEC-25 100%, SPEC-26 100%, SPEC-3 100%, SPEC-4 100%, SPEC-5 100%, SPEC-6 100%, SPEC-7 100%, SPEC-8 100%, SPEC-9 100%, W1 100%, W2 100%, W3 100%, W4 100% | how much has been worked on |
+| Work progress | SPEC-1 100%, SPEC-10 100%, SPEC-11 100%, SPEC-12 100%, SPEC-13 100%, SPEC-14 100%, SPEC-15 100%, SPEC-16 100%, SPEC-17 100%, SPEC-18 100%, SPEC-19 100%, SPEC-2 100%, SPEC-20 100%, SPEC-21 100%, SPEC-22 100%, SPEC-23 100%, SPEC-24 100%, SPEC-25 100%, SPEC-26 100%, SPEC-27 100%, SPEC-3 100%, SPEC-4 100%, SPEC-5 100%, SPEC-6 100%, SPEC-7 100%, SPEC-8 100%, SPEC-9 100%, W1 100%, W2 100%, W3 100%, W4 100% | how much has been worked on |
 | Gate readiness | 100% | whether the next gate can open |
 
 ## 1. Proven

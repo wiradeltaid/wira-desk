@@ -255,8 +255,11 @@ export component AboutPane inherits VerticalLayout {
         }
     }
 
-    // 3. Support, Source Code, and Recovery Card (SPEC-25-02, SPEC-26-02)
+    // 3. Support, Source Code, and Recovery Card (SPEC-25-02, SPEC-26-02, SPEC-27-02)
     Card {
+        accessible-role: text;
+        accessible-label: "Support and recovery card";
+
         VerticalLayout {
             padding: 0px;
             spacing: 0px;
@@ -354,19 +357,13 @@ export component AboutPane inherits VerticalLayout {
 
             CardDivider {}
 
-            // 2. Troubleshooting & Recovery Section (SPEC-26-02)
+            // 2. Recovery Section (SPEC-26-02, SPEC-27-02)
             VerticalLayout {
-                padding: 16px;
+                padding-left: 16px;
+                padding-right: 16px;
+                padding-top: 16px;
+                padding-bottom: 16px;
                 spacing: 8px;
-
-                Text {
-                    text: "Troubleshooting & Recovery";
-                    font-family: Typography.font_family;
-                    font-size: Typography.size_caption;
-                    font-weight: 600;
-                    letter-spacing: 0.8px;
-                    color: Palette.text_secondary;
-                }
 
                 Text {
                     text: "Restore all preferences to defaults";

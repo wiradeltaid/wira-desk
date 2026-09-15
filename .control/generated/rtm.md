@@ -316,10 +316,10 @@ rtm:
   - shortcut_row_slint_snapshot::tests::about_pane_omits_troubleshooting_header
   - shortcut_row_slint_snapshot::tests::modal_reset_dialog_matches_onboarding_styling_without_blue_outline
   - shortcut_row_slint_snapshot::tests::settings_normal_window_height_is_560px
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-5
   FR: FR-18
@@ -1248,10 +1248,10 @@ rtm:
   - shortcut_row_slint_snapshot::tests::about_pane_omits_troubleshooting_header
   - shortcut_row_slint_snapshot::tests::modal_reset_dialog_matches_onboarding_styling_without_blue_outline
   - shortcut_row_slint_snapshot::tests::settings_normal_window_height_is_560px
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-4
   CAP: CAP-17
   FR: FR-32
@@ -1598,10 +1598,10 @@ rtm:
   - shortcut_row_slint_snapshot::tests::about_pane_omits_troubleshooting_header
   - shortcut_row_slint_snapshot::tests::modal_reset_dialog_matches_onboarding_styling_without_blue_outline
   - shortcut_row_slint_snapshot::tests::settings_normal_window_height_is_560px
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-3
   FR: FR-7

@@ -1071,30 +1071,30 @@ impl SettingsModel {
         self.last_capture = None;
     }
 
-    /// Check whether General preferences displayed in GeneralPane differ from factory defaults (SPEC-26-01).
+    /// Check whether General preferences displayed in GeneralPane differ from factory defaults (SPEC-26-01, SPEC-27-02).
     ///
-    /// Checks `auto_start`, `switcher.visual_enabled`, and `switcher.visual_hold_delay_ms`.
+    /// Checks `switcher.visual_enabled` and `switcher.visual_hold_delay_ms`.
+    /// `general.auto_start` is intentionally isolated and excluded from difference detection (SPEC-27-02)
+    /// so enabling logon auto-start does not mark General settings as non-default.
     /// `general.check_updates` is intentionally excluded as its control resides in the About pane.
     pub fn general_differs_from_default(&self) -> bool {
         let def = Config::default();
-        self.draft.general.auto_start != def.general.auto_start
-            || self.draft.switcher.visual_enabled != def.switcher.visual_enabled
+        self.draft.switcher.visual_enabled != def.switcher.visual_enabled
             || self.draft.switcher.visual_hold_delay_ms != def.switcher.visual_hold_delay_ms
     }
 
-    /// Restore General preferences to factory defaults (SPEC-26-01).
+    /// Restore General preferences to factory defaults (SPEC-26-01, SPEC-27-02).
     ///
     /// Staged mutation only: does not write configuration or signal the daemon.
-    /// Cancels active capture, resets feedback, and restores `auto_start`,
-    /// `switcher.visual_enabled`, and `switcher.visual_hold_delay_ms`.
-    /// Preserves `general.check_updates`, shortcuts, mouse, and VM-bypass preferences.
+    /// Cancels active capture, resets feedback, and restores `switcher.visual_enabled`
+    /// and `switcher.visual_hold_delay_ms`.
+    /// Preserves `general.auto_start` (SPEC-27-02), `general.check_updates`, shortcuts, mouse, and VM-bypass preferences.
     pub fn restore_general_defaults(&mut self) {
         self.cancel_capture();
         self.last_capture = None;
         self.feedback = SaveFeedback::None;
 
         let def = Config::default();
-        self.draft.general.auto_start = def.general.auto_start;
         self.draft.switcher.visual_enabled = def.switcher.visual_enabled;
         self.draft.switcher.visual_hold_delay_ms = def.switcher.visual_hold_delay_ms;
     }
@@ -3303,7 +3303,7 @@ mod tests {
     fn about_pane_card_dividers_span_the_card() {
         let source = include_str!("../ui/panes/about_pane.slint").replace("\r\n", "\n");
         assert!(
-            source.contains("Card {\n        VerticalLayout {\n            padding: 0px;\n            spacing: 0px;\n\n            // 1. GitHub Repository"),
+            source.contains("VerticalLayout {\n            padding: 0px;\n            spacing: 0px;\n\n            // 1. GitHub Repository"),
             "Card 3 must declare padding: 0px and spacing: 0px for full-bleed dividers"
         );
     }
@@ -3739,7 +3739,10 @@ mod tests {
 
         m.restore_general_defaults();
 
-        assert_eq!(m.draft.general.auto_start, cfg.general.auto_start);
+        assert_eq!(
+            m.draft.general.auto_start, !cfg.general.auto_start,
+            "auto_start must be preserved (SPEC-27-02)"
+        );
         assert_eq!(m.draft.switcher.visual_enabled, cfg.switcher.visual_enabled);
         assert_eq!(
             m.draft.switcher.visual_hold_delay_ms,
@@ -3793,9 +3796,12 @@ mod tests {
         assert!(!m.mouse_differs_from_default());
         assert!(!m.shortcuts_differ_from_default());
 
-        // 1. General variations
+        // 1. General variations: auto_start variation alone does NOT trigger general_differs_from_default (SPEC-27-02)
         m.draft.general.auto_start = !cfg.general.auto_start;
-        assert!(m.general_differs_from_default());
+        assert!(
+            !m.general_differs_from_default(),
+            "auto_start variation must not trigger general_differs_from_default"
+        );
         assert!(!m.mouse_differs_from_default());
         assert!(!m.shortcuts_differ_from_default());
         m.restore_general_defaults();
@@ -3862,9 +3868,9 @@ mod tests {
         m.restore_general_defaults();
 
         assert!(!m.draft.general.check_updates);
-        assert_eq!(
+        assert!(
             m.draft.general.auto_start,
-            Config::default().general.auto_start
+            "auto_start must be preserved across general restore (SPEC-27-02)"
         );
     }
 
@@ -3886,13 +3892,17 @@ mod tests {
         let divider_pos = source[support_pos..]
             .find("CardDivider {}")
             .expect("CardDivider");
-        let trouble_pos = source[support_pos + divider_pos..]
-            .find("Troubleshooting & Recovery")
-            .expect("Troubleshooting & Recovery section");
+        let restore_pos = source[support_pos + divider_pos..]
+            .find("Restore all preferences to defaults")
+            .expect("Restore all preferences to defaults section");
 
         assert!(
-            divider_pos > 0 && trouble_pos > 0,
-            "Card 3 must place CardDivider between support actions and Troubleshooting & Recovery"
+            divider_pos > 0 && restore_pos > 0,
+            "Card 3 must place CardDivider between support actions and Restore all preferences to defaults"
+        );
+        assert!(
+            !source.contains("Troubleshooting & Recovery"),
+            "Troubleshooting & Recovery heading must be removed from AboutPane (SPEC-27-02)"
         );
     }
 
@@ -3902,13 +3912,13 @@ mod tests {
         let attr_pos = source
             .find("An open-source utility by ")
             .expect("Attribution text found");
-        let trouble_pos = source
-            .find("Troubleshooting & Recovery")
-            .expect("Troubleshooting found");
+        let restore_pos = source
+            .find("Restore all preferences to defaults")
+            .expect("Restore all preferences found");
 
         assert!(
-            attr_pos > trouble_pos,
-            "Attribution Card 4 must follow Troubleshooting Card 3"
+            attr_pos > restore_pos,
+            "Attribution Card 4 must follow Recovery Card 3"
         );
 
         // Verify Card 4 is the final Card
@@ -3917,5 +3927,64 @@ mod tests {
             !after_attr.contains("Card {"),
             "No Card declaration may follow Card 4 in AboutPane"
         );
+    }
+
+    #[test]
+    fn general_differs_from_default_ignores_auto_start_state() {
+        let cfg = Config::default();
+        let mut m = SettingsModel::new(cfg.clone(), false);
+
+        assert!(!m.general_differs_from_default());
+
+        m.draft.general.auto_start = !cfg.general.auto_start;
+        assert!(
+            !m.general_differs_from_default(),
+            "auto_start variation alone must not trigger general_differs_from_default"
+        );
+
+        m.draft.switcher.visual_enabled = !cfg.switcher.visual_enabled;
+        assert!(
+            m.general_differs_from_default(),
+            "switcher variation must trigger general_differs_from_default"
+        );
+    }
+
+    #[test]
+    fn restore_general_defaults_preserves_auto_start_preference() {
+        let cfg = Config::default();
+        let mut m = SettingsModel::new(cfg.clone(), false);
+
+        m.draft.general.auto_start = true;
+        m.draft.switcher.visual_enabled = false;
+        m.draft.switcher.visual_hold_delay_ms = 450;
+
+        m.restore_general_defaults();
+
+        assert!(
+            m.draft.general.auto_start,
+            "restore_general_defaults must preserve auto_start"
+        );
+        assert_eq!(m.draft.switcher.visual_enabled, cfg.switcher.visual_enabled);
+        assert_eq!(
+            m.draft.switcher.visual_hold_delay_ms,
+            cfg.switcher.visual_hold_delay_ms
+        );
+    }
+
+    #[test]
+    fn factory_reset_defaults_still_resets_auto_start_to_false() {
+        let cfg = Config::default();
+        let mut m = SettingsModel::new(cfg, false);
+
+        m.draft.general.auto_start = true;
+        m.draft.snapping.percent_left = 80;
+
+        m.factory_reset_defaults();
+
+        assert!(
+            !m.draft.general.auto_start,
+            "factory_reset_defaults must reset auto_start to false"
+        );
+        assert_eq!(m.draft, Config::default());
     }
 }

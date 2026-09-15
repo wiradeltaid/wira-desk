@@ -1904,7 +1904,7 @@ specs:
     release: "0.2.0"
     prd: [wira-desk]
     size: S
-    status: open
+    status: closed
     depends_on: []
     spec_folder: .scratch/spec-27-tray-warning-reset-auto-start-isolation-and-settings-ui-polish/
     spec_reviewed:

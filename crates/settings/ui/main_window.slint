@@ -49,7 +49,7 @@ export component MainWindow inherits Window {
     // Deliberately not per-step. Only the last screen grew, but a window that resizes as the
     // user presses Next draws attention to itself at the moment the content should have it.
     out property <length> normal_width: 760px;
-    out property <length> normal_height: 610px;
+    out property <length> normal_height: 560px;
     width: is_onboarding ? 580px : root.normal_width;
     height: is_onboarding ? 396px : root.normal_height;
 
@@ -800,13 +800,13 @@ export component MainWindow inherits Window {
                 background: Palette.bg_card;
                 border-width: 1px;
                 border-color: Palette.stroke_card;
-                border-radius: 8px;
+                border-radius: 12px;
                 drop-shadow-blur: 24px;
                 drop-shadow-color: Palette.is_dark ? rgba(0, 0, 0, 0.6) : rgba(0, 0, 0, 0.2);
                 drop-shadow-offset-y: 8px;
 
                 VerticalLayout {
-                    padding: 20px;
+                    padding: 24px;
                     spacing: 14px;
 
                     Text {
@@ -838,9 +838,9 @@ export component MainWindow inherits Window {
                             width: 80px;
                             height: 32px;
                             border-radius: 6px;
-                            background: cancel_reset_touch.has_hover ? Palette.bg_card_hover : Palette.bg_subtle;
-                            border-width: modal_focus.focus_button == 0 ? 2px : 1px;
-                            border-color: modal_focus.focus_button == 0 ? Palette.accent_primary : Palette.stroke_card;
+                            background: (modal_focus.focus_button == 0 || cancel_reset_touch.has_hover) ? Palette.bg_card_hover : Palette.bg_subtle;
+                            border-width: 1px;
+                            border-color: Palette.stroke_card;
 
                             Text {
                                 text: "Cancel";
@@ -870,9 +870,9 @@ export component MainWindow inherits Window {
                             width: 170px;
                             height: 32px;
                             border-radius: 6px;
-                            background: confirm_reset_touch.has_hover ? Palette.signal_error : Palette.signal_error;
-                            border-width: modal_focus.focus_button == 1 ? 2px : 0px;
-                            border-color: modal_focus.focus_button == 1 ? Palette.accent_primary : transparent;
+                            background: (modal_focus.focus_button == 1 || confirm_reset_touch.has_hover) ? (Palette.is_dark ? #FF6B6B : #B91C1C) : Palette.signal_error;
+                            border-width: 0px;
+                            border-color: transparent;
 
                             Text {
                                 text: "Restore all preferences";

@@ -27,26 +27,36 @@ use crate::util::debug_log;
 /// size check does not already give.
 pub const LOG_MAX_BYTES: u64 = 1_000_000; // 1 MB active + 1 MB `.old` = 2 MB total
 
+pub const WARN_CAUSE_GENERIC: usize = 0;
+pub const WARN_CAUSE_CONFIG_REJECTED: usize = 1;
+pub const WARN_CAUSE_ACL_INSECURE: usize = 2;
+pub const WARN_CAUSE_SIMULATED: usize = 3;
+
 /// Write one timestamped log line to `shared::log_path`, then notify
 /// `wndproc_impl` to set `Warning` state via `PostMessageW` — only the
 /// thread that owns `TrayData` may change tray state, not `warn` directly.
 pub fn warn(hwnd: HWND, msg: &str) {
+    warn_with_cause(hwnd, msg, WARN_CAUSE_GENERIC);
+}
+
+/// Write one timestamped log line to `shared::log_path`, then notify
+/// `wndproc_impl` to set `Warning` state with an explicit cause tag via `PostMessageW`.
+pub fn warn_with_cause(hwnd: HWND, msg: &str, cause: usize) {
     write_line(msg);
     // SAFETY: `PostMessageW` inspects `hwnd` without dereferencing it — a stale or invalid
     // handle makes the call fail and return zero rather than fault, which is why no
-    // validity proof is needed here and why the return value can be ignored. Both `wParam`
-    // and `lParam` are zero, so this message carries no pointer and transfers no
-    // ownership: a post that never arrives loses a red-dot notification and nothing else.
-    // That is the distinction from `WM_APP_CONFIG_SNAPSHOT`, which does carry a leaked
-    // `Box` and therefore must reclaim it when the post fails.
+    // validity proof is needed here and why the return value can be ignored. `wParam` carries
+    // the scalar `cause` identifier and `lParam` is zero, so this message carries no pointer
+    // and transfers no ownership: a post that never arrives loses a red-dot notification and
+    // nothing else.
     unsafe {
-        PostMessageW(hwnd, WM_APP_LOG_WARNING, 0, 0);
+        PostMessageW(hwnd, WM_APP_LOG_WARNING, cause, 0);
     }
 }
 
 /// Open-write-close per line (not a persistent file handle) so it is safe across
 /// processes — `menu::view_logs` opens the same file from this process too.
-fn write_line(msg: &str) {
+pub fn write_line(msg: &str) {
     write_line_to(&shared::log_path(), msg);
 }
 
