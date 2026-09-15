@@ -1938,3 +1938,34 @@ specs:
           - shortcut_row_slint_snapshot::tests::about_pane_omits_troubleshooting_header
           - shortcut_row_slint_snapshot::tests::modal_reset_dialog_matches_onboarding_styling_without_blue_outline
           - shortcut_row_slint_snapshot::tests::settings_normal_window_height_is_560px
+
+  - id: SPEC-28
+    release: "0.2.4"
+    prd: [wira-desk]
+    size: S
+    status: open
+    depends_on: []
+    spec_folder: .scratch/spec-28-modal-dialog-height-and-realtime-tray-warning-cleanup/
+    fr: []
+    tickets:
+      - id: SPEC-28-01
+        title: "Compact modal dialog height and content-derived container geometry"
+        spec_folder: .scratch/spec-28-modal-dialog-height-and-realtime-tray-warning-cleanup/
+        component: settings
+        satisfies: [UC-4, UC-14]
+        depends_on: []
+        tests:
+          - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
+          - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
+      - id: SPEC-28-02
+        title: "Real-time tray warning clearance on shortcut collision repair and configuration re-evaluation"
+        spec_folder: .scratch/spec-28-modal-dialog-height-and-realtime-tray-warning-cleanup/
+        component: window-management
+        satisfies: []
+        depends_on: []
+        tests:
+          - tray::tests::shortcut_collision_warning_clears_on_clean_reload
+          - tray::tests::stale_collision_warning_cannot_relatch_after_successful_reload
+          - tray::tests::autostart_acl_warning_clears_when_task_unregistered_or_admin_only
+          - tray::tests::autostart_acl_warning_persists_if_task_remains_registered_in_non_admin_path
+          - tray::tests::critical_hook_state_persists_across_collision_cleanup
