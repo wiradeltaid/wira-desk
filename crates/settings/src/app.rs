@@ -1071,7 +1071,85 @@ impl SettingsModel {
         self.last_capture = None;
     }
 
-    /// Restore all shortcut-owned fields to factory defaults (SPEC-25-01).
+    /// Check whether General preferences displayed in GeneralPane differ from factory defaults (SPEC-26-01).
+    ///
+    /// Checks `auto_start`, `switcher.visual_enabled`, and `switcher.visual_hold_delay_ms`.
+    /// `general.check_updates` is intentionally excluded as its control resides in the About pane.
+    pub fn general_differs_from_default(&self) -> bool {
+        let def = Config::default();
+        self.draft.general.auto_start != def.general.auto_start
+            || self.draft.switcher.visual_enabled != def.switcher.visual_enabled
+            || self.draft.switcher.visual_hold_delay_ms != def.switcher.visual_hold_delay_ms
+    }
+
+    /// Restore General preferences to factory defaults (SPEC-26-01).
+    ///
+    /// Staged mutation only: does not write configuration or signal the daemon.
+    /// Cancels active capture, resets feedback, and restores `auto_start`,
+    /// `switcher.visual_enabled`, and `switcher.visual_hold_delay_ms`.
+    /// Preserves `general.check_updates`, shortcuts, mouse, and VM-bypass preferences.
+    pub fn restore_general_defaults(&mut self) {
+        self.cancel_capture();
+        self.last_capture = None;
+        self.feedback = SaveFeedback::None;
+
+        let def = Config::default();
+        self.draft.general.auto_start = def.general.auto_start;
+        self.draft.switcher.visual_enabled = def.switcher.visual_enabled;
+        self.draft.switcher.visual_hold_delay_ms = def.switcher.visual_hold_delay_ms;
+    }
+
+    /// Check whether Mouse navigation preferences differ from factory defaults (SPEC-26-01).
+    ///
+    /// Checks `enabled`, `thumb_back`, `thumb_forward`, `tilt_left`, and `tilt_right`.
+    pub fn mouse_differs_from_default(&self) -> bool {
+        let def = Config::default();
+        self.draft.mouse.enabled != def.mouse.enabled
+            || self.draft.mouse.thumb_back != def.mouse.thumb_back
+            || self.draft.mouse.thumb_forward != def.mouse.thumb_forward
+            || self.draft.mouse.tilt_left != def.mouse.tilt_left
+            || self.draft.mouse.tilt_right != def.mouse.tilt_right
+    }
+
+    /// Restore Mouse preferences to factory defaults (SPEC-26-01).
+    ///
+    /// Staged mutation only: does not write configuration or signal the daemon.
+    /// Cancels active capture, resets feedback, and restores all mouse settings.
+    /// Preserves General, shortcuts, and VM-bypass preferences.
+    pub fn restore_mouse_defaults(&mut self) {
+        self.cancel_capture();
+        self.last_capture = None;
+        self.feedback = SaveFeedback::None;
+
+        let def = Config::default();
+        self.draft.mouse.enabled = def.mouse.enabled;
+        self.draft.mouse.thumb_back = def.mouse.thumb_back;
+        self.draft.mouse.thumb_forward = def.mouse.thumb_forward;
+        self.draft.mouse.tilt_left = def.mouse.tilt_left;
+        self.draft.mouse.tilt_right = def.mouse.tilt_right;
+    }
+
+    /// Check whether shortcut-owned preferences differ from factory defaults (SPEC-26-01).
+    ///
+    /// Checks every `ShortcutField` chord and enable flag, the four snap percentages,
+    /// and `layout.stack_width_percent`.
+    pub fn shortcuts_differ_from_default(&self) -> bool {
+        let def = Config::default();
+        for field in ShortcutField::ALL {
+            if field.get(&self.draft) != field.get(&def)
+                || field.is_enabled(&self.draft) != field.is_enabled(&def)
+            {
+                return true;
+            }
+        }
+        self.draft.snapping.percent_left != def.snapping.percent_left
+            || self.draft.snapping.percent_right != def.snapping.percent_right
+            || self.draft.snapping.percent_top != def.snapping.percent_top
+            || self.draft.snapping.percent_bottom != def.snapping.percent_bottom
+            || self.draft.layout.stack_width_percent != def.layout.stack_width_percent
+    }
+
+    /// Restore all shortcut-owned fields to factory defaults (SPEC-25-01, SPEC-26-01).
     ///
     /// Staged mutation only: does not write configuration or signal the daemon.
     /// Preserves General, visual-switcher, mouse, and VM-bypass preferences.
@@ -3643,5 +3721,201 @@ mod tests {
 
             let _ = std::fs::remove_file(&save_path);
         });
+    }
+
+    #[test]
+    fn restore_general_defaults_resets_only_general_preferences() {
+        let cfg = Config::default();
+        let mut m = SettingsModel::new(cfg.clone(), false);
+
+        m.draft.general.auto_start = !cfg.general.auto_start;
+        m.draft.switcher.visual_enabled = !cfg.switcher.visual_enabled;
+        m.draft.switcher.visual_hold_delay_ms = cfg.switcher.visual_hold_delay_ms + 150;
+        m.draft.general.check_updates = false; // Must be preserved!
+        m.draft.mouse.enabled = !cfg.mouse.enabled;
+        m.draft.layout.stack_width_percent = 77;
+        m.begin_capture(ShortcutField::Switcher);
+        m.feedback = SaveFeedback::Error("test error".to_string());
+
+        m.restore_general_defaults();
+
+        assert_eq!(m.draft.general.auto_start, cfg.general.auto_start);
+        assert_eq!(m.draft.switcher.visual_enabled, cfg.switcher.visual_enabled);
+        assert_eq!(
+            m.draft.switcher.visual_hold_delay_ms,
+            cfg.switcher.visual_hold_delay_ms
+        );
+        assert!(
+            !m.draft.general.check_updates,
+            "check_updates must be preserved"
+        );
+        assert_eq!(
+            m.draft.mouse.enabled, !cfg.mouse.enabled,
+            "mouse must be preserved"
+        );
+        assert_eq!(
+            m.draft.layout.stack_width_percent, 77,
+            "shortcuts must be preserved"
+        );
+        assert_eq!(m.capture, CaptureState::Idle);
+        assert_eq!(m.feedback, SaveFeedback::None);
+    }
+
+    #[test]
+    fn restore_mouse_defaults_resets_only_mouse_preferences() {
+        let cfg = Config::default();
+        let mut m = SettingsModel::new(cfg.clone(), false);
+
+        m.draft.mouse.enabled = !cfg.mouse.enabled;
+        m.draft.mouse.thumb_back = "task_view".to_string();
+        m.draft.mouse.thumb_forward = "show_desktop".to_string();
+        m.draft.mouse.tilt_left = "next_virtual_desktop".to_string();
+        m.draft.mouse.tilt_right = "prev_virtual_desktop".to_string();
+        m.draft.general.auto_start = !cfg.general.auto_start;
+        m.draft.snapping.percent_left = 42;
+        m.begin_capture(ShortcutField::SnapPercentLeft);
+
+        m.restore_mouse_defaults();
+
+        assert_eq!(m.draft.mouse, cfg.mouse);
+        assert_eq!(m.draft.general.auto_start, !cfg.general.auto_start);
+        assert_eq!(m.draft.snapping.percent_left, 42);
+        assert_eq!(m.capture, CaptureState::Idle);
+        assert_eq!(m.feedback, SaveFeedback::None);
+    }
+
+    #[test]
+    fn pane_defaults_differ_from_default_detection() {
+        let cfg = Config::default();
+        let mut m = SettingsModel::new(cfg.clone(), false);
+
+        assert!(!m.general_differs_from_default());
+        assert!(!m.mouse_differs_from_default());
+        assert!(!m.shortcuts_differ_from_default());
+
+        // 1. General variations
+        m.draft.general.auto_start = !cfg.general.auto_start;
+        assert!(m.general_differs_from_default());
+        assert!(!m.mouse_differs_from_default());
+        assert!(!m.shortcuts_differ_from_default());
+        m.restore_general_defaults();
+        assert!(!m.general_differs_from_default());
+
+        m.draft.switcher.visual_enabled = !cfg.switcher.visual_enabled;
+        assert!(m.general_differs_from_default());
+        m.restore_general_defaults();
+        assert!(!m.general_differs_from_default());
+
+        m.draft.switcher.visual_hold_delay_ms = cfg.switcher.visual_hold_delay_ms + 100;
+        assert!(m.general_differs_from_default());
+        m.restore_general_defaults();
+        assert!(!m.general_differs_from_default());
+
+        // check_updates change does NOT affect general_differs_from_default
+        m.draft.general.check_updates = false;
+        assert!(
+            !m.general_differs_from_default(),
+            "check_updates must not trigger general defaults button"
+        );
+        m.draft.general.check_updates = cfg.general.check_updates;
+
+        // 2. Mouse variations
+        m.draft.mouse.enabled = !cfg.mouse.enabled;
+        assert!(m.mouse_differs_from_default());
+        m.restore_mouse_defaults();
+        assert!(!m.mouse_differs_from_default());
+
+        m.draft.mouse.thumb_back = "show_desktop".to_string();
+        assert!(m.mouse_differs_from_default());
+        m.restore_mouse_defaults();
+        assert!(!m.mouse_differs_from_default());
+
+        // 3. Shortcuts variations
+        m.draft.snapping.percent_left = 50;
+        assert!(m.shortcuts_differ_from_default());
+        m.restore_shortcuts_defaults();
+        assert!(!m.shortcuts_differ_from_default());
+
+        m.draft.layout.stack_width_percent = 80;
+        assert!(m.shortcuts_differ_from_default());
+        m.restore_shortcuts_defaults();
+        assert!(!m.shortcuts_differ_from_default());
+
+        ShortcutField::Switcher.set(&mut m.draft, "ctrl+alt+k".to_string());
+        assert!(m.shortcuts_differ_from_default());
+        m.restore_shortcuts_defaults();
+        assert!(!m.shortcuts_differ_from_default());
+
+        ShortcutField::Switcher.set_enabled(&mut m.draft, false);
+        assert!(m.shortcuts_differ_from_default());
+        m.restore_shortcuts_defaults();
+        assert!(!m.shortcuts_differ_from_default());
+    }
+
+    #[test]
+    fn general_defaults_preserves_check_updates_preference() {
+        let mut cfg = Config::default();
+        cfg.general.check_updates = false;
+        cfg.general.auto_start = true;
+        let mut m = SettingsModel::new(cfg, false);
+
+        m.restore_general_defaults();
+
+        assert!(!m.draft.general.check_updates);
+        assert_eq!(
+            m.draft.general.auto_start,
+            Config::default().general.auto_start
+        );
+    }
+
+    #[test]
+    fn about_pane_card_hierarchy_and_divider_structure() {
+        let source = include_str!("../ui/panes/about_pane.slint").replace("\r\n", "\n");
+        // Card 3 begins with Support development, Issue Tracker, and GitHub repository
+        assert!(
+            source.contains("Support development")
+                && source.contains("Issue Tracker")
+                && source.contains("GitHub repository"),
+            "Card 3 must contain support, issue tracker, and repo buttons"
+        );
+
+        // Followed by CardDivider
+        let support_pos = source
+            .find("Support development")
+            .expect("support development");
+        let divider_pos = source[support_pos..]
+            .find("CardDivider {}")
+            .expect("CardDivider");
+        let trouble_pos = source[support_pos + divider_pos..]
+            .find("Troubleshooting & Recovery")
+            .expect("Troubleshooting & Recovery section");
+
+        assert!(
+            divider_pos > 0 && trouble_pos > 0,
+            "Card 3 must place CardDivider between support actions and Troubleshooting & Recovery"
+        );
+    }
+
+    #[test]
+    fn about_pane_attribution_card_at_bottom() {
+        let source = include_str!("../ui/panes/about_pane.slint").replace("\r\n", "\n");
+        let attr_pos = source
+            .find("An open-source utility by ")
+            .expect("Attribution text found");
+        let trouble_pos = source
+            .find("Troubleshooting & Recovery")
+            .expect("Troubleshooting found");
+
+        assert!(
+            attr_pos > trouble_pos,
+            "Attribution Card 4 must follow Troubleshooting Card 3"
+        );
+
+        // Verify Card 4 is the final Card
+        let after_attr = &source[attr_pos..];
+        assert!(
+            !after_attr.contains("Card {"),
+            "No Card declaration may follow Card 4 in AboutPane"
+        );
     }
 }

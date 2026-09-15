@@ -8,30 +8,74 @@ export component GeneralPane inherits VerticalLayout {
     in-out property <bool> visual_switcher_enabled: true;
     in-out property <int> visual_hold_delay_ms: 300;
     in property <int> revert_generation: 0;
+    in property <bool> show_defaults_button: false;
 
     callback auto_start_toggled(bool);
     callback visual_switcher_toggled(bool);
     callback visual_hold_delay_changed(int);
+    callback restore_defaults_clicked();
 
     spacing: 12px;
     alignment: start;
 
     // Heading Section
-    VerticalLayout {
-        spacing: 2px;
-        Text {
-            text: "General Settings";
-            font-family: Typography.font_family;
-            font-size: Typography.size_heading;
-            font-weight: 700;
-            color: Palette.text_primary;
+    HorizontalLayout {
+        alignment: space-between;
+
+        VerticalLayout {
+            spacing: 2px;
+            horizontal-stretch: 1;
+
+            Text {
+                text: "General Settings";
+                font-family: Typography.font_family;
+                font-size: Typography.size_heading;
+                font-weight: 700;
+                color: Palette.text_primary;
+            }
+            Text {
+                text: "Startup integration and multi-monitor spatial settings.";
+                font-family: Typography.font_family;
+                font-size: Typography.size_caption;
+                color: Palette.text_secondary;
+                wrap: word-wrap;
+            }
         }
-        Text {
-            text: "Startup integration and multi-monitor spatial settings.";
-            font-family: Typography.font_family;
-            font-size: Typography.size_caption;
-            color: Palette.text_secondary;
-            wrap: word-wrap;
+
+        if root.show_defaults_button : HorizontalLayout {
+            alignment: end;
+            padding-left: 12px;
+
+            Rectangle {
+                width: 96px;
+                height: 32px;
+                border-radius: 6px;
+                background: restore_touch.has_hover ? Palette.bg_card_hover : Palette.bg_subtle;
+                border-width: 1px;
+                border-color: Palette.stroke_card;
+
+                Text {
+                    text: "↺ Defaults";
+                    font-family: Typography.font_family;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: Palette.text_primary;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                restore_touch := TouchArea {
+                    accessible-role: button;
+                    accessible-label: "Restore General settings to defaults";
+                    accessible-action-default => {
+                        root.restore_defaults_clicked();
+                    }
+                    mouse-cursor: pointer;
+                    clicked => {
+                        root.restore_defaults_clicked();
+                    }
+                }
+            }
         }
     }
 

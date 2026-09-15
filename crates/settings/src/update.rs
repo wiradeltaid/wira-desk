@@ -304,31 +304,52 @@ pub fn is_allowed_browser_url(url: &str) -> bool {
     false
 }
 
+#[cfg(test)]
+static BROWSER_LAUNCH_COUNTER: std::sync::atomic::AtomicUsize =
+    std::sync::atomic::AtomicUsize::new(0);
+
+#[cfg(test)]
+pub fn browser_launch_count() -> usize {
+    BROWSER_LAUNCH_COUNTER.load(std::sync::atomic::Ordering::SeqCst)
+}
+
+#[cfg(test)]
+pub fn reset_browser_launch_count() {
+    BROWSER_LAUNCH_COUNTER.store(0, std::sync::atomic::Ordering::SeqCst);
+}
+
 /// Open an allowed URL in the user's default browser.
 pub fn open_in_browser(url: &str) {
-    use windows_sys::Win32::UI::Shell::ShellExecuteW;
-    use windows_sys::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
-
     if !is_allowed_browser_url(url) {
         return;
     }
 
-    let target = wide(url);
-    let verb = wide("open");
-    // SAFETY: `target` and `verb` are NUL-terminated wide strings in locals that outlive the
-    // call. A null owner window is documented for a caller with no window to parent to, and
-    // null parameters and directory are the documented "nothing to add" values. The result is
-    // discarded: a browser that fails to open is not something this can act on, and the URL
-    // is also shown in the release itself.
-    unsafe {
-        ShellExecuteW(
-            0,
-            verb.as_ptr(),
-            target.as_ptr(),
-            std::ptr::null(),
-            std::ptr::null(),
-            SW_SHOWNORMAL,
-        );
+    #[cfg(test)]
+    {
+        BROWSER_LAUNCH_COUNTER.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+    }
+    #[cfg(not(test))]
+    {
+        use windows_sys::Win32::UI::Shell::ShellExecuteW;
+        use windows_sys::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
+
+        let target = wide(url);
+        let verb = wide("open");
+        // SAFETY: `target` and `verb` are NUL-terminated wide strings in locals that outlive the
+        // call. A null owner window is documented for a caller with no window to parent to, and
+        // null parameters and directory are the documented "nothing to add" values. The result is
+        // discarded: a browser that fails to open is not something this can act on, and the URL
+        // is also shown in the release itself.
+        unsafe {
+            ShellExecuteW(
+                0,
+                verb.as_ptr(),
+                target.as_ptr(),
+                std::ptr::null(),
+                std::ptr::null(),
+                SW_SHOWNORMAL,
+            );
+        }
     }
 }
 

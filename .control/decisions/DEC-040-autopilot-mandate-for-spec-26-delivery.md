@@ -1,7 +1,7 @@
 ---
 type: mandate
 id: DEC-040
-status: accepted
+status: applied
 touches:
   - .control/decisions/DEC-040-autopilot-mandate-for-spec-26-delivery.md
   - .control/memlog/autopilot-DEC-040.md

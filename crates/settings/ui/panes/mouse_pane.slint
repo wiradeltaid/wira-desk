@@ -128,6 +128,7 @@ export component MousePane inherits VerticalLayout {
     in property <string> accessible_thumb_forward: "Thumb Button 2 (Forward) Action";
     in property <string> accessible_tilt_left: "Tilt Wheel Left Action";
     in property <string> accessible_tilt_right: "Tilt Wheel Right Action";
+    in property <bool> show_defaults_button: false;
 
     callback toggle_mouse_navigation(bool);
     callback thumb_back_changed(int);
@@ -135,25 +136,68 @@ export component MousePane inherits VerticalLayout {
     callback tilt_left_changed(int);
     callback tilt_right_changed(int);
     callback open_selector(int, length);
+    callback restore_defaults_clicked();
 
     spacing: 12px;
     alignment: start;
 
     // Heading Section
-    VerticalLayout {
-        spacing: 2px;
-        Text {
-            text: "Mouse Navigation";
-            font-family: Typography.font_family;
-            font-size: Typography.size_heading;
-            font-weight: 700;
-            color: Palette.text_primary;
+    HorizontalLayout {
+        alignment: space-between;
+
+        VerticalLayout {
+            spacing: 2px;
+            horizontal-stretch: 1;
+
+            Text {
+                text: "Mouse Navigation";
+                font-family: Typography.font_family;
+                font-size: Typography.size_heading;
+                font-weight: 700;
+                color: Palette.text_primary;
+            }
+            Text {
+                text: "Driverless desktop multitasking with auxiliary mouse buttons and tilt wheel.";
+                font-family: Typography.font_family;
+                font-size: Typography.size_caption;
+                color: Palette.text_secondary;
+            }
         }
-        Text {
-            text: "Driverless desktop multitasking with auxiliary mouse buttons and tilt wheel.";
-            font-family: Typography.font_family;
-            font-size: Typography.size_caption;
-            color: Palette.text_secondary;
+
+        if root.show_defaults_button : HorizontalLayout {
+            alignment: end;
+            padding-left: 12px;
+
+            Rectangle {
+                width: 96px;
+                height: 32px;
+                border-radius: 6px;
+                background: restore_touch.has_hover ? Palette.bg_card_hover : Palette.bg_subtle;
+                border-width: 1px;
+                border-color: Palette.stroke_card;
+
+                Text {
+                    text: "↺ Defaults";
+                    font-family: Typography.font_family;
+                    font-size: 12.5px;
+                    font-weight: 600;
+                    color: Palette.text_primary;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                restore_touch := TouchArea {
+                    accessible-role: button;
+                    accessible-label: "Restore Mouse settings to defaults";
+                    accessible-action-default => {
+                        root.restore_defaults_clicked();
+                    }
+                    mouse-cursor: pointer;
+                    clicked => {
+                        root.restore_defaults_clicked();
+                    }
+                }
+            }
         }
     }
 
