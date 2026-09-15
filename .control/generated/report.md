@@ -4,15 +4,15 @@
 
 Period: **the project's start → 2026-09-15**. This period has no left bound — there is no earlier report yet.
 
-Freshness: commit `3556bdf0ab92`. **The registry has uncommitted changes — the numbers below may not reflect what is on `main`.**
+Freshness: commit `1858ab45fdb7`. **The registry has uncommitted changes — the numbers below may not reflect what is on `main`.**
 
 ## Promise progress — 100%
 
-This is the number that counts: green RTM rows divided by counted rows (99 out of 99; 8 excluded for having `no_uc`). It measures what is **proven**, not what has been worked on.
+This is the number that counts: green RTM rows divided by counted rows (102 out of 102; 8 excluded for having `no_uc`). It measures what is **proven**, not what has been worked on.
 
 | Other measure | Value | Answers |
 |---|---|---|
-| Work progress | SPEC-1 100%, SPEC-10 100%, SPEC-11 100%, SPEC-12 100%, SPEC-13 100%, SPEC-14 100%, SPEC-15 100%, SPEC-16 100%, SPEC-17 100%, SPEC-18 100%, SPEC-19 100%, SPEC-2 100%, SPEC-20 100%, SPEC-21 100%, SPEC-22 100%, SPEC-23 100%, SPEC-24 100%, SPEC-25 100%, SPEC-26 100%, SPEC-27 100%, SPEC-3 100%, SPEC-4 100%, SPEC-5 100%, SPEC-6 100%, SPEC-7 100%, SPEC-8 100%, SPEC-9 100%, W1 100%, W2 100%, W3 100%, W4 100% | how much has been worked on |
+| Work progress | SPEC-1 100%, SPEC-10 100%, SPEC-11 100%, SPEC-12 100%, SPEC-13 100%, SPEC-14 100%, SPEC-15 100%, SPEC-16 100%, SPEC-17 100%, SPEC-18 100%, SPEC-19 100%, SPEC-2 100%, SPEC-20 100%, SPEC-21 100%, SPEC-22 100%, SPEC-23 100%, SPEC-24 100%, SPEC-25 100%, SPEC-26 100%, SPEC-27 100%, SPEC-28 100%, SPEC-3 100%, SPEC-4 100%, SPEC-5 100%, SPEC-6 100%, SPEC-7 100%, SPEC-8 100%, SPEC-9 100%, W1 100%, W2 100%, W3 100%, W4 100% | how much has been worked on |
 | Gate readiness | 100% | whether the next gate can open |
 
 ## 1. Proven
@@ -97,6 +97,9 @@ RTM rows that turned green within this period.
 | FR-6 | UC-1 | SPEC-17-01 | cycling::tests::backward_blind_cycle_traverses_all_eligible_windows, worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse | 2026-09-13 |
 | FR-18 | UC-4 | SPEC-25-01 | app::tests::restore_shortcuts_defaults_every_field_and_preserves_non_shortcut_preferences, app::tests::restore_shortcuts_is_dirty_only_when_draft_differs_from_saved, app::tests::revert_after_shortcut_restore_returns_to_the_saved_legacy_configuration, app::tests::fix_stack_conflict_requires_the_exact_pair_and_never_creates_a_third_conflict, shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_the_draft, shortcut_row_slint_snapshot::tests::restore_shortcuts_discards_pending_percentage_and_cancels_capture, shortcut_row_slint_snapshot::tests::legacy_stack_conflict_banner_repairs_only_when_safe | 2026-09-15 |
 | FR-7 | UC-4 | SPEC-25-01 | app::tests::restore_shortcuts_defaults_every_field_and_preserves_non_shortcut_preferences, app::tests::restore_shortcuts_is_dirty_only_when_draft_differs_from_saved, app::tests::revert_after_shortcut_restore_returns_to_the_saved_legacy_configuration, app::tests::fix_stack_conflict_requires_the_exact_pair_and_never_creates_a_third_conflict, shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_the_draft, shortcut_row_slint_snapshot::tests::restore_shortcuts_discards_pending_percentage_and_cancels_capture, shortcut_row_slint_snapshot::tests::legacy_stack_conflict_banner_repairs_only_when_safe | 2026-09-15 |
+| FR-18 | UC-4 | SPEC-28-01 | shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height, shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window | 2026-09-15 |
+| FR-32 | UC-14 | SPEC-28-01 | shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height, shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window | 2026-09-15 |
+| FR-7 | UC-4 | SPEC-28-01 | shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height, shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window | 2026-09-15 |
 
 ## 2. Moved
 

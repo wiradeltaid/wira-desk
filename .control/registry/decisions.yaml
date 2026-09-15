@@ -1102,7 +1102,7 @@ decisions:
 
   - id: DEC-042
     title: Autopilot mandate for SPEC-28 delivery
-    status: accepted
+    status: applied
     file: decisions/DEC-042-autopilot-mandate-for-spec-28-delivery.md
     created: '2026-09-15'
     touches:

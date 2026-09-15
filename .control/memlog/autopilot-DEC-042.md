@@ -9,11 +9,11 @@ date: 2026-09-15
 ## Resume
 
 Iteration: 1 (boundary: HEAD)
-Run branch: autopilot/DEC-042, PR not open yet
-Stopped at: Done
+Run branch: autopilot/DEC-042, PR ready for owner merge
+Stopped at: Done — SPEC-28 delivered and closed under mandate DEC-042
 Blocked: —
 Parked: —
-Next: § Finish (all tickets in SPEC-28 closed and verified)
+Next: Owner final review and PR merge
 
 ## Decisions
 

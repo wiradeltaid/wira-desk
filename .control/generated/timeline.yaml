@@ -285,6 +285,7 @@ capabilities:
     - SPEC-10-02
     - SPEC-26-01
     - SPEC-27-02
+    - SPEC-28-01
     - SPEC-8-01
     - SPEC-9-02
     - SPEC-9-03
@@ -350,6 +351,7 @@ capabilities:
     - SPEC-25-01
     - SPEC-26-01
     - SPEC-27-02
+    - SPEC-28-01
     - SPEC-4-01
     - SPEC-4-02
     - SPEC-4-03
@@ -424,6 +426,7 @@ capabilities:
     - SPEC-25-01
     - SPEC-26-01
     - SPEC-27-02
+    - SPEC-28-01
     - SPEC-4-01
     - SPEC-4-02
     - SPEC-4-03
