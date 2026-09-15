@@ -1,15 +1,13 @@
 asof: '2026-09-15'
 since: ''
 since_report: ''
-sha: e75be4bb1b62d0a2202f43d53977d5d983b1cd1c
+sha: 3556bdf0ab921fe7412e2cdd338d90a38ca605ac
 registry_dirty: true
-uncommitted_tickets:
-- SPEC-27-01
-- SPEC-27-02
+uncommitted_tickets: []
 promise_progress: 100%
 rtm_rows:
-  green: 96
-  counted: 96
+  green: 99
+  counted: 99
   excluded_no_uc: 8
 work_progress:
 - spec: SPEC-1
@@ -103,6 +101,11 @@ work_progress:
   tickets_total: 2
   work_progress: 100%
 - spec: SPEC-26
+  status: closed
+  tickets_done: 2
+  tickets_total: 2
+  work_progress: 100%
+- spec: SPEC-27
   status: closed
   tickets_done: 2
   tickets_total: 2

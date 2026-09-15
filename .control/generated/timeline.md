@@ -42,10 +42,3 @@ gantt
 | CAP-7 | Restrict cycling to the same physical monitor and virtual desktop as the active window. | — | — | — | — | — → — | 2026-09-07 → — | — | in-progress |
 | CAP-8 | Pass shortcuts through unchanged when the foreground window is a VM or RDP client. | — | — | — | — | — → — | 2026-09-07 → — | — | in-progress |
 | CAP-9 | Recover the tray icon after explorer.exe restarts and follow the three-tier error protocol. | — | — | — | — | — → — | 2026-09-07 → 2026-09-07 | — | done |
-
-## Tickets with no git history
-
-The file exists on disk but has never been committed, so its date MUST NOT be derived. Commit it first, then run again.
-
-- `SPEC-27-01`
-- `SPEC-27-02`

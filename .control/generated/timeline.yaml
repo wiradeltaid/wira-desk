@@ -293,8 +293,7 @@ capabilities:
     actual_start: '2026-09-10'
     actual_end: ''
     state: in-progress
-  waiting_on:
-  - SPEC-27-02
+  waiting_on: []
 - id: CAP-2
   text: Snap and resize the active window with keyboard shortcuts, DPI-aware per monitor.
   size: ''
@@ -367,8 +366,7 @@ capabilities:
     actual_start: '2026-09-07'
     actual_end: ''
     state: in-progress
-  waiting_on:
-  - SPEC-27-02
+  waiting_on: []
 - id: CAP-4
   text: Operate on elevated windows by running the daemon with Administrator privileges.
   size: ''
@@ -460,8 +458,7 @@ capabilities:
     actual_start: ''
     actual_end: ''
     state: not-started
-  waiting_on:
-  - SPEC-27-02
+  waiting_on: []
 - id: CAP-6
   text: Alert the user when the keyboard hook dies at runtime via tray state and one toast.
   size: ''
@@ -562,6 +559,4 @@ capabilities:
     actual_end: ''
     state: not-started
   waiting_on: []
-uncommitted_tickets:
-- SPEC-27-01
-- SPEC-27-02
+uncommitted_tickets: []

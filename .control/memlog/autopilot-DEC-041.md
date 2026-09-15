@@ -8,12 +8,12 @@ date: 2026-09-15
 
 ## Resume
 
-Iteration: 1 (boundary: in flight)
-Run branch: autopilot/DEC-041, PR not open yet
+Iteration: 1 (boundary: HEAD)
+Run branch: autopilot/DEC-041, PR ready for owner merge
 Stopped at: Done — SPEC-27 delivered and closed under mandate DEC-041
 Blocked: —
 Parked: —
-Next: § Finish (smoke test, validate, push, open PR)
+Next: Owner final review and PR merge
 
 ## Decisions
 
