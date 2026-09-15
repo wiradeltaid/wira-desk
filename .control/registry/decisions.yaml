@@ -1065,6 +1065,41 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-040.md
 
+  - id: DEC-041
+    title: Autopilot mandate for SPEC-27 delivery
+    status: accepted
+    file: decisions/DEC-041-autopilot-mandate-for-spec-27-delivery.md
+    created: '2026-09-15'
+    touches:
+      - .control/decisions/DEC-041-autopilot-mandate-for-spec-27-delivery.md
+      - .control/memlog/autopilot-DEC-041.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+      - .scratch/spec-27-tray-warning-reset-auto-start-isolation-and-settings-ui-polish/SPEC.md
+      - .scratch/spec-27-tray-warning-reset-auto-start-isolation-and-settings-ui-polish/issues/01-real-time-tray-warning-reset-on-config-reload.md
+      - .scratch/spec-27-tray-warning-reset-auto-start-isolation-and-settings-ui-polish/issues/02-general-auto-start-isolation-about-card-and-modal-polish.md
+      - crates/daemon/src/tray.rs
+      - crates/daemon/src/worker.rs
+      - crates/daemon/src/config.rs
+      - crates/settings/src/app.rs
+      - crates/settings/ui/panes/about_pane.slint
+      - crates/settings/ui/panes/general_pane.slint
+      - crates/settings/ui/main_window.slint
+      - crates/settings/src/shortcut_row_slint_snapshot.rs
+      - 3p.md
+      - docs/3p.md
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-09-22'
+      run_branch: autopilot/DEC-041
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-041.md
+
 
 
 

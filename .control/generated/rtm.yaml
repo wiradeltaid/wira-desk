@@ -300,6 +300,26 @@ rtm:
   FR: FR-18
   DEC: []
   UC: UC-4
+  ticket: SPEC-27-02
+  spec: SPEC-27
+  release: 0.2.0
+  test:
+  - app::tests::general_differs_from_default_ignores_auto_start_state
+  - app::tests::restore_general_defaults_preserves_auto_start_preference
+  - app::tests::factory_reset_defaults_still_resets_auto_start_to_false
+  - shortcut_row_slint_snapshot::tests::about_pane_card_3_geometry_encloses_reset_button_without_overflow
+  - shortcut_row_slint_snapshot::tests::about_pane_omits_troubleshooting_header
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_matches_onboarding_styling_without_blue_outline
+  - shortcut_row_slint_snapshot::tests::settings_normal_window_height_is_560px
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-2
+  CAP: CAP-5
+  FR: FR-18
+  DEC: []
+  UC: UC-4
   ticket: SPEC-4-01
   spec: SPEC-4
   release: 0.5.0
@@ -1212,6 +1232,26 @@ rtm:
   FR: FR-32
   DEC: []
   UC: UC-14
+  ticket: SPEC-27-02
+  spec: SPEC-27
+  release: 0.2.0
+  test:
+  - app::tests::general_differs_from_default_ignores_auto_start_state
+  - app::tests::restore_general_defaults_preserves_auto_start_preference
+  - app::tests::factory_reset_defaults_still_resets_auto_start_to_false
+  - shortcut_row_slint_snapshot::tests::about_pane_card_3_geometry_encloses_reset_button_without_overflow
+  - shortcut_row_slint_snapshot::tests::about_pane_omits_troubleshooting_header
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_matches_onboarding_styling_without_blue_outline
+  - shortcut_row_slint_snapshot::tests::settings_normal_window_height_is_560px
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-4
+  CAP: CAP-17
+  FR: FR-32
+  DEC: []
+  UC: UC-14
   ticket: SPEC-8-01
   spec: SPEC-8
   release: 0.3.0
@@ -1537,6 +1577,26 @@ rtm:
   exempt: false
   green: true
   broken_at: ''
+- BG: BG-2
+  CAP: CAP-3
+  FR: FR-7
+  DEC: []
+  UC: UC-4
+  ticket: SPEC-27-02
+  spec: SPEC-27
+  release: 0.2.0
+  test:
+  - app::tests::general_differs_from_default_ignores_auto_start_state
+  - app::tests::restore_general_defaults_preserves_auto_start_preference
+  - app::tests::factory_reset_defaults_still_resets_auto_start_to_false
+  - shortcut_row_slint_snapshot::tests::about_pane_card_3_geometry_encloses_reset_button_without_overflow
+  - shortcut_row_slint_snapshot::tests::about_pane_omits_troubleshooting_header
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_matches_onboarding_styling_without_blue_outline
+  - shortcut_row_slint_snapshot::tests::settings_normal_window_height_is_560px
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
 - BG: BG-2
   CAP: CAP-3
   FR: FR-7
