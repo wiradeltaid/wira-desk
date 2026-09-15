@@ -795,6 +795,7 @@ export component MainWindow inherits Window {
 
             Rectangle {
                 width: 440px;
+                height: dialog_layout.preferred-height;
                 x: (parent.width - self.width) / 2;
                 y: (parent.height - self.height) / 2;
                 background: Palette.bg_card;
@@ -804,8 +805,10 @@ export component MainWindow inherits Window {
                 drop-shadow-blur: 24px;
                 drop-shadow-color: Palette.is_dark ? rgba(0, 0, 0, 0.6) : rgba(0, 0, 0, 0.2);
                 drop-shadow-offset-y: 8px;
+                accessible-role: text;
+                accessible-label: "Factory reset confirmation card";
 
-                VerticalLayout {
+                dialog_layout := VerticalLayout {
                     padding: 24px;
                     spacing: 14px;
 
