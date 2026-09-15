@@ -31,6 +31,7 @@ pub const WARN_CAUSE_GENERIC: usize = 0;
 pub const WARN_CAUSE_CONFIG_REJECTED: usize = 1;
 pub const WARN_CAUSE_ACL_INSECURE: usize = 2;
 pub const WARN_CAUSE_SIMULATED: usize = 3;
+pub const WARN_CAUSE_CONFIG_COLLISION: usize = 4;
 
 /// Write one timestamped log line to `shared::log_path`, then notify
 /// `wndproc_impl` to set `Warning` state via `PostMessageW` — only the

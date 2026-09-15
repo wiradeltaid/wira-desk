@@ -301,12 +301,30 @@ fn current_username() -> String {
     std::env::var("USERNAME").unwrap_or_default()
 }
 
+/// Observation of the auto-start task state in Windows Task Scheduler.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TaskStatus {
+    Absent,
+    Registered,
+    Unknown,
+}
+
+/// Query Task Scheduler and return structured task status.
+pub fn task_status() -> TaskStatus {
+    match run_schtasks(&query_args()) {
+        Some(s) => match s.code() {
+            Some(0) => TaskStatus::Registered,
+            Some(1) => TaskStatus::Absent,
+            _ => TaskStatus::Unknown,
+        },
+        None => TaskStatus::Unknown,
+    }
+}
+
 /// `true` when the auto-start task is registered (`schtasks /Query` exit code 0).
 /// Authoritative source for the Auto-Start menu checkmark.
 pub fn is_registered() -> bool {
-    run_schtasks(&query_args())
-        .map(|s| s.success())
-        .unwrap_or(false)
+    task_status() == TaskStatus::Registered
 }
 
 /// Register the auto-start task. Returns `true` when registration succeeds.

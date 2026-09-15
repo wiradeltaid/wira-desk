@@ -3,7 +3,7 @@ id: SPEC-28-02
 component: window-management
 satisfies: []
 blocked_by: []
-status: open
+status: done
 tests:
   - tray::tests::shortcut_collision_warning_clears_on_clean_reload
   - tray::tests::stale_collision_warning_cannot_relatch_after_successful_reload
@@ -84,14 +84,14 @@ tests:
 
 **Blocked by:** None.
 
-**Status:** open
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] Shortcut collision warnings are tagged with `WARN_CAUSE_CONFIG_COLLISION` and bound to config generation.
-- [ ] `ReloadOutcome::Applied` synchronously owns `has_shortcut_collision` and updates `config_collision` in real time.
-- [ ] Delayed stale collision warning dispatch cannot re-latch Warning state after a clean applied reload.
-- [ ] Auto-start ACL warning is re-evaluated against verified Task Scheduler observation (`TaskStatus`), clearing only on positively confirmed absence or admin-only path, and fail-safely retaining warning on `Unknown`.
-- [ ] When all active warning causes are resolved and the tray icon is in `TrayState::Warning`, it immediately resets to `TrayState::Normal` and re-renders via `Shell_NotifyIconW(NIM_MODIFY)`.
-- [ ] Critical hook state (`TrayState::Critical`) is never downgraded by a reload outcome.
-- [ ] Tests named in frontmatter pass cleanly.
+- [x] Shortcut collision warnings are tagged with `WARN_CAUSE_CONFIG_COLLISION` and bound to config generation.
+- [x] `ReloadOutcome::Applied` synchronously owns `has_shortcut_collision` and updates `config_collision` in real time.
+- [x] Delayed stale collision warning dispatch cannot re-latch Warning state after a clean applied reload.
+- [x] Auto-start ACL warning is re-evaluated against verified Task Scheduler observation (`TaskStatus`), clearing only on positively confirmed absence or admin-only path, and fail-safely retaining warning on `Unknown`.
+- [x] When all active warning causes are resolved and the tray icon is in `TrayState::Warning`, it immediately resets to `TrayState::Normal` and re-renders via `Shell_NotifyIconW(NIM_MODIFY)`.
+- [x] Critical hook state (`TrayState::Critical`) is never downgraded by a reload outcome.
+- [x] Tests named in frontmatter pass cleanly.

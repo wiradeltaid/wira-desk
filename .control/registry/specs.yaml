@@ -1943,7 +1943,7 @@ specs:
     release: "0.2.4"
     prd: [wira-desk]
     size: S
-    status: open
+    status: closed
     spec_reviewed:
       date: '2026-09-15'
       sha: 'f4e29c7'

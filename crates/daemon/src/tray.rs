@@ -92,13 +92,15 @@ pub enum TrayState {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct WarningCauses {
     pub config_rejected: bool,
+    pub config_collision: bool,
     pub acl_insecure: bool,
     pub simulated: bool,
+    pub reload_generation: u64,
 }
 
 impl WarningCauses {
     pub fn any_active(&self) -> bool {
-        self.config_rejected || self.acl_insecure || self.simulated
+        self.config_rejected || self.config_collision || self.acl_insecure || self.simulated
     }
 }
 
@@ -254,13 +256,49 @@ fn set_state(data: &mut TrayData, state: TrayState) {
 }
 
 /// Apply configuration reload outcome to tray state and structured warning causes.
-/// Selective reset: a successful reload clears `config_rejected` and, if no other warning
-/// causes remain active, immediately returns the tray icon to `TrayState::Normal`.
+/// Selective reset: a successful reload clears `config_rejected` and `config_collision`,
+/// re-evaluates auto-start Task Scheduler ACL status, and if no other warning causes remain
+/// active, immediately returns the tray icon to `TrayState::Normal`.
 /// Preserves `TrayState::Critical` precedence so a dead hook is never downgraded.
 pub fn handle_config_reload_outcome(data: &mut TrayData, outcome: &crate::config::ReloadOutcome) {
+    handle_config_reload_outcome_with_status(data, outcome, crate::autostart::task_status());
+}
+
+/// Core outcome handler taking explicit `TaskStatus` to enable hermetic testing and deterministic observation.
+pub fn handle_config_reload_outcome_with_status(
+    data: &mut TrayData,
+    outcome: &crate::config::ReloadOutcome,
+    task_status: crate::autostart::TaskStatus,
+) {
     match outcome {
         crate::config::ReloadOutcome::Applied { .. } => {
+            data.warning_causes.reload_generation =
+                data.warning_causes.reload_generation.saturating_add(1);
             data.warning_causes.config_rejected = false;
+            data.warning_causes.config_collision = false;
+
+            // Re-evaluate auto-start location ACL safety against observed Task Scheduler status
+            if data.warning_causes.acl_insecure {
+                match task_status {
+                    crate::autostart::TaskStatus::Absent => {
+                        data.warning_causes.acl_insecure = false;
+                    }
+                    crate::autostart::TaskStatus::Registered => {
+                        if let Ok(exe) = std::env::current_exe() {
+                            match crate::acl::replaceable_by_non_admin(&exe) {
+                                crate::acl::Verdict::AdminOnly => {
+                                    data.warning_causes.acl_insecure = false;
+                                }
+                                crate::acl::Verdict::NonAdminWritable => {
+                                    data.warning_causes.acl_insecure = true;
+                                }
+                                crate::acl::Verdict::Unknown => {} // fail-safe: retain existing state
+                            }
+                        }
+                    }
+                    crate::autostart::TaskStatus::Unknown => {} // fail-safe: retain existing state
+                }
+            }
         }
         crate::config::ReloadOutcome::Rejected(_) => {
             data.warning_causes.config_rejected = true;
@@ -271,21 +309,30 @@ pub fn handle_config_reload_outcome(data: &mut TrayData, outcome: &crate::config
         set_state(data, TrayState::Normal);
         #[cfg(debug_assertions)]
         debug_trace("RELOAD_CONFIG: Warning cleared → state→Normal");
-    } else if data.warning_causes.config_rejected && data.state != TrayState::Critical {
+    } else if data.warning_latched && data.state != TrayState::Critical {
         set_state(data, TrayState::Warning);
     }
 }
 
 /// Apply log warning event to tray state and structured warning causes.
-/// Config rejection is a deliberate no-op here because its lifecycle is owned
-/// synchronously by `WM_APP_RELOAD_CONFIG` via `handle_config_reload_outcome`,
-/// preventing asynchronous message queue interleaving from re-latching warning state.
+/// Config rejection and shortcut collisions are governed by `handle_config_reload_outcome`:
+/// once a clean reload has occurred (reload_generation > 0), delayed Hook warning messages
+/// cannot re-latch `config_collision` after clean reload.
 pub fn handle_log_warning(data: &mut TrayData, cause: usize) {
     match cause {
         crate::log::WARN_CAUSE_CONFIG_REJECTED => {
             // Deliberate no-op: config rejection is handled synchronously on
             // WM_APP_RELOAD_CONFIG so delayed or out-of-order warning messages cannot
             // re-latch Warning after a subsequent successful reload.
+        }
+        crate::log::WARN_CAUSE_CONFIG_COLLISION => {
+            // Causal ownership: shortcut collisions are reported at daemon startup.
+            // Once a clean reload has occurred (reload_generation > 0), any collision fix
+            // or new collision rejection is owned synchronously by handle_config_reload_outcome,
+            // preventing stale delayed Hook messages from re-latching Warning.
+            if data.warning_causes.reload_generation == 0 {
+                data.warning_causes.config_collision = true;
+            }
         }
         crate::log::WARN_CAUSE_ACL_INSECURE => {
             data.warning_causes.acl_insecure = true;
@@ -919,6 +966,7 @@ mod tests {
                 config_rejected: true,
                 acl_insecure: false,
                 simulated: false,
+                ..Default::default()
             },
         };
         assert_eq!(data.state, TrayState::Warning);
@@ -950,6 +998,7 @@ mod tests {
                 config_rejected: true,
                 acl_insecure: true,
                 simulated: false,
+                ..Default::default()
             },
         };
         assert_eq!(data.state, TrayState::Warning);
@@ -982,6 +1031,7 @@ mod tests {
                 config_rejected: true,
                 acl_insecure: false,
                 simulated: false,
+                ..Default::default()
             },
         };
         assert_eq!(data.state, TrayState::Critical);
@@ -1055,6 +1105,149 @@ mod tests {
         assert!(!data.warning_causes.config_rejected);
         assert!(!data.warning_latched);
 
+        let restored = state_after_recovery(data.warning_latched);
+        assert_eq!(restored, TrayState::Normal);
+    }
+
+    fn test_tray_data(state: TrayState, latched: bool, causes: WarningCauses) -> TrayData {
+        TrayData {
+            hwnd: 0,
+            icon_normal: 0,
+            icon_warning: 0,
+            icon_critical: 0,
+            state,
+            taskbar_created: 0,
+            hook_thread_id: 0,
+            hook_join: None,
+            health_shutdown: std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false)),
+            hook_dead_toast_sent: false,
+            warning_latched: latched,
+            warning_causes: causes,
+        }
+    }
+
+    #[test]
+    fn shortcut_collision_warning_clears_on_clean_reload() {
+        let mut data = test_tray_data(TrayState::Normal, false, WarningCauses::default());
+
+        // Startup: collision warning posted from hook
+        handle_log_warning(&mut data, crate::log::WARN_CAUSE_CONFIG_COLLISION);
+        assert_eq!(data.state, TrayState::Warning);
+        assert!(data.warning_causes.config_collision);
+        assert!(data.warning_latched);
+
+        // Settings fixes the collision and triggers clean reload
+        let applied = crate::config::ReloadOutcome::Applied { auto_start: false };
+        handle_config_reload_outcome(&mut data, &applied);
+
+        assert_eq!(data.state, TrayState::Normal);
+        assert!(!data.warning_causes.config_collision);
+        assert!(!data.warning_latched);
+    }
+
+    #[test]
+    fn stale_collision_warning_cannot_relatch_after_successful_reload() {
+        let mut data = test_tray_data(TrayState::Normal, false, WarningCauses::default());
+
+        // 1. Collision warning at startup
+        handle_log_warning(&mut data, crate::log::WARN_CAUSE_CONFIG_COLLISION);
+        assert_eq!(data.state, TrayState::Warning);
+        assert!(data.warning_causes.config_collision);
+
+        // 2. Clean reload applies and clears collision warning
+        let applied = crate::config::ReloadOutcome::Applied { auto_start: false };
+        handle_config_reload_outcome(&mut data, &applied);
+        assert_eq!(data.state, TrayState::Normal);
+        assert!(!data.warning_causes.config_collision);
+
+        // 3. Stale delayed collision warning message arrives: must NOT re-latch
+        handle_log_warning(&mut data, crate::log::WARN_CAUSE_CONFIG_COLLISION);
+        assert_eq!(data.state, TrayState::Normal);
+        assert!(!data.warning_causes.config_collision);
+        assert!(!data.warning_latched);
+    }
+
+    #[test]
+    fn autostart_acl_warning_clears_when_task_unregistered_or_admin_only() {
+        let mut data = test_tray_data(
+            TrayState::Warning,
+            true,
+            WarningCauses {
+                config_rejected: false,
+                config_collision: false,
+                acl_insecure: true,
+                simulated: false,
+                reload_generation: 0,
+            },
+        );
+        assert_eq!(data.state, TrayState::Warning);
+        assert!(data.warning_causes.acl_insecure);
+
+        let applied = crate::config::ReloadOutcome::Applied { auto_start: false };
+        handle_config_reload_outcome_with_status(
+            &mut data,
+            &applied,
+            crate::autostart::TaskStatus::Absent,
+        );
+
+        assert_eq!(data.state, TrayState::Normal);
+        assert!(!data.warning_causes.acl_insecure);
+        assert!(!data.warning_latched);
+    }
+
+    #[test]
+    fn autostart_acl_warning_persists_if_task_remains_registered_in_non_admin_path() {
+        let mut data = test_tray_data(
+            TrayState::Warning,
+            true,
+            WarningCauses {
+                config_rejected: false,
+                config_collision: false,
+                acl_insecure: true,
+                simulated: false,
+                reload_generation: 0,
+            },
+        );
+
+        let applied = crate::config::ReloadOutcome::Applied { auto_start: false };
+        // When task status is Unknown, fail-safe retains existing acl_insecure warning
+        handle_config_reload_outcome_with_status(
+            &mut data,
+            &applied,
+            crate::autostart::TaskStatus::Unknown,
+        );
+
+        assert_eq!(data.state, TrayState::Warning);
+        assert!(data.warning_causes.acl_insecure);
+        assert!(data.warning_latched);
+    }
+
+    #[test]
+    fn critical_hook_state_persists_across_collision_cleanup() {
+        let mut data = test_tray_data(
+            TrayState::Critical,
+            true,
+            WarningCauses {
+                config_rejected: false,
+                config_collision: true,
+                acl_insecure: false,
+                simulated: false,
+                reload_generation: 0,
+            },
+        );
+        assert_eq!(data.state, TrayState::Critical);
+        assert!(data.warning_causes.config_collision);
+        assert!(data.warning_latched);
+
+        // Clean reload clears collision, but preserves Critical
+        let applied = crate::config::ReloadOutcome::Applied { auto_start: false };
+        handle_config_reload_outcome(&mut data, &applied);
+
+        assert_eq!(data.state, TrayState::Critical);
+        assert!(!data.warning_causes.config_collision);
+        assert!(!data.warning_latched);
+
+        // Once hook recovers, transition goes to Normal (not Warning)
         let restored = state_after_recovery(data.warning_latched);
         assert_eq!(restored, TrayState::Normal);
     }
