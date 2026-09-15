@@ -996,8 +996,8 @@ mod tests {
             warning_latched: true,
             warning_causes: WarningCauses {
                 config_rejected: true,
-                acl_insecure: true,
-                simulated: false,
+                acl_insecure: false,
+                simulated: true,
                 ..Default::default()
             },
         };
@@ -1009,7 +1009,7 @@ mod tests {
 
         assert_eq!(data.state, TrayState::Warning);
         assert!(!data.warning_causes.config_rejected);
-        assert!(data.warning_causes.acl_insecure);
+        assert!(data.warning_causes.simulated);
         assert!(data.warning_latched);
     }
 
