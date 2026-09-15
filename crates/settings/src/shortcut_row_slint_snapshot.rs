@@ -3042,4 +3042,97 @@ pub(crate) mod tests {
             let _ = std::fs::remove_file(&save_path);
         });
     }
+
+    #[test]
+    fn modal_reset_dialog_has_compact_content_derived_height() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+            window
+                .window()
+                .set_size(slint::LogicalSize::new(760.0, 560.0));
+            model.borrow_mut().set_pane(Pane::About);
+            sync_model_to_ui(&window, &model.borrow());
+
+            window.set_factory_reset_dialog_open(true);
+            assert!(window.get_factory_reset_dialog_open());
+
+            // Source check: card explicitly declares height: dialog_layout.preferred-height;
+            let main_window_slint = include_str!("../ui/main_window.slint");
+            assert!(
+                main_window_slint.contains("height: dialog_layout.preferred-height;"),
+                "Confirmation card must bind height directly to dialog_layout.preferred-height"
+            );
+            assert!(
+                main_window_slint.contains("dialog_layout := VerticalLayout"),
+                "Inner vertical layout must be named dialog_layout"
+            );
+
+            // Runtime AccessKit geometry check
+            let card =
+                ElementHandle::find_by_accessible_label(&window, "Factory reset confirmation card")
+                    .next()
+                    .expect("Factory reset confirmation card found");
+            let card_size = card.size();
+            let win_size = window.window().size();
+
+            assert!(
+                card_size.height >= 180.0 && card_size.height <= 260.0,
+                "Card height ({}) must be compact and between 180px and 260px",
+                card_size.height
+            );
+            assert!(
+                card_size.height < win_size.height as f32 / 2.0,
+                "Card height ({}) must be strictly less than half the window height ({})",
+                card_size.height,
+                win_size.height as f32 / 2.0
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
+
+    #[test]
+    fn modal_reset_dialog_is_vertically_centered_in_window() {
+        run_on_ui_thread(|| {
+            let (window, model, save_path) = setup_shortcuts_window();
+            window
+                .window()
+                .set_size(slint::LogicalSize::new(760.0, 560.0));
+            model.borrow_mut().set_pane(Pane::About);
+            sync_model_to_ui(&window, &model.borrow());
+
+            window.set_factory_reset_dialog_open(true);
+            assert!(window.get_factory_reset_dialog_open());
+
+            let card =
+                ElementHandle::find_by_accessible_label(&window, "Factory reset confirmation card")
+                    .next()
+                    .expect("Factory reset confirmation card found");
+            let card_pos = card.absolute_position();
+            let card_size = card.size();
+            let win_size = window.window().size();
+
+            let card_mid_y = card_pos.y + card_size.height / 2.0;
+            let win_mid_y = win_size.height as f32 / 2.0;
+
+            assert!(
+                (card_mid_y - win_mid_y).abs() <= 10.0,
+                "Card vertical center ({}) must match window vertical center ({}) within 10px tolerance",
+                card_mid_y,
+                win_mid_y
+            );
+            assert!(
+                card_pos.y > 100.0,
+                "Card top ({}) must be well below window top (> 100px)",
+                card_pos.y
+            );
+            assert!(
+                card_pos.y + card_size.height < win_size.height as f32 - 100.0,
+                "Card bottom ({}) must be well above window bottom",
+                card_pos.y + card_size.height
+            );
+
+            let _ = std::fs::remove_file(&save_path);
+        });
+    }
 }

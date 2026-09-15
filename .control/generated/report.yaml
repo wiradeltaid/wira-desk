@@ -1,13 +1,13 @@
 asof: '2026-09-15'
 since: ''
 since_report: ''
-sha: 3556bdf0ab921fe7412e2cdd338d90a38ca605ac
-registry_dirty: true
+sha: 09c18a4e9115bc0ce0faa1c44f57ba6843646624
+registry_dirty: false
 uncommitted_tickets: []
 promise_progress: 100%
 rtm_rows:
-  green: 99
-  counted: 99
+  green: 102
+  counted: 102
   excluded_no_uc: 8
 work_progress:
 - spec: SPEC-1
@@ -106,6 +106,11 @@ work_progress:
   tickets_total: 2
   work_progress: 100%
 - spec: SPEC-27
+  status: closed
+  tickets_done: 2
+  tickets_total: 2
+  work_progress: 100%
+- spec: SPEC-28
   status: closed
   tickets_done: 2
   tickets_total: 2
@@ -901,6 +906,27 @@ proven:
   - shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_the_draft
   - shortcut_row_slint_snapshot::tests::restore_shortcuts_discards_pending_percentage_and_cancels_capture
   - shortcut_row_slint_snapshot::tests::legacy_stack_conflict_banner_repairs_only_when_safe
+  closed: '2026-09-15'
+- FR: FR-18
+  UC: UC-4
+  ticket: SPEC-28-01
+  test:
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
+  closed: '2026-09-15'
+- FR: FR-32
+  UC: UC-14
+  ticket: SPEC-28-01
+  test:
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
+  closed: '2026-09-15'
+- FR: FR-7
+  UC: UC-4
+  ticket: SPEC-28-01
+  test:
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
   closed: '2026-09-15'
 moved:
 - id: CAP-1

@@ -36,7 +36,8 @@ function Write-Fail($msg) { Write-Host "[verify-installer-safety] FAIL: $msg" -F
 # ----------------------------------------------------------------------------
 # 1. Locate Inno Setup Compiler (ISCC.exe)
 # ----------------------------------------------------------------------------
-$iscc = (Get-Command ISCC.exe -ErrorAction SilentlyContinue)?.Source
+$isccCmd = Get-Command ISCC.exe -ErrorAction SilentlyContinue
+$iscc = if ($isccCmd) { $isccCmd.Source } else { $null }
 if (-not $iscc) {
     $fallbackPaths = @()
     if ($env:ProgramFiles) {
@@ -209,8 +210,21 @@ if (-not $isAdmin) {
     exit 0
 }
 
-# Locate or compile standard production installer (version 0.2.0)
-$stdSetupPath = Join-Path $resolvedOut "WiraDesk-0.2.0-x64-setup.exe"
+# Locate or compile standard production installer (derived from Cargo.toml)
+$workspaceManifest = Join-Path $repoRoot 'Cargo.toml'
+$prodVersion = '0.2.0'
+if (Test-Path -LiteralPath $workspaceManifest) {
+    $inWorkspacePackage = $false
+    foreach ($line in Get-Content -LiteralPath $workspaceManifest) {
+        if ($line -match '^\s*\[workspace\.package\]') { $inWorkspacePackage = $true; continue }
+        if ($inWorkspacePackage -and $line -match '^\s*version\s*=\s*"([^"]+)"') {
+            $prodVersion = $Matches[1]
+            break
+        }
+    }
+}
+
+$stdSetupPath = Join-Path $resolvedOut "WiraDesk-$prodVersion-x64-setup.exe"
 if (-not (Test-Path $stdSetupPath)) {
     Write-Step "Compiling production installer with ISCC..."
     & $iscc "/DSTAGE_DIR=$resolvedStage" "/DOUT_DIR=$resolvedOut" "packaging\wiradesk.iss" *>$null
@@ -364,8 +378,8 @@ try {
     # ------------------------------------------------------------------------
     # Case 5: Equal Version Installed (Reinstall)
     # ------------------------------------------------------------------------
-    Write-Step "Decision Table: Equal Installed Version (0.2.0)..."
-    & reg.exe add "HKLM\$appIdKey" /v "DisplayVersion" /t REG_SZ /d "0.2.0" /f /reg:64 *>$null
+    Write-Step "Decision Table: Equal Installed Version ($prodVersion)..."
+    & reg.exe add "HKLM\$appIdKey" /v "DisplayVersion" /t REG_SZ /d "$prodVersion" /f /reg:64 *>$null
     $res = Invoke-SilentInstaller $stdSetup (Join-Path $tempRoot "inst_equal")
     if ($res.ExitCode -ne 0 -or (-not $res.Extracted)) {
         Write-Fail "Equal reinstall failed! ExitCode=$($res.ExitCode), Extracted=$($res.Extracted)"

@@ -14,7 +14,7 @@ Following user testing of Wira Desk v0.2.4, two usability defects and lifecycle 
 1. **Compact Modal Dialog Height (`crates/settings/ui/main_window.slint`)**:
    - Bind the Factory Reset dialog card container's height directly to its content layout: `height: dialog_layout.preferred-height;`.
    - Name the inner `VerticalLayout` as `dialog_layout := VerticalLayout { ... }`.
-   - Add a test-addressable identifier on the dialog card (`accessible-role: group; accessible-label: "Factory reset confirmation card";`) and expose `property <length> modal_card_height: dialog_layout.preferred-height;` so that UI tests can measure the rendered card's actual geometry and vertical bounds rather than checking source code strings alone.
+   - Add a test-addressable identifier on the dialog card (`accessible-role: group; accessible-label: "Factory reset confirmation card";`) so that UI test harnesses can locate and measure the rendered card's actual geometry and vertical bounds.
    - Center the card vertically and horizontally:
      ```slint
      x: (parent.width - self.width) / 2;
@@ -23,33 +23,54 @@ Following user testing of Wira Desk v0.2.4, two usability defects and lifecycle 
      height: dialog_layout.preferred-height;
      ```
    - Ensure the card is compact (~200px-230px tall), cleanly wrapping the title, description, and action buttons with consistent 24px padding and 14px spacing.
-   - Add runtime Slint snapshot regression tests measuring the rendered card bounds directly: asserting that the card height is strictly bounded (`card.height < 260px` and `card.height >= 180px`) and vertically centered (`y > 100px` and `y + card.height < 460px`).
+   - Add runtime Slint snapshot regression tests measuring the rendered card bounds directly at normal window geometry (760×560): asserting that the card height is strictly bounded (`card.height < window.height / 2`, `< 280px` and `>= 180px`) and vertically centered with midpoint within 10px tolerance of window vertical center.
 
-2. **Real-Time Tray Warning Clearance Across All Configuration Sources (`crates/daemon/src/tray.rs`, `crates/daemon/src/hook.rs`, `crates/daemon/src/log.rs`, `crates/daemon/src/config.rs`)**:
-   - Introduce dedicated warning cause identifiers in `crates/daemon/src/log.rs`:
-     - `WARN_CAUSE_CONFIG_COLLISION: usize = 4;`
-   - In `crates/daemon/src/hook.rs`:
-     - When unbinding duplicate shortcuts, tag the warning post with `WARN_CAUSE_CONFIG_COLLISION`.
-   - In `crates/daemon/src/tray.rs`:
-     - Model `config_collision: bool` in `WarningCauses`.
-     - In `handle_log_warning`, map `WARN_CAUSE_CONFIG_COLLISION` to `data.warning_causes.config_collision = true`.
-     - In `handle_config_reload_outcome`:
-       - Single ordered owner for configuration reload outcomes:
-         - On `ReloadOutcome::Applied { .. }`:
-           - Clear both `data.warning_causes.config_rejected = false` and `data.warning_causes.config_collision = false`.
-           - Verify confirmed scheduler state: check `crate::autostart::is_registered()`.
-             - If `!crate::autostart::is_registered()`, confirmed that no auto-start task exists -> clear `data.warning_causes.acl_insecure = false`.
-             - If task is registered, re-evaluate `crate::acl::replaceable_by_non_admin(&current_exe)`: if `AdminOnly`, clear `acl_insecure = false`; if `NonAdminWritable`, keep `acl_insecure = true`.
-         - On `ReloadOutcome::Rejected(_)`:
-           - Set `data.warning_causes.config_rejected = true`.
-       - After updating causes, set `data.warning_latched = data.warning_causes.any_active();`.
-       - If `!data.warning_latched && data.state == TrayState::Warning`, immediately transition `data.state` to `TrayState::Normal` and update the tray icon via `modify_icon(data)`.
-       - If `data.state == TrayState::Critical`, preserve `Critical` state so that a dead keyboard hook is never downgraded.
+2. **Real-Time Tray Warning Clearance Across All Configuration Sources (crates/daemon/src/tray.rs, crates/daemon/src/hook.rs, crates/daemon/src/log.rs, crates/daemon/src/config.rs)**:
+   - Causal ownership and synchronous derivation for shortcut collisions:
+     - In crates/daemon/src/config.rs, assign a monotonic config_generation: u64 and evaluate duplicate shortcut bindings synchronously during 
+eload:
+       `
+ust
+       pub enum ReloadOutcome {
+           Applied {
+               auto_start: bool,
+               has_shortcut_collision: bool,
+               generation: u64,
+           },
+           Rejected(String),
+       }
+       `
+   - Introduce dedicated warning cause identifiers in crates/daemon/src/log.rs:
+     - WARN_CAUSE_CONFIG_COLLISION: usize = 4;
+   - In crates/daemon/src/hook.rs:
+     - When unbinding duplicate shortcuts, tag the warning post with WARN_CAUSE_CONFIG_COLLISION and carry the snapshot's generation.
+   - In crates/daemon/src/tray.rs:
+     - Model config_collision: bool and last_applied_generation: u64 in WarningCauses.
+     - In handle_log_warning, ignore any collision warning message older than last_applied_generation.
+     - In handle_config_reload_outcome:
+       - Single synchronous authoritative owner for configuration reload outcomes:
+         - On ReloadOutcome::Applied { auto_start: _, has_shortcut_collision, generation }:
+           - Record data.warning_causes.last_applied_generation = generation;.
+           - Clear data.warning_causes.config_rejected = false;.
+           - Synchronously update data.warning_causes.config_collision = has_shortcut_collision;.
+           - Verify confirmed scheduler state via structured TaskStatus:
+             - If TaskStatus::Absent: positively confirmed that no auto-start task exists -> set data.warning_causes.acl_insecure = false;.
+             - If TaskStatus::Registered:
+               - Re-evaluate crate::acl::replaceable_by_non_admin(&current_exe):
+                 - Verdict::AdminOnly: clear data.warning_causes.acl_insecure = false;.
+                 - Verdict::NonAdminWritable: set data.warning_causes.acl_insecure = true;.
+                 - Verdict::Unknown: fail-safely retain previous cl_insecure state.
+             - If TaskStatus::Unknown: fail-safely retain previous cl_insecure state (never infer safety from an observation failure).
+         - On ReloadOutcome::Rejected(_):
+           - Set data.warning_causes.config_rejected = true;.
+       - After updating causes, set data.warning_latched = data.warning_causes.any_active();.
+       - If !data.warning_latched && data.state == TrayState::Warning, immediately transition data.state to TrayState::Normal and update the tray icon via modify_icon(data).
+       - If data.state == TrayState::Critical, preserve Critical state so that a dead keyboard hook is never downgraded.
    - Add unit and integration tests covering:
-     - Collision warning sets `config_collision` and Warning state.
-     - Interleaving test: collision warning -> clean applied reload -> delayed stale collision warning does not re-latch Warning.
-     - Auto-start ACL warning is cleared if and only if the task is confirmed unregistered or registered at an admin-only path.
-     - Critical hook state (`TrayState::Critical`) remains `Critical` across reloads.
+     - Synchronous reload outcome clearing collision and restoring Normal state.
+     - Interleaving test: collision warning -> clean applied reload -> delayed stale collision warning cannot re-latch Warning.
+     - Auto-start ACL warning is cleared if and only if the task is confirmed unregistered or registered at an admin-only path; retained fail-safely on query failure or unknown ACL verdict.
+     - Critical hook state (TrayState::Critical) remains Critical across reloads.
 
 ## User Stories
 
@@ -86,34 +107,44 @@ Following user testing of Wira Desk v0.2.4, two usability defects and lifecycle 
         }
     }
     ```
-- In `crates/daemon/src/log.rs`:
-  - Define `pub const WARN_CAUSE_CONFIG_COLLISION: usize = 4;`.
-- In `crates/daemon/src/hook.rs`:
-  - When reporting duplicate shortcut unbinding, call `crate::log::warn_with_cause(worker_hwnd, &format!(...), crate::log::WARN_CAUSE_CONFIG_COLLISION);`.
-- In `crates/daemon/src/tray.rs`:
-  - Add `pub config_collision: bool` to `WarningCauses`.
-  - In `handle_log_warning`:
-    - On `WARN_CAUSE_CONFIG_COLLISION`, set `data.warning_causes.config_collision = true`.
-  - In `handle_config_reload_outcome`:
-    - When `ReloadOutcome::Applied { .. }` is received:
-      - `data.warning_causes.config_rejected = false;`
-      - `data.warning_causes.config_collision = false;`
-      - Re-evaluate location safety against verified scheduler state:
-        ```rust
-        if !crate::autostart::is_registered() {
-            data.warning_causes.acl_insecure = false;
-        } else if let Ok(exe) = std::env::current_exe() {
-            if crate::acl::replaceable_by_non_admin(&exe) == crate::acl::Verdict::AdminOnly {
-                data.warning_causes.acl_insecure = false;
-            } else {
-                data.warning_causes.acl_insecure = true;
+- In crates/daemon/src/config.rs:
+  - Extend ReloadOutcome::Applied to carry has_shortcut_collision: bool and generation: u64.
+  - Increment monotonic config_generation: u64 during 
+eload.
+  - Introduce utostart::task_status() returning structured TaskStatus (Absent, Registered, Unknown).
+- In crates/daemon/src/log.rs:
+  - Define pub const WARN_CAUSE_CONFIG_COLLISION: usize = 4;.
+- In crates/daemon/src/hook.rs:
+  - When duplicate shortcuts are unbound, tag warning with WARN_CAUSE_CONFIG_COLLISION and carry the snapshot generation.
+- In crates/daemon/src/tray.rs:
+  - Add pub config_collision: bool and pub last_applied_generation: u64 to WarningCauses.
+  - In handle_log_warning:
+    - Drop collision warnings with generation older than last_applied_generation.
+  - In handle_config_reload_outcome:
+    - When ReloadOutcome::Applied { auto_start: _, has_shortcut_collision, generation } is received:
+      - data.warning_causes.last_applied_generation = generation;
+      - data.warning_causes.config_rejected = false;
+      - data.warning_causes.config_collision = has_shortcut_collision;
+      - Re-evaluate location safety against observed utostart::task_status():
+        `
+ust
+        match crate::autostart::task_status() {
+            TaskStatus::Absent => data.warning_causes.acl_insecure = false,
+            TaskStatus::Registered => {
+                if let Ok(exe) = std::env::current_exe() {
+                    match crate::acl::replaceable_by_non_admin(&exe) {
+                        crate::acl::Verdict::AdminOnly => data.warning_causes.acl_insecure = false,
+                        crate::acl::Verdict::NonAdminWritable => data.warning_causes.acl_insecure = true,
+                        crate::acl::Verdict::Unknown => {}, // fail-safe: retain
+                    }
+                }
             }
+            TaskStatus::Unknown => {}, // fail-safe: retain
         }
-        ```
-    - Recalculate `data.warning_latched = data.warning_causes.any_active();`.
-    - If `!data.warning_latched && data.state == TrayState::Warning`, call `set_state(data, TrayState::Normal)`.
-    - Retain `TrayState::Critical` guard.
-
+        `
+    - Recalculate data.warning_latched = data.warning_causes.any_active();.
+    - If !data.warning_latched && data.state == TrayState::Warning, call set_state(data, TrayState::Normal).
+    - Retain TrayState::Critical guard.
 ## Testing Decisions
 
 - Slint UI tests in `crates/settings/src/shortcut_row_slint_snapshot.rs`:

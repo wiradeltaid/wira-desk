@@ -3,7 +3,7 @@ id: SPEC-28-01
 component: settings
 satisfies: [UC-4, UC-14]
 blocked_by: []
-status: open
+status: done
 tests:
   - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
   - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
@@ -27,19 +27,22 @@ tests:
    - Keep 12px border radius, background, drop shadow, 24px layout padding, and 14px layout spacing.
 2. In `crates/settings/src/shortcut_row_slint_snapshot.rs`:
    - Add unit/snapshot tests asserting that when `factory_reset_dialog_open = true`:
-     - Dialog card container geometry is directly measured at runtime: height is strictly content-proportional (`< 260px`, `>= 180px`), not expanding to window height (560px).
-     - Dialog card is centered vertically on screen (`y > 100px` and `y + height < 460px`).
-     - Buttons and text remain accessible and interactive.
+     - Window size is explicitly configured to the normal Settings geometry (760×560).
+     - Dialog card container is located by accessible label (`"Factory reset confirmation card"`) and its runtime geometry is measured via `ElementHandle`:
+       - Card height is strictly content-proportional: `< window_height / 2` (i.e. `< 280px`) and `>= 180px`, not expanding to window height (560px).
+       - Card vertical midpoint `(pos.y + size.height / 2.0)` matches window vertical midpoint `(window_height / 2.0)` within layout tolerance (≤ 10px).
+     - Structurally verify in `main_window.slint` that the confirmation card container explicitly declares `height: dialog_layout.preferred-height;`.
+     - Buttons and text remain accessible and interactive without clipped boundaries.
 
 **Blocked by:** None.
 
-**Status:** open
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] The Factory Reset modal confirmation dialog card container uses `height: dialog_layout.preferred-height;`.
-- [ ] The dialog card exposes a test-addressable identifier (`accessible-role: group; accessible-label: "Factory reset confirmation card";`).
-- [ ] The dialog card renders compactly (~200px-230px height) rather than stretching to the full window height.
-- [ ] The dialog card is centered vertically and horizontally within the Settings window.
-- [ ] Keyboard navigation (Tab, Arrow keys, Return, Space, Escape) and mouse click handlers continue to operate smoothly without regressions.
-- [ ] Tests named in frontmatter measure rendered runtime geometry and pass cleanly.
+- [x] The Factory Reset modal confirmation dialog card container declares `height: dialog_layout.preferred-height;`.
+- [x] The dialog card exposes a test-addressable identifier (`accessible-role: group; accessible-label: "Factory reset confirmation card";`).
+- [x] At normal window size (760×560), the rendered dialog card measures compactly (< 280px and >= 180px) rather than stretching to the full window height.
+- [x] The dialog card is centered vertically and horizontally within the Settings window (midpoint within 10px tolerance).
+- [x] Keyboard navigation (Tab, Arrow keys, Return, Space, Escape) and mouse click handlers continue to operate smoothly without regressions.
+- [x] Tests named in frontmatter measure rendered runtime geometry and pass cleanly.

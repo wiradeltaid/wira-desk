@@ -1674,12 +1674,13 @@ fn load_shortcuts_from_config(worker_hwnd: HWND, cfg: &Config) -> Chords {
     // any pre-existing `layout.stack_shortcut = "ctrl+alt+down"`.
     for (keeper, loser) in unbind_duplicates(&mut resolved) {
         let chord = resolved_display(&rows, keeper);
-        crate::log::warn(
+        crate::log::warn_with_cause(
             worker_hwnd,
             &format!(
                 "{} and {} are both set to {chord}; {} keeps it and {} is unbound until one of them changes",
                 rows[keeper].0, rows[loser].0, rows[keeper].0, rows[loser].0
             ),
+            crate::log::WARN_CAUSE_CONFIG_COLLISION,
         );
     }
 

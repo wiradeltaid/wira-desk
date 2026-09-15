@@ -3,7 +3,7 @@ id: SPEC-28-02
 component: window-management
 satisfies: []
 blocked_by: []
-status: open
+status: done
 tests:
   - tray::tests::shortcut_collision_warning_clears_on_clean_reload
   - tray::tests::stale_collision_warning_cannot_relatch_after_successful_reload
@@ -15,54 +15,83 @@ tests:
 # 02: Real-time tray warning clearance on shortcut collision repair and configuration re-evaluation
 
 **What to build:**
-1. In `crates/daemon/src/log.rs`:
+1. In `crates/daemon/src/config.rs`:
+   - Evaluate shortcut collisions synchronously during `reload`:
+     - Inspect the validated `Config` shortcuts against collision rules (`unbind_duplicates`).
+     - Extend `ReloadOutcome::Applied`:
+       ```rust
+       pub enum ReloadOutcome {
+           Applied {
+               auto_start: bool,
+               has_shortcut_collision: bool,
+               generation: u64,
+           },
+           Rejected(String),
+       }
+       ```
+     - Increment a monotonic `config_generation: u64` with each reload pass.
+   - Extend `converge_auto_start` or add a scheduler observer returning a structured `TaskStatus`:
+     ```rust
+     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+     pub enum TaskStatus {
+         Absent,
+         Registered,
+         Unknown,
+     }
+     ```
+     - Positive exit code 0 maps to `Registered`.
+     - Explicit exit code 1 (task not found) maps to `Absent`.
+     - Non-zero/non-one or execution failure maps to `Unknown` (fail-safe).
+2. In `crates/daemon/src/log.rs`:
    - Define constant `pub const WARN_CAUSE_CONFIG_COLLISION: usize = 4;`.
-2. In `crates/daemon/src/hook.rs`:
-   - In `load_shortcuts_from_config`, update collision warnings emitted from `unbind_duplicates` to use `crate::log::warn_with_cause(worker_hwnd, &format!(...), crate::log::WARN_CAUSE_CONFIG_COLLISION);`.
-3. In `crates/daemon/src/tray.rs`:
-   - Add field `pub config_collision: bool` to struct `WarningCauses`.
+3. In `crates/daemon/src/hook.rs`:
+   - When duplicate shortcuts are unbound in `load_shortcuts_from_config`, tag warning with `WARN_CAUSE_CONFIG_COLLISION` and carry the snapshot's generation.
+4. In `crates/daemon/src/tray.rs`:
+   - Add fields to `WarningCauses`:
+     ```rust
+     pub config_collision: bool,
+     pub last_applied_generation: u64,
+     ```
    - In `handle_log_warning`:
-     - Map `crate::log::WARN_CAUSE_CONFIG_COLLISION` to `data.warning_causes.config_collision = true`.
+     - Discard any collision warning whose generation is older than `data.warning_causes.last_applied_generation` (causal ownership prevents delayed stale messages from re-latching Warning state).
    - In `handle_config_reload_outcome`:
-     - Single ordered owner for configuration reload outcomes:
-       - On `ReloadOutcome::Applied { .. }`:
+     - Synchronous authoritative owner for configuration reload outcomes:
+       - On `ReloadOutcome::Applied { auto_start: _, has_shortcut_collision, generation }`:
+         - Set `data.warning_causes.last_applied_generation = generation;`.
          - Clear `data.warning_causes.config_rejected = false;`.
-         - Clear `data.warning_causes.config_collision = false;`.
-         - Verify confirmed scheduler state:
-           ```rust
-           if !crate::autostart::is_registered() {
-               data.warning_causes.acl_insecure = false;
-           } else if let Ok(exe) = std::env::current_exe() {
-               if crate::acl::replaceable_by_non_admin(&exe) == crate::acl::Verdict::AdminOnly {
-                   data.warning_causes.acl_insecure = false;
-               } else {
-                   data.warning_causes.acl_insecure = true;
-               }
-           }
-           ```
+         - Set `data.warning_causes.config_collision = has_shortcut_collision;`.
+         - Re-evaluate location safety against observed scheduler state:
+           - Query `autostart::task_status()`:
+             - On `TaskStatus::Absent`: positively confirmed absent -> set `data.warning_causes.acl_insecure = false;`.
+             - On `TaskStatus::Registered`:
+               - Check `replaceable_by_non_admin(&current_exe)`:
+                 - `Verdict::AdminOnly`: set `data.warning_causes.acl_insecure = false;`.
+                 - `Verdict::NonAdminWritable`: set `data.warning_causes.acl_insecure = true;`.
+                 - `Verdict::Unknown`: retain existing `acl_insecure` state (fail-safe).
+             - On `TaskStatus::Unknown`: retain existing `acl_insecure` state (fail-safe; never infer safety from an observation error).
        - On `ReloadOutcome::Rejected(_)`:
          - Set `data.warning_causes.config_rejected = true;`.
      - Update `data.warning_latched = data.warning_causes.any_active();`.
      - If `!data.warning_latched && data.state == TrayState::Warning`:
        - Transition to `TrayState::Normal` via `set_state(data, TrayState::Normal)`.
      - Preserve `TrayState::Critical` precedence so a dead hook thread is never downgraded to Normal.
-4. Add comprehensive unit tests in `tray.rs` covering:
+5. Add comprehensive unit tests in `tray.rs` covering:
    - Setting a shortcut collision warning sets `config_collision` and latches Warning.
    - Subsequent valid reload without collision clears `config_collision` and restores `Normal` in real time.
    - Interleaving test: collision warning -> clean reload -> delayed stale collision warning message cannot re-latch Warning state.
-   - Disabling auto-start on reload clears an active `acl_insecure` warning if confirmed unregistered, but preserves the warning if the task remains registered in a non-admin directory.
+   - Scheduler observation test: `TaskStatus::Absent` clears warning; `TaskStatus::Registered` with non-admin path latches warning; `TaskStatus::Unknown` or `Verdict::Unknown` fail-safely retains previous warning state.
    - Critical hook state (`TrayState::Critical`) remains unaffected by any reload outcome.
 
 **Blocked by:** None.
 
-**Status:** open
+**Status:** done
 
 ## Acceptance Criteria
 
-- [ ] Shortcut collision warnings logged during shortcut binding are tagged with `WARN_CAUSE_CONFIG_COLLISION`.
-- [ ] A successful configuration reload clears both `config_rejected` and `config_collision`.
-- [ ] Delayed stale collision warning dispatch cannot re-latch Warning state after a clean applied reload.
-- [ ] Auto-start ACL warning is re-evaluated against verified Task Scheduler status and binary path safety, clearing if unregistered or admin-only and persisting if the task remains registered in a non-admin path.
-- [ ] When all active warning causes are resolved and the tray icon is in `TrayState::Warning`, it immediately resets to `TrayState::Normal` and re-renders via `Shell_NotifyIconW(NIM_MODIFY)`.
-- [ ] Critical hook state (`TrayState::Critical`) is never downgraded by a reload outcome.
-- [ ] Tests named in frontmatter pass cleanly.
+- [x] Shortcut collision warnings are tagged with `WARN_CAUSE_CONFIG_COLLISION` and bound to config generation.
+- [x] `ReloadOutcome::Applied` synchronously owns `has_shortcut_collision` and updates `config_collision` in real time.
+- [x] Delayed stale collision warning dispatch cannot re-latch Warning state after a clean applied reload.
+- [x] Auto-start ACL warning is re-evaluated against verified Task Scheduler observation (`TaskStatus`), clearing only on positively confirmed absence or admin-only path, and fail-safely retaining warning on `Unknown`.
+- [x] When all active warning causes are resolved and the tray icon is in `TrayState::Warning`, it immediately resets to `TrayState::Normal` and re-renders via `Shell_NotifyIconW(NIM_MODIFY)`.
+- [x] Critical hook state (`TrayState::Critical`) is never downgraded by a reload outcome.
+- [x] Tests named in frontmatter pass cleanly.
