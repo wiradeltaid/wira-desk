@@ -1,4 +1,4 @@
-asof: '2026-09-07'
+asof: '2026-09-15'
 capabilities:
 - id: CAP-1
   text: Cycle focus among visible windows of the active application via a precise global shortcut.
@@ -9,39 +9,51 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-06'
-  actual_end: '2026-09-06'
+  actual_start: '2026-09-07'
+  actual_end: ''
   delta_days: null
-  state: done
+  state: in-progress
   children:
   - id: FR-1
     text: Cycle only among windows of the same application identity (exe name), not global Alt+Tab.
     tickets:
+    - SPEC-17-01
+    - SPEC-18-01
+    - SPEC-19-01
     - W1-S1
-    actual_start: '2026-09-06'
-    actual_end: '2026-09-06'
-    state: done
+    actual_start: '2026-09-07'
+    actual_end: ''
+    state: in-progress
   - id: FR-4
     text: Bring Not Responding windows to the foreground instead of hiding them during a cycle.
     tickets:
+    - SPEC-17-01
+    - SPEC-18-01
+    - SPEC-19-01
     - W1-S1
-    actual_start: '2026-09-06'
-    actual_end: '2026-09-06'
-    state: done
+    actual_start: '2026-09-07'
+    actual_end: ''
+    state: in-progress
   - id: FR-5
     text: Skip minimized, ghost, and tool-window overlays; cycle only visibly open windows.
     tickets:
+    - SPEC-17-01
+    - SPEC-18-01
+    - SPEC-19-01
     - W1-S1
-    actual_start: '2026-09-06'
-    actual_end: '2026-09-06'
-    state: done
+    actual_start: '2026-09-07'
+    actual_end: ''
+    state: in-progress
   - id: FR-6
     text: Require an exact shortcut match; extra modifiers must not trigger cycling.
     tickets:
+    - SPEC-17-01
+    - SPEC-18-01
+    - SPEC-19-01
     - W1-S1
-    actual_start: '2026-09-06'
-    actual_end: '2026-09-06'
-    state: done
+    actual_start: '2026-09-07'
+    actual_end: ''
+    state: in-progress
   waiting_on: []
 - id: CAP-10
   text: Launch the daemon silently at logon via a scheduled task without repeated UAC prompts.
@@ -52,17 +64,19 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: ''
+  actual_start: '2026-09-07'
   actual_end: ''
   delta_days: null
-  state: not-started
+  state: in-progress
   children:
   - id: FR-13
     text: Toggle auto-start via a logon scheduled task with highest privileges for the active user.
-    tickets: []
-    actual_start: ''
+    tickets:
+    - W1-S6
+    - W3-S1
+    actual_start: '2026-09-07'
     actual_end: ''
-    state: not-started
+    state: in-progress
   waiting_on: []
 - id: CAP-11
   text: Expose runtime diagnostic logs from the tray context menu.
@@ -73,8 +87,8 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-06'
-  actual_end: '2026-09-06'
+  actual_start: '2026-09-07'
+  actual_end: '2026-09-07'
   delta_days: null
   state: done
   children:
@@ -82,8 +96,8 @@ capabilities:
     text: Provide View Logs in the tray menu opening the silent log file location.
     tickets:
     - W1-S3
-    actual_start: '2026-09-06'
-    actual_end: '2026-09-06'
+    actual_start: '2026-09-07'
+    actual_end: '2026-09-07'
     state: done
   waiting_on: []
 - id: CAP-12
@@ -96,8 +110,8 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-06'
-  actual_end: '2026-09-06'
+  actual_start: '2026-09-07'
+  actual_end: '2026-09-07'
   delta_days: null
   state: done
   children:
@@ -106,8 +120,8 @@ capabilities:
       same virtual desktop.
     tickets:
     - W4-S3
-    actual_start: '2026-09-06'
-    actual_end: '2026-09-06'
+    actual_start: '2026-09-07'
+    actual_end: '2026-09-07'
     state: done
   waiting_on: []
 - id: CAP-13
@@ -120,10 +134,10 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: ''
-  actual_end: ''
+  actual_start: '2026-09-07'
+  actual_end: '2026-09-07'
   delta_days: null
-  state: not-started
+  state: done
   children:
   - id: FR-24
     text: Periodically check over HTTPS whether a newer release exists, on by default and toggleable,
@@ -135,10 +149,11 @@ capabilities:
   - id: FR-25
     text: Let the user check for updates on demand, and on confirmation, download, verify, and launch
       the installer.
-    tickets: []
-    actual_start: ''
-    actual_end: ''
-    state: not-started
+    tickets:
+    - SPEC-2-02
+    actual_start: '2026-09-07'
+    actual_end: '2026-09-07'
+    state: done
   waiting_on: []
 - id: CAP-14
   text: Snap the active window to a screen edge at a user-configurable percentage instead of a fixed half.
@@ -149,19 +164,25 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-06'
-  actual_end: '2026-09-07'
+  actual_start: '2026-09-07'
+  actual_end: ''
   delta_days: null
-  state: done
+  state: in-progress
   children:
   - id: FR-26
     text: Snap the active window to a screen edge at a percentage the user configures per direction, instead
       of the fixed half.
     tickets:
     - SPEC-1-01
-    actual_start: '2026-09-06'
-    actual_end: '2026-09-07'
-    state: done
+    - SPEC-2-01
+    - SPEC-24-01
+    - SPEC-4-02
+    - SPEC-5-03
+    - SPEC-6-02
+    - SPEC-7-01
+    actual_start: '2026-09-07'
+    actual_end: ''
+    state: in-progress
   waiting_on: []
 - id: CAP-15
   text: Snap the active window to one of three equal horizontal thirds of the current monitor.
@@ -185,6 +206,95 @@ capabilities:
     actual_end: '2026-09-07'
     state: done
   waiting_on: []
+- id: CAP-16
+  text: Let the user turn any individual shortcut action off, returning its chord to Windows instead of
+    leaving it claimed and inert.
+  size: ''
+  priority: ''
+  owner: ''
+  target_release: ''
+  planned_start: ''
+  planned_end: ''
+  estimate_mandays: 0
+  actual_start: '2026-09-07'
+  actual_end: '2026-09-08'
+  delta_days: null
+  state: done
+  children:
+  - id: FR-28
+    text: Every editable shortcut action carries its own on/off control, distinct from a chord-collision
+      unbind.
+    tickets:
+    - SPEC-3-01
+    - SPEC-4-03
+    actual_start: '2026-09-07'
+    actual_end: '2026-09-08'
+    state: done
+  - id: FR-29
+    text: A shortcut action the user turned off is not registered at the keyboard hook, so its chord passes
+      through to Windows.
+    tickets:
+    - SPEC-3-02
+    actual_start: '2026-09-07'
+    actual_end: '2026-09-07'
+    state: done
+  waiting_on: []
+- id: CAP-17
+  text: Provide driverless, low-overhead mouse desktop navigation for standard auxiliary mouse inputs
+    (thumb buttons and tilt wheels) with configurable action presets.
+  size: ''
+  priority: ''
+  owner: ''
+  target_release: ''
+  planned_start: ''
+  planned_end: ''
+  estimate_mandays: 0
+  actual_start: '2026-09-10'
+  actual_end: ''
+  delta_days: null
+  state: in-progress
+  children:
+  - id: FR-30
+    text: Low-level mouse hook captures thumb buttons and horizontal tilt wheel, immediately passing cursor
+      movement through.
+    tickets:
+    - SPEC-10-03
+    - SPEC-10-04
+    - SPEC-8-02
+    - SPEC-9-01
+    - SPEC-9-06
+    actual_start: '2026-09-10'
+    actual_end: '2026-09-11'
+    state: done
+  - id: FR-31
+    text: Dispatch configured actions for mouse inputs, with debounce filtering for tilt-wheel burst signals.
+    tickets:
+    - SPEC-10-03
+    - SPEC-10-04
+    - SPEC-8-02
+    - SPEC-9-01
+    - SPEC-9-06
+    actual_start: '2026-09-10'
+    actual_end: '2026-09-11'
+    state: done
+  - id: FR-32
+    text: Dedicated Mouse pane in Settings provides a master toggle and curated action preset dropdowns
+      per physical input.
+    tickets:
+    - SPEC-10-01
+    - SPEC-10-02
+    - SPEC-26-01
+    - SPEC-27-02
+    - SPEC-8-01
+    - SPEC-9-02
+    - SPEC-9-03
+    - SPEC-9-04
+    - SPEC-9-05
+    actual_start: '2026-09-10'
+    actual_end: ''
+    state: in-progress
+  waiting_on:
+  - SPEC-27-02
 - id: CAP-2
   text: Snap and resize the active window with keyboard shortcuts, DPI-aware per monitor.
   size: ''
@@ -194,8 +304,8 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-06'
-  actual_end: '2026-09-06'
+  actual_start: '2026-09-07'
+  actual_end: '2026-09-07'
   delta_days: null
   state: done
   children:
@@ -203,8 +313,8 @@ capabilities:
     text: Snap the active window to the left or right half and maximize it with Ctrl+Alt shortcuts, DPI-aware.
     tickets:
     - W1-S2
-    actual_start: '2026-09-06'
-    actual_end: '2026-09-06'
+    actual_start: '2026-09-07'
+    actual_end: '2026-09-07'
     state: done
   - id: FR-15
     text: Apply overlapping stack layout on small monitors with up to three half-width windows.
@@ -216,8 +326,8 @@ capabilities:
     text: Snap the active window to the top or bottom half of the current monitor, DPI-aware.
     tickets:
     - W1-S2
-    actual_start: '2026-09-06'
-    actual_end: '2026-09-06'
+    actual_start: '2026-09-07'
+    actual_end: '2026-09-07'
     state: done
   waiting_on: []
 - id: CAP-3
@@ -229,18 +339,36 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: ''
+  actual_start: '2026-09-07'
   actual_end: ''
   delta_days: null
-  state: not-started
+  state: in-progress
   children:
   - id: FR-7
     text: Allow configurable primary and fallback cycling shortcuts via config.toml.
-    tickets: []
-    actual_start: ''
+    tickets:
+    - SPEC-2-01
+    - SPEC-25-01
+    - SPEC-26-01
+    - SPEC-27-02
+    - SPEC-4-01
+    - SPEC-4-02
+    - SPEC-4-03
+    - SPEC-4-04
+    - SPEC-4-05
+    - SPEC-5-01
+    - SPEC-5-02
+    - SPEC-5-03
+    - SPEC-6-01
+    - SPEC-6-02
+    - SPEC-7-01
+    - W1-S4
+    - W3-S1
+    actual_start: '2026-09-07'
     actual_end: ''
-    state: not-started
-  waiting_on: []
+    state: in-progress
+  waiting_on:
+  - SPEC-27-02
 - id: CAP-4
   text: Operate on elevated windows by running the daemon with Administrator privileges.
   size: ''
@@ -271,10 +399,10 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: ''
+  actual_start: '2026-09-07'
   actual_end: ''
   delta_days: null
-  state: not-started
+  state: in-progress
   children:
   - id: FR-16
     text: Tray menu order Settings, View Logs, Auto-Start toggle, About, Exit, with an update item shown
@@ -285,16 +413,35 @@ capabilities:
     state: not-started
   - id: FR-17
     text: First-run interactive tutorial with dummy window practice and Skip Tutorial.
-    tickets: []
-    actual_start: ''
+    tickets:
+    - W1-S5
+    - W2-S1
+    actual_start: '2026-09-07'
     actual_end: ''
-    state: not-started
+    state: in-progress
   - id: FR-18
     text: Shortcut fields use listening mode capturing physical key combinations.
-    tickets: []
-    actual_start: ''
+    tickets:
+    - SPEC-2-01
+    - SPEC-25-01
+    - SPEC-26-01
+    - SPEC-27-02
+    - SPEC-4-01
+    - SPEC-4-02
+    - SPEC-4-03
+    - SPEC-4-04
+    - SPEC-4-05
+    - SPEC-5-01
+    - SPEC-5-02
+    - SPEC-5-03
+    - SPEC-6-01
+    - SPEC-6-02
+    - SPEC-7-01
+    - W1-S4
+    - W3-S1
+    actual_start: '2026-09-07'
     actual_end: ''
-    state: not-started
+    state: in-progress
   - id: FR-19
     text: Settings UI follows OS light or dark theme automatically.
     tickets: []
@@ -313,7 +460,8 @@ capabilities:
     actual_start: ''
     actual_end: ''
     state: not-started
-  waiting_on: []
+  waiting_on:
+  - SPEC-27-02
 - id: CAP-6
   text: Alert the user when the keyboard hook dies at runtime via tray state and one toast.
   size: ''
@@ -338,18 +486,21 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-06'
-  actual_end: '2026-09-06'
+  actual_start: '2026-09-07'
+  actual_end: ''
   delta_days: null
-  state: done
+  state: in-progress
   children:
   - id: FR-2
     text: Lock cycling to the same physical monitor and virtual desktop as the active window.
     tickets:
+    - SPEC-17-01
+    - SPEC-18-01
+    - SPEC-19-01
     - W1-S1
-    actual_start: '2026-09-06'
-    actual_end: '2026-09-06'
-    state: done
+    actual_start: '2026-09-07'
+    actual_end: ''
+    state: in-progress
   waiting_on: []
 - id: CAP-8
   text: Pass shortcuts through unchanged when the foreground window is a VM or RDP client.
@@ -360,18 +511,21 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-06'
-  actual_end: '2026-09-06'
+  actual_start: '2026-09-07'
+  actual_end: ''
   delta_days: null
-  state: done
+  state: in-progress
   children:
   - id: FR-3
     text: Bypass interception when the foreground window is a known VM or Remote Desktop client.
     tickets:
+    - SPEC-17-01
+    - SPEC-18-01
+    - SPEC-19-01
     - W1-S1
-    actual_start: '2026-09-06'
-    actual_end: '2026-09-06'
-    state: done
+    actual_start: '2026-09-07'
+    actual_end: ''
+    state: in-progress
   waiting_on: []
 - id: CAP-9
   text: Recover the tray icon after explorer.exe restarts and follow the three-tier error protocol.
@@ -382,8 +536,8 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-06'
-  actual_end: '2026-09-06'
+  actual_start: '2026-09-07'
+  actual_end: '2026-09-07'
   delta_days: null
   state: done
   children:
@@ -391,15 +545,15 @@ capabilities:
     text: Re-create the tray icon when TaskbarCreated is broadcast after explorer restarts.
     tickets:
     - W1-S3
-    actual_start: '2026-09-06'
-    actual_end: '2026-09-06'
+    actual_start: '2026-09-07'
+    actual_end: '2026-09-07'
     state: done
   - id: FR-11
     text: Apply the three-tier error protocol for startup fatal, runtime warning, and hook-dead critical.
     tickets:
     - W1-S3
-    actual_start: '2026-09-06'
-    actual_end: '2026-09-06'
+    actual_start: '2026-09-07'
+    actual_end: '2026-09-07'
     state: done
   - id: FR-9
     text: Run tray-resident using native Win32 APIs without a third-party GUI framework in the daemon.
@@ -408,4 +562,6 @@ capabilities:
     actual_end: ''
     state: not-started
   waiting_on: []
-uncommitted_tickets: []
+uncommitted_tickets:
+- SPEC-27-01
+- SPEC-27-02

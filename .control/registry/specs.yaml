@@ -1899,3 +1899,42 @@ specs:
           - app::tests::about_pane_card_hierarchy_and_divider_structure
           - app::tests::about_pane_attribution_card_at_bottom
           - shortcut_row_slint_snapshot::tests::about_pane_merged_troubleshooting_card_renders_cleanly
+
+  - id: SPEC-27
+    release: "0.2.0"
+    prd: [wira-desk]
+    size: S
+    status: open
+    depends_on: []
+    spec_folder: .scratch/spec-27-tray-warning-reset-auto-start-isolation-and-settings-ui-polish/
+    spec_reviewed:
+      date: '2026-09-15'
+      sha: 'e75be4b'
+      lenses: [structure, prose, edge-case-hunter]
+    fr: []
+    tickets:
+      - id: SPEC-27-01
+        title: "Real-time tray warning reset upon successful configuration reload"
+        spec_folder: .scratch/spec-27-tray-warning-reset-auto-start-isolation-and-settings-ui-polish/
+        component: window-management
+        satisfies: []
+        depends_on: []
+        tests:
+          - tray::tests::successful_reload_clears_config_warning_and_restores_normal_tray_state
+          - tray::tests::non_config_warning_persists_across_successful_reload
+          - tray::tests::successful_reload_does_not_downgrade_critical_state
+          - config::tests::reload_with_valid_config_returns_applied_outcome
+      - id: SPEC-27-02
+        title: "General auto-start defaults isolation, About card 3 polish, and modal confirmation redesign"
+        spec_folder: .scratch/spec-27-tray-warning-reset-auto-start-isolation-and-settings-ui-polish/
+        component: settings
+        satisfies: [UC-4, UC-14]
+        depends_on: []
+        tests:
+          - app::tests::general_differs_from_default_ignores_auto_start_state
+          - app::tests::restore_general_defaults_preserves_auto_start_preference
+          - app::tests::factory_reset_defaults_still_resets_auto_start_to_false
+          - shortcut_row_slint_snapshot::tests::about_pane_card_3_geometry_encloses_reset_button_without_overflow
+          - shortcut_row_slint_snapshot::tests::about_pane_omits_troubleshooting_header
+          - shortcut_row_slint_snapshot::tests::modal_reset_dialog_matches_onboarding_styling_without_blue_outline
+          - shortcut_row_slint_snapshot::tests::settings_normal_window_height_is_560px
