@@ -1862,3 +1862,40 @@ specs:
           - shortcut_row_slint_snapshot::tests::factory_reset_confirmation_cancels_without_mutation
           - shortcut_row_slint_snapshot::tests::factory_reset_confirmation_stages_defaults_and_blocks_background_actions
 
+  - id: SPEC-26
+    release: "0.2.0"
+    prd: [wira-desk]
+    size: S
+    status: open
+    depends_on: []
+    spec_folder: .scratch/spec-26-header-defaults-and-about-card-hierarchy/
+    spec_reviewed:
+      date: '2026-09-15'
+      sha: '0395587'
+      lenses: [structure, prose, edge-case-hunter]
+    fr: []
+    tickets:
+      - id: SPEC-26-01
+        title: "Shortcuts, General, and Mouse panes header Defaults button with conditional visibility"
+        spec_folder: .scratch/spec-26-header-defaults-and-about-card-hierarchy/
+        component: settings
+        satisfies: [UC-4, UC-14]
+        depends_on: []
+        tests:
+          - app::tests::restore_general_defaults_resets_only_general_preferences
+          - app::tests::restore_mouse_defaults_resets_only_mouse_preferences
+          - app::tests::pane_defaults_differ_from_default_detection
+          - app::tests::general_defaults_preserves_check_updates_preference
+          - shortcut_row_slint_snapshot::tests::general_pane_defaults_button_visibility_and_action
+          - shortcut_row_slint_snapshot::tests::mouse_pane_defaults_button_visibility_and_action
+          - shortcut_row_slint_snapshot::tests::shortcuts_pane_defaults_button_visibility_and_action
+      - id: SPEC-26-02
+        title: "About pane card hierarchy restructuring and Troubleshooting button redesign"
+        spec_folder: .scratch/spec-26-header-defaults-and-about-card-hierarchy/
+        component: settings
+        satisfies: []
+        depends_on: []
+        tests:
+          - app::tests::about_pane_card_hierarchy_and_divider_structure
+          - app::tests::about_pane_attribution_card_at_bottom
+          - shortcut_row_slint_snapshot::tests::about_pane_merged_troubleshooting_card_renders_cleanly

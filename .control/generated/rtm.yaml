@@ -280,6 +280,26 @@ rtm:
   FR: FR-18
   DEC: []
   UC: UC-4
+  ticket: SPEC-26-01
+  spec: SPEC-26
+  release: 0.2.0
+  test:
+  - app::tests::restore_general_defaults_resets_only_general_preferences
+  - app::tests::restore_mouse_defaults_resets_only_mouse_preferences
+  - app::tests::pane_defaults_differ_from_default_detection
+  - app::tests::general_defaults_preserves_check_updates_preference
+  - shortcut_row_slint_snapshot::tests::general_pane_defaults_button_visibility_and_action
+  - shortcut_row_slint_snapshot::tests::mouse_pane_defaults_button_visibility_and_action
+  - shortcut_row_slint_snapshot::tests::shortcuts_pane_defaults_button_visibility_and_action
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-2
+  CAP: CAP-5
+  FR: FR-18
+  DEC: []
+  UC: UC-4
   ticket: SPEC-4-01
   spec: SPEC-4
   release: 0.5.0
@@ -1172,6 +1192,26 @@ rtm:
   FR: FR-32
   DEC: []
   UC: UC-14
+  ticket: SPEC-26-01
+  spec: SPEC-26
+  release: 0.2.0
+  test:
+  - app::tests::restore_general_defaults_resets_only_general_preferences
+  - app::tests::restore_mouse_defaults_resets_only_mouse_preferences
+  - app::tests::pane_defaults_differ_from_default_detection
+  - app::tests::general_defaults_preserves_check_updates_preference
+  - shortcut_row_slint_snapshot::tests::general_pane_defaults_button_visibility_and_action
+  - shortcut_row_slint_snapshot::tests::mouse_pane_defaults_button_visibility_and_action
+  - shortcut_row_slint_snapshot::tests::shortcuts_pane_defaults_button_visibility_and_action
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-4
+  CAP: CAP-17
+  FR: FR-32
+  DEC: []
+  UC: UC-14
   ticket: SPEC-8-01
   spec: SPEC-8
   release: 0.3.0
@@ -1477,6 +1517,26 @@ rtm:
   exempt: false
   green: true
   broken_at: ''
+- BG: BG-2
+  CAP: CAP-3
+  FR: FR-7
+  DEC: []
+  UC: UC-4
+  ticket: SPEC-26-01
+  spec: SPEC-26
+  release: 0.2.0
+  test:
+  - app::tests::restore_general_defaults_resets_only_general_preferences
+  - app::tests::restore_mouse_defaults_resets_only_mouse_preferences
+  - app::tests::pane_defaults_differ_from_default_detection
+  - app::tests::general_defaults_preserves_check_updates_preference
+  - shortcut_row_slint_snapshot::tests::general_pane_defaults_button_visibility_and_action
+  - shortcut_row_slint_snapshot::tests::mouse_pane_defaults_button_visibility_and_action
+  - shortcut_row_slint_snapshot::tests::shortcuts_pane_defaults_button_visibility_and_action
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
 - BG: BG-2
   CAP: CAP-3
   FR: FR-7
