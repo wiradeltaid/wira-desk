@@ -987,6 +987,56 @@ mod tests {
     }
 
     #[test]
+    fn v020_config_without_switcher_and_mouse_sections_loads_safely_with_clean_defaults() {
+        // v0.2.0 shipped before the visual switcher ([switcher]) and driverless
+        // mouse navigation ([mouse]) existed. Reading a v0.2.0 config.toml
+        // must retain all general, snapping, layout, and vm_bypass preferences
+        // while populating modern safe defaults for switcher and mouse without errors.
+        let toml_v020 = r#"
+            [general]
+            auto_start = true
+            check_updates = false
+
+            [snapping]
+            snap_half_left = "ctrl+alt+left"
+            snap_half_right = "ctrl+alt+right"
+            snap_half_top = "ctrl+alt+up"
+            snap_half_bottom = "ctrl+alt+down"
+            snap_maximize = "ctrl+alt+enter"
+            percent_left = 50
+
+            [layout]
+            stack_width_percent = 65
+
+            [vm_bypass]
+            bypass_processes = ["mstsc.exe"]
+        "#;
+        let cfg =
+            Config::from_toml_str(toml_v020).expect("v0.2.0 configuration must parse cleanly");
+        assert!(cfg.general.auto_start);
+        assert!(!cfg.general.check_updates);
+        assert_eq!(cfg.snapping.snap_half_left, "ctrl+alt+left");
+        assert_eq!(cfg.snapping.percent_left, 50);
+        assert_eq!(cfg.layout.stack_width_percent, 65);
+        assert_eq!(cfg.vm_bypass.bypass_processes, vec!["mstsc.exe"]);
+
+        // Switcher gains default configuration cleanly
+        assert_eq!(cfg.switcher.shortcut, "win+backtick");
+        assert!(cfg.switcher.shortcut_enabled);
+        assert_eq!(cfg.switcher.fallback_shortcut, "alt+backtick");
+        assert!(cfg.switcher.fallback_shortcut_enabled);
+        assert!(cfg.switcher.visual_enabled);
+        assert_eq!(cfg.switcher.visual_hold_delay_ms, 300);
+
+        // Mouse gains default configuration cleanly
+        assert!(cfg.mouse.enabled);
+        assert_eq!(cfg.mouse.thumb_back, "prev_virtual_desktop");
+        assert_eq!(cfg.mouse.thumb_forward, "next_virtual_desktop");
+        assert_eq!(cfg.mouse.tilt_left, "show_desktop");
+        assert_eq!(cfg.mouse.tilt_right, "task_view");
+    }
+
+    #[test]
     fn default_tilt_directions_are_inverted() {
         let def = MouseConfig::default();
         assert_eq!(def.tilt_left, "show_desktop");

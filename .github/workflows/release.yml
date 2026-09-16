@@ -213,7 +213,7 @@ jobs:
             @(
               'Install with the setup executable, or through winget:',
               '',
-              '    winget install WiraDigitalIndonesia.WiraDesk'
+              '    winget install WiraDeltaIndonesia.WiraDesk'
             ) -join "`n"
           } else {
             @(
@@ -282,7 +282,7 @@ jobs:
     steps:
       - uses: vedantmgoyal9/winget-releaser@v2
         with:
-          identifier: WiraDigitalIndonesia.WiraDesk
+          identifier: WiraDeltaIndonesia.WiraDesk
           # Matches only the setup executable. The loose binaries published beside it are
           # not installers and must not end up in the manifest.
           installers-regex: '-x64-setup\.exe$'

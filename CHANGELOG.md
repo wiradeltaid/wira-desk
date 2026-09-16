@@ -1,7 +1,7 @@
 # Changelog
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versioning is
-[semantic](https://semver.org/). Below `1.0` the **minor** digit carries the breaking change —
+[semantic](https://semver.org/). Below `1.0` the **minor** digit carries the breaking change -
 `0.1.x` to `0.2.0` is the incompatible step.
 
 Two things depend on the shape of this file, so the headings are not free-form:
@@ -12,7 +12,7 @@ Two things depend on the shape of this file, so the headings are not free-form:
 - The in-app updater shows the section for the version it is offering, so this is what a user
   reads before deciding to update. Write it for them, not for the commit log.
 
-Who may move which digit is a rule, not a convention — see `AGENTS.md`, "Versioning authority".
+Who may move which digit is a rule, not a convention - see `AGENTS.md`, "Versioning authority".
 Work that needs a minor or major bump belongs under **Unreleased** and stays there until the
 owner decides.
 

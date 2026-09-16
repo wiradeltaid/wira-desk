@@ -31,7 +31,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$identifier = 'WiraDigitalIndonesia.WiraDesk'
+$identifier = 'WiraDeltaIndonesia.WiraDesk'
 $repo = 'wiradeltaid/wira-desk'
 $tag = "v$Version"
 $setupName = "WiraDesk-$Version-x64-setup.exe"
@@ -54,7 +54,7 @@ $sha256 = $Matches[1].ToUpper()
 $url = $asset.url
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$outDir = Join-Path $repoRoot "packaging\winget\manifests\w\WiraDigitalIndonesia\WiraDesk\$Version"
+$outDir = Join-Path $repoRoot "packaging\winget\manifests\w\WiraDeltaIndonesia\WiraDesk\$Version"
 New-Item -ItemType Directory -Force $outDir | Out-Null
 
 @"
@@ -89,14 +89,14 @@ ManifestVersion: 1.10.0
 PackageIdentifier: $identifier
 PackageVersion: $Version
 PackageLocale: en-US
-Publisher: Wira Digital Indonesia
-PublisherUrl: https://github.com/wiradigitalid
+Publisher: Wira Delta Indonesia
+PublisherUrl: https://wiradelta.id
 PublisherSupportUrl: https://github.com/$repo/issues
 PackageName: Wira Desk
 PackageUrl: https://github.com/$repo
 License: GPL-3.0-only
 LicenseUrl: https://github.com/$repo/blob/main/LICENSE
-Copyright: Copyright (c) 2026 Wira Digital Indonesia
+Copyright: Copyright (c) 2026 Wira Delta Indonesia
 PrivacyUrl: https://github.com/$repo/blob/main/PRIVACY.md
 ShortDescription: Lightweight desktop tools for Windows - same-app window switching and window arrangement via a tray daemon.
 Description: |-

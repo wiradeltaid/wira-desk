@@ -1,192 +1,83 @@
 # Wira Desk
 
-Windows doesn't have macOS's `` ⌘+` `` same-app window cycling — Alt+Tab piles every app's windows
-together instead. Wira Desk adds that, plus fast one-key window snapping and arranging and
-driver-free mouse button mapping, to Windows 11 as one lightweight tray daemon.
+> Lightweight, native same-app window cycling, zone snapping, and driverless mouse navigation for Windows 11 - written in Rust 🦀
 
-## Why
+[English](README.md) | [简体中文](docs/README.zh-CN.md) | [日本語](docs/README.ja.md) | [Bahasa Indonesia](docs/README.id.md)
 
-- **Alt+Tab treats every window from every app as one pile.** With a dozen windows open, cycling
-  to the one you want becomes a small tax on your attention, every time. Windows has no built-in
-  way to cycle only the windows of the app you're currently using — that's what `` Win + ` `` does
-  here.
-- **Fast, one-key window snapping and arranging.** Windows already has window snapping; this is
-  about speed and consistency — snap left/right/top/bottom, maximize, move to another monitor, or
-  stack three windows, each with one dedicated keyboard shortcut instead of a mouse drag or menu.
-- The one third-party tool that came close to same-app window cycling had been unmaintained for
-  years, so this exists to fill that specific gap.
-- **A self-contained alternative to PowerToys FancyZones for zone-based snapping**, for anyone who
-  wants that but not a second tray app to keep running: halves, thirds, and a per-edge custom
-  percentage (`Ctrl+Alt+Shift+Left/Right/Up/Down`, `Ctrl+Alt+1/2/3`) live in the same daemon
-  already doing window cycling, with no separate zone editor to configure.
+---
 
-## Default shortcuts
+> **If you run PowerToys only for FancyZones, and Logi Options+ only for the thumb buttons, this replaces both - one tray process instead of two.**
+>
+> What this does not replace: PowerRename, Awake, Color Picker, or custom drawn FancyZones layouts; Logitech Flow, per-app profiles, battery, or DPI switching.
 
-All of these are remappable, and can be individually turned on or off, from the Settings app.
+## Installation
 
-| Shortcut | Action |
-|---|---|
-| `` Win + ` `` | Cycle windows of the app you're currently using (hold 300 ms for visual switcher overlay) |
-| `` Alt + ` `` | Fallback cycling shortcut, for when the primary one collides with another app |
-| `Ctrl+Alt+Left/Right/Up/Down` | Snap the window to that half of the screen (50%) |
-| `Ctrl+Alt+Shift+Left/Right/Up/Down` | Snap the window to that edge at a percentage you set per direction in Settings |
-| `Ctrl+Alt+1/2/3` | Snap the window to the left, middle, or right third of the screen |
-| `Ctrl+Alt+Enter` | Maximize the window to full screen |
-| `Ctrl+Alt+Shift+Enter` | Move the window to the next monitor (multi-monitor setups) |
-| `Ctrl+Alt+Shift+S` | Stack 3 windows at a configurable width each — useful on a small monitor when you still want another window visible |
+### Via Scoop (Recommended)
 
-## Mouse buttons, without the vendor software
+```powershell
+scoop bucket add wiradesk https://github.com/wiradeltaid/scoop-wiradesk
+scoop install wiradesk
+```
 
-If your mouse has thumb buttons or a tilting wheel, Wira Desk can map them — no driver, no vendor
-utility, no second tray app. This is on by default and can be switched off in Settings.
+### Setup Executable
 
-| Button | Default action |
-|---|---|
-| Thumb back (`XBUTTON1`) | Previous virtual desktop |
-| Thumb forward (`XBUTTON2`) | Next virtual desktop |
-| Wheel tilt left | Show desktop |
-| Wheel tilt right | Task View |
-
-Each of the four is remappable to any of 20 presets: the virtual-desktop and Task View actions
-above, every snap in the table above (halves, thirds, per-edge percentage, maximize, stack,
-move-to-monitor), same-app cycling, and `passthrough` to hand the button back to the application
-untouched.
-
-Nothing here is brand-specific — it reads the standard Windows mouse messages, so it works with any
-mouse that sends them.
-
-**What this means for privacy:** the daemon watches mouse events to do this. Cursor movement is
-passed through on the callback's first line, and the pointer coordinates are never read at all —
-only the message type and which button it was. [`PRIVACY.md`](PRIVACY.md) sets out both hooks in
-full.
-
-## About
-
-Wira Desk began as **WinTick**, a private personal project born from missing macOS's `` ⌘+` ``
-same-app window cycling after moving to Windows — Alt+Tab doesn't do that job. It also bundles
-fast, one-key window snapping and arranging: quick left/right/top/bottom snap, maximize, and
-move-to-monitor, each on its own dedicated shortcut instead of a drag or a menu. The source is now
-published under the Wira Desk name as its first public release.
-
-**Wira Delta Indonesia** is the studio brand behind this project.
-Wira Desk is built and maintained by [@kodesh87](https://github.com/kodesh87) - the studio name
-and the maintainer are the same effort, not separate products.
-
-## Install
-
-Download `WiraDesk-<version>-x64-setup.exe` from the
-[releases page](https://github.com/wiradeltaid/wira-desk/releases) (mirrored on
-[SourceForge](https://sourceforge.net/projects/wira-desk/files/latest/download)) and run it.
-Verify it against the published `SHA256SUMS` first:
+Download `WiraDesk-0.2.4-x64-setup.exe` from the [releases page](https://github.com/wiradeltaid/wira-desk/releases) (mirrored on [SourceForge](https://sourceforge.net/projects/wira-desk/files/latest/download)) and verify SHA-256:
 
 ```powershell
 Get-FileHash .\WiraDesk-0.2.4-x64-setup.exe -Algorithm SHA256
 ```
 
-The installer needs Administrator, installs to `%ProgramFiles%\Wira Desk`, and offers no per-user
-location. That is deliberate rather than an omission - auto-start runs the daemon elevated at
-every logon with no prompt, so a directory only administrators can write is the whole thing
-protecting it. See `SECURITY.md`.
+Installs elevated to `%ProgramFiles%\Wira Desk`. Auto-start is opt-in and configurable from Settings or the tray icon.
 
-It does **not** switch auto-start on. That stays yours to enable from the tray menu or Settings.
+### Loose Binaries (Portable)
 
-### Without the installer
+Download loose `wiradesk.exe` and `wiradesk-settings.exe` into an administrator-only directory and run `wiradesk.exe` as Administrator.
 
-The loose binaries are published beside it, so you can run the program without one:
+---
 
-1. Place `wiradesk.exe` and `wiradesk-settings.exe` in the same folder - one only administrators
-   can write.
-2. Run `wiradesk.exe` as Administrator.
+## Features
 
-Wira Desk will warn you, in the log and on the tray icon, if you turn auto-start on from a folder
-a normal user could overwrite.
+- **Same-App Window Cycling:** ``Win + ` `` cycles only windows of the active app on the current monitor and virtual desktop (fallback: ``Alt + ` ``). Tap to cycle instantly, or hold 300 ms for the visual switcher overlay with live thumbnails.
+- **One-Key Zone Snapping:** Instant window snapping to halves (50%), thirds (33%), or directional custom percentages (default 67%) without opening a zone editor.
+- **Driverless Mouse Navigation:** Maps thumb buttons (`XBUTTON1`/`XBUTTON2`) and horizontal tilt wheel to virtual desktop switching or 20 customizable presets without background vendor utilities.
 
-## Update
+### Default Shortcuts
 
-Updating is built in: Settings includes an automatic or on-demand **Check for updates** button that
-downloads the latest verified release installer and runs it with your permission, keeping your settings.
-You can also download the newer setup executable directly from the
-[releases page](https://github.com/wiradeltaid/wira-desk/releases) and run it manually over the old install.
+| Shortcut | Action |
+|---|---|
+| ``Win + ` `` | Cycle windows of current app (hold 300 ms for visual switcher overlay) |
+| ``Alt + ` `` | Fallback cycling shortcut |
+| `Ctrl+Alt+Left/Right/Up/Down` | Snap active window to that half (50%) |
+| `Ctrl+Alt+Shift+Left/Right/Up/Down` | Snap window to that edge at custom percentage (default 67%) |
+| `Ctrl+Alt+1/2/3` | Snap window to left, middle, or right third |
+| `Ctrl+Alt+Enter` | Maximize window |
+| `Ctrl+Alt+Shift+Enter` | Move window to next monitor |
+| `Ctrl+Alt+Shift+S` | Stack 3 windows at configurable width |
 
-> **Privacy & Offline Posture:** No telemetry, no account, no background updater service — HTTPS
-> requests to GitHub occur only when checking for or installing updates, which you can switch off.
-> See `SECURITY.md` for full details.
+### Mouse Presets
 
-## Uninstall
+Thumb buttons default to previous/next virtual desktop; tilt wheel defaults to Show Desktop / Task View. Each is remappable to any of 20 presets in Settings. Cursor coordinates are never read; see [`PRIVACY.md`](PRIVACY.md).
 
-From Add/Remove Programs.
+---
 
-Uninstalling removes the program and the auto-start scheduled task. It leaves
-`%APPDATA%\WiraDesk\` alone - delete that folder by hand if you want your settings and log gone,
-and read Factory reset below first, because that folder does not behave the way you might expect.
+## Why
 
-## Build
+While PowerToys includes Window Hopper and vendor tools manage mouse buttons, they consume 150-500 MB of RAM across multiple background processes. Wira Desk runs as a single native background daemon consuming approximately 4.0 MB private memory (under 5 MB budget), with zero telemetry.
 
-Requires Rust (stable) and the MSVC toolchain on Windows.
+---
 
-```powershell
-.\build.ps1 -Mode prod
-```
+## Configuration & Development
 
-Binaries: `target\release\wiradesk.exe` and `target\release\wiradesk-settings.exe`.
+- **Configuration:** Settings live under `%APPDATA%\WiraDesk\config.toml`. See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for the complete TOML reference.
+- **Development:** Built with Rust and MSVC. See [DEVELOPMENT.md](DEVELOPMENT.md) for build, testing, and unsafe code guidelines.
+- **Contributing:** Contributions are welcome - see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Administrator, keyboard hook and mouse hook
+---
 
-Wira Desk requests Administrator because it installs `WH_KEYBOARD_LL` and must activate windows
-across integrity levels (UIPI). The keyboard hook observes key events to match configured
-shortcuts; it does not log keystroke contents to disk.
+## About & Legal
 
-It installs `WH_MOUSE_LL` as well, for the mouse button mapping above. That hook passes cursor
-movement through on its first line and never reads the pointer coordinates — only the message type
-and which button it was. See `SECURITY.md` and `PRIVACY.md`, which set out both in full.
+**Wira Delta Indonesia** is the studio behind this project. Built and maintained by [@kodesh87](https://github.com/kodesh87).
 
-## Data on disk
-
-Configuration and logs live under `%APPDATA%\WiraDesk\` (`config.toml`, `wiradesk.log`).
-
-## Factory reset
-
-To restore defaults (including first-run onboarding), delete the config file:
-
-```text
-Delete   %APPDATA%\WiraDesk\config.toml
-```
-
-When `config.toml` is absent, the next launch opens first-run onboarding and writes clean default configuration.
-
-## Status
-
-Pre-release (`0.2.0`). Behavior and packaging may change. Not code-signed yet, so Windows
-SmartScreen and the UAC prompt will show an unverified publisher warning - verify the published
-`SHA256SUMS` before running.
-
-## Built with Slint
-
-[![#MadeWithSlint](https://raw.githubusercontent.com/slint-ui/slint/master/logo/MadeWithSlint-logo-light.svg)](https://slint.dev)
-
-The Settings window is built with [Slint](https://slint.dev). Slint is offered under a choice of
-licences, and Wira Desk uses it under **GPL-3.0-only** - the same licence this project's own code
-carries, so no separate disclosure obligation applies the way the royalty-free tier's did.
-
-## Contributing
-
-Contributions are welcome via pull request - see [CONTRIBUTING.md](CONTRIBUTING.md) for the checks
-CI runs and the conventions this repository follows.
-
-## The name and the icon
-
-The GPL grants rights over code. It says nothing about names or logos, and it does not oblige the
-studio to hand over either — so the licence above covers this repository's code, not the name
-**Wira Desk**, not **Wira Delta Indonesia**, and not the icon or wordmark.
-
-You may use those names to refer to this project: "based on Wira Desk", "a fork of Wira Desk",
-"compatible with Wira Desk". You may not use them as the name of your own product, or in a way that
-suggests you are this project or endorsed by it.
-
-If you publish a modified build, please give it your own name and your own icon, so the people using
-it know whom to ask when it breaks. The code is yours to take; the name is not.
-
-## License
-
-GPL-3.0-only - see [LICENSE](LICENSE). Third-party dependency licences are listed in [NOTICE](NOTICE),
-generated from `cargo metadata`.
+- **License:** [GPL-3.0-only](LICENSE). Third-party acknowledgements are listed in [NOTICE](NOTICE). Built with [Slint](https://slint.dev).
+- **Privacy & Security:** Zero telemetry, no account, no background updater service. See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
+- **The Name and the Icon:** The GPL grants rights over code, not names or logos. The names **Wira Desk** and **Wira Delta Indonesia**, and the product icon, remain property of Wira Delta Indonesia.

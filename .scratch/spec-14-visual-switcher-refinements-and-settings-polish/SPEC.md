@@ -1,6 +1,6 @@
 ---
 spec: SPEC-14
-release: "0.4.0"
+release: "0.3.0"
 prd: wira-desk
 fr: []
 status: closed

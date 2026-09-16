@@ -11,7 +11,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-17-01
   spec: SPEC-17
-  release: 0.4.0
+  release: 0.3.0
   test:
   - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
   - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
@@ -26,7 +26,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-18-01
   spec: SPEC-18
-  release: 0.4.0
+  release: 0.3.0
   test:
   - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
   - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
@@ -41,7 +41,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-19-01
   spec: SPEC-19
-  release: 0.4.0
+  release: 0.3.0
   test:
   - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
   - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
@@ -605,7 +605,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-17-01
   spec: SPEC-17
-  release: 0.4.0
+  release: 0.3.0
   test:
   - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
   - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
@@ -620,7 +620,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-18-01
   spec: SPEC-18
-  release: 0.4.0
+  release: 0.3.0
   test:
   - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
   - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
@@ -635,7 +635,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-19-01
   spec: SPEC-19
-  release: 0.4.0
+  release: 0.3.0
   test:
   - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
   - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
@@ -968,7 +968,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-17-01
   spec: SPEC-17
-  release: 0.4.0
+  release: 0.3.0
   test:
   - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
   - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
@@ -983,7 +983,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-18-01
   spec: SPEC-18
-  release: 0.4.0
+  release: 0.3.0
   test:
   - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
   - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
@@ -998,7 +998,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-19-01
   spec: SPEC-19
-  release: 0.4.0
+  release: 0.3.0
   test:
   - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
   - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
@@ -1368,7 +1368,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-17-01
   spec: SPEC-17
-  release: 0.4.0
+  release: 0.3.0
   test:
   - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
   - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
@@ -1383,7 +1383,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-18-01
   spec: SPEC-18
-  release: 0.4.0
+  release: 0.3.0
   test:
   - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
   - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
@@ -1398,7 +1398,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-19-01
   spec: SPEC-19
-  release: 0.4.0
+  release: 0.3.0
   test:
   - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
   - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
@@ -1432,7 +1432,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-17-01
   spec: SPEC-17
-  release: 0.4.0
+  release: 0.3.0
   test:
   - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
   - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
@@ -1447,7 +1447,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-18-01
   spec: SPEC-18
-  release: 0.4.0
+  release: 0.3.0
   test:
   - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
   - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
@@ -1462,7 +1462,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-19-01
   spec: SPEC-19
-  release: 0.4.0
+  release: 0.3.0
   test:
   - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
   - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit
@@ -1496,7 +1496,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-17-01
   spec: SPEC-17
-  release: 0.4.0
+  release: 0.3.0
   test:
   - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
   - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
@@ -1511,7 +1511,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-18-01
   spec: SPEC-18
-  release: 0.4.0
+  release: 0.3.0
   test:
   - worker::tests::backward_blind_cycle_survives_rapid_switcher_arm_disarm_taps
   - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
@@ -1526,7 +1526,7 @@ rtm:
   UC: UC-1
   ticket: SPEC-19-01
   spec: SPEC-19
-  release: 0.4.0
+  release: 0.3.0
   test:
   - switcher::tests::mouse_click_selection_updates_controller_candidate_selection
   - switcher::tests::mouse_hover_updates_selection_for_subsequent_modifier_commit

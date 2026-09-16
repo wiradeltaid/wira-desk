@@ -52,8 +52,10 @@ one and change all three in the same commit; drift between them is silent, and t
 reads the stale copy is the one that misbehaves.
 
 `.constitution/project/constitution.md` records how work is conducted here. `3p.md` and `docs/3p.md`
-track progress for code and documentation respectively — read the relevant one before starting
+track progress for code and documentation respectively - read the relevant one before starting
 and add an entry when finished.
+
+When updating `README.md`, any localized front-page mirrors in `docs/` must be updated in the same commit to prevent documentation drift. Technical and reference documents (`DEVELOPMENT.md`, `docs/CONFIGURATION.md`, `CHANGELOG.md`, `SECURITY.md`) remain authoritative in English only.
 
 ## Planning with BMAD and WDI Method
 

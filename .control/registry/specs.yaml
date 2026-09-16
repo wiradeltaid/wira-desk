@@ -1130,7 +1130,7 @@ specs:
   # name a sha that predates every edit reviewed, which is the rubber stamp the SPEC-11 note
   # above warns about. Stamp with the sha of the commit that lands these edits.
   - id: SPEC-13
-    release: "0.4.0"
+    release: "0.3.0"
     prd: [wira-desk]
     size: M
     status: closed
@@ -1286,7 +1286,7 @@ specs:
   # Still owner's call, not blocking: clause 3's undiagnosed subject -- all three things it names
   # (zero extent, empty title, popup host) are WindowFacts contract changes, not filter rules.
   - id: SPEC-14
-    release: "0.4.0"
+    release: "0.3.0"
     prd: [wira-desk]
     size: M
     status: closed
@@ -1415,7 +1415,7 @@ specs:
           - switcher::selection::tests::up_and_down_pick_the_greatest_horizontal_overlap_across_ragged_rows
 
   - id: SPEC-15
-    release: "0.4.0"
+    release: "0.3.0"
     prd: [wira-desk]
     size: M
     status: closed
@@ -1577,7 +1577,7 @@ specs:
   # about. Stamp with the sha of the commit that lands these edits, date 2026-09-13, lenses
   # [structure, prose, edge-case-hunter].
   - id: SPEC-16
-    release: "0.4.0"
+    release: "0.3.0"
     prd: [wira-desk]
     size: S
     status: closed
@@ -1631,7 +1631,7 @@ specs:
           - cycling::eligibility::tests::owned_window_is_still_eligible
 
   - id: SPEC-17
-    release: "0.4.0"
+    release: "0.3.0"
     prd: [wira-desk]
     size: S
     status: closed
@@ -1654,7 +1654,7 @@ specs:
           - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
 
   - id: SPEC-18
-    release: "0.4.0"
+    release: "0.3.0"
     prd: [wira-desk]
     size: S
     status: closed
@@ -1677,7 +1677,7 @@ specs:
           - worker::tests::drain_commands_consecutive_backward_taps_traverse_all_windows
 
   - id: SPEC-19
-    release: "0.4.0"
+    release: "0.3.0"
     prd: [wira-desk]
     size: S
     status: closed
