@@ -76,7 +76,7 @@ Window titles are not used for switching decisions.
 | Path | Contents | Retention |
 | --- | --- | --- |
 | `%APPDATA%\WiraDesk\config.toml` | Your shortcuts, bypass lists, layout, auto-start flag | Until you delete it |
-| `%APPDATA%\WiraDesk\wiradesk.log` | Timestamped warning lines | Until you delete it — **there is no log rotation in this version**, so the file grows unbounded |
+| `%APPDATA%\WiraDesk\wiradesk.log` | Timestamped warning lines | Bounded at ~2 MB — rotated at 1 MB with one `.old` generation |
 
 Both live in your user profile at normal user permissions, so treat them as readable by
 anything else running as you. To reset configuration, delete `config.toml` only — see

@@ -1,0 +1,112 @@
+# Every number, name, and claim that appears on a public surface.
+# Changing a value here without changing what it describes is a lie with a commit hash.
+
+facts:
+  - id: product_version
+    value: "0.2.4"
+    derived_from:
+      file: Cargo.toml
+      pattern: 'version\s*=\s*"([^"]+)"'
+    appears_in:
+      - README.md
+
+  - id: switcher_hold_delay_default_ms
+    value: 300
+    derived_from:
+      file: crates/shared/src/config.rs
+      pattern: 'DEFAULT_HOLD_DELAY_MS:\s*u32\s*=\s*(\d+)'
+    appears_in:
+      - README.md
+    stale_patterns:
+      - '150\s*ms'
+
+  - id: switcher_hold_delay_min_ms
+    value: 100
+    derived_from:
+      file: crates/shared/src/config.rs
+      pattern: 'MIN_HOLD_DELAY_MS:\s*u32\s*=\s*(\d+)'
+    appears_in: []
+
+  - id: switcher_hold_delay_max_ms
+    value: 500
+    derived_from:
+      file: crates/shared/src/config.rs
+      pattern: 'MAX_HOLD_DELAY_MS:\s*u32\s*=\s*(\d+)'
+    appears_in: []
+
+  - id: mouse_preset_count
+    value: 20
+    derived_from:
+      file: crates/shared/src/config.rs
+      pattern: 'pub const ALL:\s*\[MouseActionPreset;\s*(\d+)\]'
+    appears_in:
+      - README.md
+
+  - id: mouse_category_count
+    value: 8
+    derived_from:
+      file: crates/shared/src/config.rs
+      pattern: 'pub const CATEGORY_COUNT:\s*usize\s*=\s*(\d+)'
+    appears_in: []
+
+  - id: daemon_memory_idle_mb
+    value: 4.0
+    metric: private_bytes_mb
+    measured_on: "2026-09-16"
+    measured_build: "0eae449"
+    source: .scratch/smoke-def-11-memory.md
+    appears_in: []
+
+  - id: daemon_memory_budget_mb
+    value: 5
+    derived_from:
+      file: crates/daemon/src/main.rs
+      pattern: 'DAEMON_BUDGET_PRIVATE_BYTES:\s*u64\s*=\s*(\d+)\s*\*\s*1024\s*\*\s*1024'
+    appears_in: []
+
+  - id: settings_memory_idle_mb
+    value: 7.4
+    metric: private_bytes_mb
+    measured_on: "2026-09-15"
+    measured_build: "0eae449"
+    source: .scratch/smoke-def-11-memory.md
+    appears_in: []
+
+  - id: installer_size_mb
+    value: 6.8
+    metric: megabytes
+    measured_on: "2026-09-15"
+    measured_build: "0eae449"
+    source: dist/WiraDesk-0.2.4-x64-setup.exe
+    appears_in: []
+
+  - id: support_email
+    value: "support@wiradigital.id"
+    source: .control/project-non-technical-log.md
+    appears_in: []
+
+  - id: canonical_url
+    value: "https://wiradigital.id/wira-desk"
+    derived_from:
+      file: crates/settings/src/update.rs
+      pattern: '"(https://wiradigital\.id/wira-desk)"'
+    appears_in:
+      - crates/settings/src/update.rs
+
+  - id: license_identifier
+    value: "GPL-3.0-only"
+    derived_from:
+      file: crates/daemon/Cargo.toml
+      pattern: 'license\s*=\s*"([^"]+)"'
+    appears_in:
+      - crates/daemon/Cargo.toml
+      - crates/settings/Cargo.toml
+      - crates/shared/Cargo.toml
+
+  - id: winget_available
+    value: false
+    source: ops
+    note: >
+      0.1.4 is live in winget-pkgs, but it predates mouse navigation and the visual
+      switcher, so no surface may advertise winget until a current version is accepted.
+    appears_in: []

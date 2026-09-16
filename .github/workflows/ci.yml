@@ -140,3 +140,7 @@ jobs:
       - name: Publication hygiene
         shell: pwsh
         run: ./scripts/verify-public-export.ps1 -Path . -SkipHistory
+
+      - name: Canonical public facts verification
+        shell: pwsh
+        run: ./scripts/verify-public-facts.ps1
