@@ -17,7 +17,7 @@ does not come back — that is the piece that should wait for a signed certifica
 | Channel | State (2026-08-30) | What's left | Then |
 |---|---|---|---|
 | winget | **PR open**: [microsoft/winget-pkgs#426321](https://github.com/microsoft/winget-pkgs/pull/426321) | Wait for community review/merge; `WINGET_TOKEN` repo secret is already set | `release.yml`'s `winget` job takes over on the next tag |
-| Scoop | **Live**: [wiradigitalid/scoop-wiradesk](https://github.com/wiradigitalid/scoop-wiradesk) | Nothing — `excavator.yml` is already polling on its own schedule | Updates itself forever, no action needed |
+| Scoop | **Live**: [wiradeltaid/scoop-wiradesk](https://github.com/wiradeltaid/scoop-wiradesk) | Nothing — `excavator.yml` is already polling on its own schedule | Updates itself forever, no action needed |
 | SourceForge | **Live**: [sourceforge.net/projects/wira-desk](https://sourceforge.net/projects/wira-desk/) | Nothing — see below, this needed no workflow code at all | Every future GitHub release is mirrored automatically by SourceForge itself |
 
 Check `3p.md`'s Progress entries for the running account of what changed and when.
@@ -34,7 +34,7 @@ every release after with no further action.
 
 ## Scoop
 
-Live at [wiradigitalid/scoop-wiradesk](https://github.com/wiradigitalid/scoop-wiradesk), pushed
+Live at [wiradeltaid/scoop-wiradesk](https://github.com/wiradeltaid/scoop-wiradesk), pushed
 2026-08-30. This is its own bucket rather than a submission to Scoop's `extras` bucket, because
 the installer requires Administrator and installs to `%ProgramFiles%` — `extras` expects
 portable, user-scoped packages, and this is neither. `.github/workflows/excavator.yml` in that

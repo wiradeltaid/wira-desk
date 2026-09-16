@@ -1,6 +1,6 @@
 # scoop-wiradesk
 
-A [Scoop](https://scoop.sh) bucket for [Wira Desk](https://github.com/wiradigitalid/wira-desk).
+A [Scoop](https://scoop.sh) bucket for [Wira Desk](https://github.com/wiradeltaid/wira-desk).
 
 This is a dedicated bucket rather than a submission to Scoop's `extras` bucket, because Wira
 Desk's installer requires Administrator and installs to `%ProgramFiles%` - it is not portable
@@ -11,7 +11,7 @@ or `winget install` would.
 ## Install
 
 ```powershell
-scoop bucket add wiradesk https://github.com/wiradigitalid/scoop-wiradesk
+scoop bucket add wiradesk https://github.com/wiradeltaid/scoop-wiradesk
 scoop install wiradesk
 ```
 
@@ -34,6 +34,6 @@ Manual regeneration, if ever needed: bump `version` and `url` by hand, or trigge
 ## Source of truth
 
 The staged content of this bucket lives at `packaging/scoop-bucket/` in the
-[wira-desk](https://github.com/wiradigitalid/wira-desk) repository, and this repository is a
+[wira-desk](https://github.com/wiradeltaid/wira-desk) repository, and this repository is a
 plain copy of it. If the two ever disagree, wira-desk's copy is correct; push its content here
 again to fix the drift.
