@@ -4,7 +4,7 @@ version.workspace = true
 edition = "2021"
 description = "Elevated system-tray daemon for Wira Desk window tools"
 license = "GPL-3.0-only"
-repository = "https://github.com/wiradigitalid/wira-desk"
+repository = "https://github.com/wiradeltaid/wira-desk"
 publish = false
 default-run = "wiradesk"
 

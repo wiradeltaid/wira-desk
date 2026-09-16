@@ -123,12 +123,12 @@
   #error Invalid AppVersion. Must be stable decimal major.minor.patch (e.g. 0.2.0).
 #endif
 #define AppName "Wira Desk"
-#define Publisher "Wira Digital Indonesia"
+#define Publisher "Wira Delta Indonesia"
 // Kept identical to `LegalCopyright` in `crates/daemon/wiradesk.rc`. Two copies of one
 // sentence, because a resource script cannot read this file and this file cannot read a
 // resource script; if one is edited the other must follow.
-#define Copyright "Copyright (c) 2026 Wira Digital Indonesia"
-#define Homepage "https://github.com/wiradigitalid/wira-desk"
+#define Copyright "Copyright (c) 2026 Wira Delta Indonesia"
+#define Homepage "https://github.com/wiradeltaid/wira-desk"
 
 ; Must match `crates/shared/src/constants.rs`. The window class is how a running
 ; daemon is found and asked to shut down; the task name is what uninstall removes.

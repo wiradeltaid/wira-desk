@@ -956,7 +956,7 @@ pub(crate) fn bind_callbacks(
                     return;
                 }
             }
-            update::open_in_browser("https://wiradigital.id");
+            update::open_in_browser("https://wiradelta.id");
         });
     }
     {
@@ -967,7 +967,7 @@ pub(crate) fn bind_callbacks(
                     return;
                 }
             }
-            update::open_in_browser("https://github.com/wiradigitalid/wira-desk/");
+            update::open_in_browser("https://github.com/wiradeltaid/wira-desk/");
         });
     }
     {
@@ -978,7 +978,7 @@ pub(crate) fn bind_callbacks(
                     return;
                 }
             }
-            update::open_in_browser("https://wiradigital.id/wira-desk");
+            update::open_in_browser("https://wiradelta.id/wira-desk");
         });
     }
     {
@@ -989,7 +989,7 @@ pub(crate) fn bind_callbacks(
                     return;
                 }
             }
-            update::open_in_browser("https://github.com/wiradigitalid/wira-desk/issues");
+            update::open_in_browser("https://github.com/wiradeltaid/wira-desk/issues");
         });
     }
 

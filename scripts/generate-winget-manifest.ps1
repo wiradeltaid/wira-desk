@@ -32,7 +32,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $identifier = 'WiraDigitalIndonesia.WiraDesk'
-$repo = 'wiradigitalid/wira-desk'
+$repo = 'wiradeltaid/wira-desk'
 $tag = "v$Version"
 $setupName = "WiraDesk-$Version-x64-setup.exe"
 

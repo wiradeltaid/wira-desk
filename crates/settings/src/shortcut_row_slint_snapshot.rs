@@ -2649,7 +2649,7 @@ pub(crate) mod tests {
             model.borrow_mut().update_available = Some(shared::update::Release {
                 version: "0.9.9".to_string(),
                 released: "2026-09-15".to_string(),
-                notes_url: "https://github.com/wiradigitalid/wira-desk/releases/tag/v0.9.9"
+                notes_url: "https://github.com/wiradeltaid/wira-desk/releases/tag/v0.9.9"
                     .to_string(),
                 setup_url: "https://example.com/installer.exe".to_string(),
                 setup_sha256: "0000000000000000000000000000000000000000000000000000000000000000"
@@ -2885,7 +2885,7 @@ pub(crate) mod tests {
             assert!(reset_btn.is_some(), "Reset all settings button found");
 
             // Card 4 elements
-            let publisher = find_element_scrolling(&window, "Publisher website (wiradigital.id)");
+            let publisher = find_element_scrolling(&window, "Publisher website (wiradelta.id)");
             assert!(
                 publisher.is_some(),
                 "Publisher website link found in Card 4"

@@ -278,9 +278,9 @@ fn launch_installer(path: &std::path::Path) -> Result<(), String> {
 /// Validate whether a URL is in the strict allowlist of browser navigation targets.
 ///
 /// Pinned targets allowed:
-/// - Exact `https://wiradigital.id` or `https://wiradigital.id/`
-/// - Exact `https://wiradigital.id/wira-desk` or `https://wiradigital.id/wira-desk/`
-/// - Pinned GitHub repository prefix `https://github.com/wiradigitalid/wira-desk` or subpaths
+/// - Exact `https://wiradelta.id` or `https://wiradelta.id/`
+/// - Exact `https://wiradelta.id/wira-desk` or `https://wiradelta.id/wira-desk/`
+/// - Pinned GitHub repository prefix `https://github.com/wiradeltaid/wira-desk` or subpaths
 ///
 /// All non-HTTPS schemes, dot-segments (`..`), userinfo (`@`), or unpinned hosts are rejected.
 pub fn is_allowed_browser_url(url: &str) -> bool {
@@ -291,14 +291,14 @@ pub fn is_allowed_browser_url(url: &str) -> bool {
     if url.contains("..") || url.contains('@') {
         return false;
     }
-    if url == "https://wiradigital.id" || url == "https://wiradigital.id/" {
+    if url == "https://wiradelta.id" || url == "https://wiradelta.id/" {
         return true;
     }
-    if url == "https://wiradigital.id/wira-desk" || url == "https://wiradigital.id/wira-desk/" {
+    if url == "https://wiradelta.id/wira-desk" || url == "https://wiradelta.id/wira-desk/" {
         return true;
     }
-    const REPO_BASE: &str = "https://github.com/wiradigitalid/wira-desk";
-    if url == REPO_BASE || url.starts_with("https://github.com/wiradigitalid/wira-desk/") {
+    const REPO_BASE: &str = "https://github.com/wiradeltaid/wira-desk";
+    if url == REPO_BASE || url.starts_with("https://github.com/wiradeltaid/wira-desk/") {
         return true;
     }
     false
@@ -437,32 +437,32 @@ mod tests {
 
     #[test]
     fn open_in_browser_accepts_publisher_and_repo_domains() {
-        assert!(is_allowed_browser_url("https://wiradigital.id"));
-        assert!(is_allowed_browser_url("https://wiradigital.id/"));
-        assert!(is_allowed_browser_url("https://wiradigital.id/wira-desk"));
-        assert!(is_allowed_browser_url("https://wiradigital.id/wira-desk/"));
+        assert!(is_allowed_browser_url("https://wiradelta.id"));
+        assert!(is_allowed_browser_url("https://wiradelta.id/"));
+        assert!(is_allowed_browser_url("https://wiradelta.id/wira-desk"));
+        assert!(is_allowed_browser_url("https://wiradelta.id/wira-desk/"));
         assert!(is_allowed_browser_url(
-            "https://github.com/wiradigitalid/wira-desk"
+            "https://github.com/wiradeltaid/wira-desk"
         ));
         assert!(is_allowed_browser_url(
-            "https://github.com/wiradigitalid/wira-desk/"
+            "https://github.com/wiradeltaid/wira-desk/"
         ));
         assert!(is_allowed_browser_url(
-            "https://github.com/wiradigitalid/wira-desk/releases"
+            "https://github.com/wiradeltaid/wira-desk/releases"
         ));
         assert!(is_allowed_browser_url(
-            "https://github.com/wiradigitalid/wira-desk/issues"
+            "https://github.com/wiradeltaid/wira-desk/issues"
         ));
 
         // Reject non-https
-        assert!(!is_allowed_browser_url("http://wiradigital.id"));
+        assert!(!is_allowed_browser_url("http://wiradelta.id"));
         assert!(!is_allowed_browser_url(
-            "http://github.com/wiradigitalid/wira-desk/"
+            "http://github.com/wiradeltaid/wira-desk/"
         ));
 
         // Reject dot-segments and userinfo
-        assert!(!is_allowed_browser_url("https://wiradigital.id/../evil"));
-        assert!(!is_allowed_browser_url("https://user:pass@wiradigital.id"));
+        assert!(!is_allowed_browser_url("https://wiradelta.id/../evil"));
+        assert!(!is_allowed_browser_url("https://user:pass@wiradelta.id"));
 
         // Reject other domains
         assert!(!is_allowed_browser_url("https://evil.com"));

@@ -176,7 +176,7 @@ jobs:
           # is the problem this file exists to solve.
           #
           # Read by two consumers that must not disagree, so there is one file rather than
-          # two: the application's own updater, and the download page on wiradigital.id.
+          # two: the application's own updater, and the download page on wiradelta.id.
           #
           # The hash here is what the updater checks a download against before executing
           # it. Until a code-signing certificate exists it is the only verification there

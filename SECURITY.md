@@ -19,7 +19,7 @@ Two facts most people want up front:
   only the message type and the button identifier are taken out — **the coordinate field is not
   read anywhere in the codebase**, so where you click never enters the program at all.
 - **No telemetry, no user account, no background updater service.** The application makes two
-  distinct outbound HTTPS requests to GitHub under `github.com/wiradigitalid/wira-desk`:
+  distinct outbound HTTPS requests to GitHub under `github.com/wiradeltaid/wira-desk`:
   1. An update check request (automated or on-demand) fetching version descriptor `latest.json`.
   2. An installer download request fetching the release setup executable, initiated ONLY when the
      user explicitly clicks 'Download and install' in Settings.

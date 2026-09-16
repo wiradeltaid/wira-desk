@@ -68,14 +68,14 @@ fast, one-key window snapping and arranging: quick left/right/top/bottom snap, m
 move-to-monitor, each on its own dedicated shortcut instead of a drag or a menu. The source is now
 published under the Wira Desk name as its first public release.
 
-**Wira Digital Indonesia** is the studio brand behind this project; it is still being established.
+**Wira Delta Indonesia** is the studio brand behind this project.
 Wira Desk is built and maintained by [@kodesh87](https://github.com/kodesh87) - the studio name
 and the maintainer are the same effort, not separate products.
 
 ## Install
 
 Download `WiraDesk-<version>-x64-setup.exe` from the
-[releases page](https://github.com/wiradigitalid/wira-desk/releases) (mirrored on
+[releases page](https://github.com/wiradeltaid/wira-desk/releases) (mirrored on
 [SourceForge](https://sourceforge.net/projects/wira-desk/files/latest/download)) and run it.
 Verify it against the published `SHA256SUMS` first:
 
@@ -106,7 +106,7 @@ a normal user could overwrite.
 Updating is built in: Settings includes an automatic or on-demand **Check for updates** button that
 downloads the latest verified release installer and runs it with your permission, keeping your settings.
 You can also download the newer setup executable directly from the
-[releases page](https://github.com/wiradigitalid/wira-desk/releases) and run it manually over the old install.
+[releases page](https://github.com/wiradeltaid/wira-desk/releases) and run it manually over the old install.
 
 > **Privacy & Offline Posture:** No telemetry, no account, no background updater service — HTTPS
 > requests to GitHub occur only when checking for or installing updates, which you can switch off.
@@ -177,7 +177,7 @@ CI runs and the conventions this repository follows.
 
 The GPL grants rights over code. It says nothing about names or logos, and it does not oblige the
 studio to hand over either — so the licence above covers this repository's code, not the name
-**Wira Desk**, not **Wira Digital Indonesia**, and not the icon or wordmark.
+**Wira Desk**, not **Wira Delta Indonesia**, and not the icon or wordmark.
 
 You may use those names to refer to this project: "based on Wira Desk", "a fork of Wira Desk",
 "compatible with Wira Desk". You may not use them as the name of your own product, or in a way that

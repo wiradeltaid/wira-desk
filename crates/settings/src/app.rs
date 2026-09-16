@@ -3196,7 +3196,7 @@ mod tests {
                 "Issue Tracker button found in About pane"
             );
 
-            let pub_btn = find_about_element(&window, "Publisher website (wiradigital.id)");
+            let pub_btn = find_about_element(&window, "Publisher website (wiradelta.id)");
             assert!(
                 pub_btn.is_some(),
                 "Publisher website button found in About pane"
@@ -3214,7 +3214,7 @@ mod tests {
                 "Attribution prefix found in About pane"
             );
 
-            let legal_link = find_about_element(&window, "Wira Digital Indonesia");
+            let legal_link = find_about_element(&window, "Wira Delta Indonesia");
             assert!(
                 legal_link.is_some(),
                 "Inline publisher link text found in About pane"
@@ -3240,12 +3240,12 @@ mod tests {
             crate::sync_model_to_ui(&window, &model.borrow());
             assert_eq!(window.get_current_pane(), 4);
 
-            let inline_link = find_about_element(&window, "Publisher website (wiradigital.id)");
+            let inline_link = find_about_element(&window, "Publisher website (wiradelta.id)");
             assert!(
                 inline_link.is_some(),
                 "Inline publisher link with accessible-label found in About pane"
             );
-            let inline_text = find_about_element(&window, "Wira Digital Indonesia");
+            let inline_text = find_about_element(&window, "Wira Delta Indonesia");
             assert!(
                 inline_text.is_some(),
                 "Inline publisher link text found in About pane"
@@ -3291,8 +3291,8 @@ mod tests {
 
             let source = include_str!("../ui/panes/about_pane.slint");
             assert!(
-                !source.contains("text: \"Publisher website (wiradigital.id)\";"),
-                "Standalone 'Publisher website (wiradigital.id)' Text element must be removed from Card 3"
+                !source.contains("text: \"Publisher website (wiradelta.id)\";"),
+                "Standalone 'Publisher website (wiradelta.id)' Text element must be removed from Card 3"
             );
 
             let _ = std::fs::remove_file(&save_path);
@@ -3328,7 +3328,7 @@ mod tests {
             // Absolute content right-edge bound = 760 - 20 - 16 = 724px.
             let card_content_right_bound = window_width - 20.0 - 16.0;
 
-            let link_el = find_about_element(&window, "Publisher website (wiradigital.id)")
+            let link_el = find_about_element(&window, "Publisher website (wiradelta.id)")
                 .expect("Inline publisher link must be instantiated in accessible tree");
             let link_right = link_el.absolute_position().x + link_el.size().width;
             assert!(

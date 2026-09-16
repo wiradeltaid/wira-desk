@@ -81,15 +81,15 @@ facts:
     appears_in: []
 
   - id: support_email
-    value: "support@wiradigital.id"
+    value: "support@wiradelta.id"
     source: .control/project-non-technical-log.md
     appears_in: []
 
   - id: canonical_url
-    value: "https://wiradigital.id/wira-desk"
+    value: "https://wiradelta.id/wira-desk"
     derived_from:
       file: crates/settings/src/update.rs
-      pattern: '"(https://wiradigital\.id/wira-desk)"'
+      pattern: '"(https://wiradelta\.id/wira-desk)"'
     appears_in:
       - crates/settings/src/update.rs
 
