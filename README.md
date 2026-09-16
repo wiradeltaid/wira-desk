@@ -26,7 +26,7 @@ All of these are remappable, and can be individually turned on or off, from the 
 
 | Shortcut | Action |
 |---|---|
-| `` Win + ` `` | Cycle windows of the app you're currently using (e.g. Chrome window 1 → Chrome window 2 → ...) |
+| `` Win + ` `` | Cycle windows of the app you're currently using (hold 300 ms for visual switcher overlay) |
 | `` Alt + ` `` | Fallback cycling shortcut, for when the primary one collides with another app |
 | `Ctrl+Alt+Left/Right/Up/Down` | Snap the window to that half of the screen (50%) |
 | `Ctrl+Alt+Shift+Left/Right/Up/Down` | Snap the window to that edge at a percentage you set per direction in Settings |
@@ -80,7 +80,7 @@ Download `WiraDesk-<version>-x64-setup.exe` from the
 Verify it against the published `SHA256SUMS` first:
 
 ```powershell
-Get-FileHash .\WiraDesk-0.2.0-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\WiraDesk-0.2.4-x64-setup.exe -Algorithm SHA256
 ```
 
 The installer needs Administrator, installs to `%ProgramFiles%\Wira Desk`, and offers no per-user

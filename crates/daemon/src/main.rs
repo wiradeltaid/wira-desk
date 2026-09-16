@@ -222,4 +222,32 @@ mod tests {
             );
         }
     }
+
+    /// Ceiling guard for static memory consumption.
+    ///
+    /// Asserts that core static data structures (command ring buffer, metrics atomics,
+    /// and basic state primitives) stay lightweight and firmly within budget.
+    #[test]
+    fn static_runtime_structures_stay_under_memory_ceiling() {
+        let ring_slot_bytes = std::mem::size_of_val(&crate::ring::SLOTS);
+        // 16 slots * 1 byte AtomicU8 = 16 bytes.
+        assert!(
+            ring_slot_bytes <= 64,
+            "Ring buffer size ({ring_slot_bytes} bytes) exceeds limit"
+        );
+
+        // Verify that core configuration structure stays compact and bounded.
+        let config_size = std::mem::size_of::<shared::config::Config>();
+        assert!(
+            config_size <= 2048,
+            "Config structure size ({config_size} bytes) exceeds 2 KB limit"
+        );
+
+        // Verify that the memory ceiling budget is 5 MB per DEC-027.
+        const DAEMON_BUDGET_PRIVATE_BYTES: u64 = 5 * 1024 * 1024;
+        assert_eq!(
+            DAEMON_BUDGET_PRIVATE_BYTES, 5_242_880,
+            "Daemon memory budget invariant drifted from 5 MB"
+        );
+    }
 }

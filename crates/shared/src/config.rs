@@ -250,6 +250,7 @@ impl MouseActionPreset {
         MouseActionPreset::MoveNextMonitor,
         MouseActionPreset::Passthrough,
     ];
+    pub const CATEGORY_COUNT: usize = 8;
 
     pub fn as_str(&self) -> &'static str {
         match self {
@@ -1062,6 +1063,7 @@ mod tests {
             "Arrange & Move",
             "Passthrough",
         ];
+        assert_eq!(expected_categories.len(), MouseActionPreset::CATEGORY_COUNT);
 
         for (i, preset) in MouseActionPreset::ALL.iter().enumerate() {
             assert_eq!(preset.index(), i);

@@ -7,7 +7,7 @@ use shared::constants::RING_BUFFER_CAPACITY;
 
 const CAP: u32 = RING_BUFFER_CAPACITY as u32;
 
-static SLOTS: [AtomicU8; RING_BUFFER_CAPACITY] = [
+pub(crate) static SLOTS: [AtomicU8; RING_BUFFER_CAPACITY] = [
     AtomicU8::new(0),
     AtomicU8::new(0),
     AtomicU8::new(0),

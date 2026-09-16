@@ -1,0 +1,42 @@
+﻿{
+    "Conditions":  {
+                       "Timestamp":  "2026-09-16T15:13:38Z",
+                       "GitCommit":  "0eae44900fc58ec3e2b9a91117d2cff401b76ee5",
+                       "GitWorkingTree":  "dirty",
+                       "Profile":  "release",
+                       "OS":  "Microsoft Windows NT 10.0.26200.0",
+                       "WindowsBuild":  "26200",
+                       "MonitorCount":  2,
+                       "Monitors":  [
+                                        {
+                                            "Width":  2560,
+                                            "Height":  1440,
+                                            "DpiX":  96,
+                                            "DpiY":  96,
+                                            "ScalePercent":  100
+                                        },
+                                        {
+                                            "Width":  1234,
+                                            "Height":  2194,
+                                            "DpiX":  96,
+                                            "DpiY":  96,
+                                            "ScalePercent":  100
+                                        }
+                                    ]
+                   },
+    "Measurements":  {
+                         "Daemon":  {
+                                        "PID":  28128,
+                                        "ProcessName":  "wiradesk",
+                                        "WorkingSet64":  38223872,
+                                        "WorkingSetMB":  36.45,
+                                        "PrivateMemorySize64":  4988928,
+                                        "PrivateMemoryMB":  4.76,
+                                        "PagedMemorySize64":  4988928,
+                                        "PagedMemoryMB":  4.76,
+                                        "HandleCount":  424,
+                                        "GdiObjects":  21,
+                                        "UserObjects":  20
+                                    }
+                     }
+}
