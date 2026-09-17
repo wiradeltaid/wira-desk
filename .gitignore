@@ -16,3 +16,5 @@ __pycache__/
 
 # The planning archive under `_bmad-output/` is committed source.
 # `_bmad/`, `.claude/`, `.agents/`, and `.work/` are committed too — see CONTRIBUTING.md.
+# Local runner configuration (never commit personal runners/credentials)
+.control/custom-dispatch.yaml
