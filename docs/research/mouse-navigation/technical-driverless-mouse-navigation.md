@@ -8,7 +8,7 @@ status: 'complete'
 preset: 'quick'
 validation: 'normal'
 created: '2026-09-10'
-updated: '2026-09-10'
+updated: '2026-09-18'
 ---
 
 # Technical Research: Driverless Productivity Mouse Desktop Navigation
@@ -23,7 +23,7 @@ Modern productivity mice (such as Logitech M-series, MX Master, and similar ergo
 
 However, vendor companion suites have evolved into heavyweight, multi-process web-runtime applications (often exceeding 500 MB to 1.5 GB on disk and consuming 150 MB to 500+ MB of background RAM) accompanied by background updater, ad-broker, and telemetry agents [2]. This creates substantial friction for developers, system administrators, and performance-conscious power users operating under workstation resource constraints [2].
 
-This technical research confirms that standard multi-button mice emit standard USB HID reports that Windows exposes directly via low-level Win32 messaging (`WH_MOUSE_LL`): `WM_XBUTTONDOWN` for thumb buttons and `WM_MOUSEHWHEEL` for tilt-wheels [3, 4]. Wira Desk can capture, filter, and dispatch these inputs directly into Windows desktop multitasking flows (Virtual Desktop switching, Task View, window cycling, and workspace snapping) with zero external vendor runtimes, near-zero CPU overhead, and negligible memory footprint (<2 MB static RAM) [5] [6].
+This technical research confirms that standard multi-button mice emit standard USB HID reports that Windows exposes directly via low-level Win32 messaging (`WH_MOUSE_LL`): `WM_XBUTTONDOWN` for thumb buttons and `WM_MOUSEHWHEEL` for tilt-wheels [3, 4]. Wira Desk can capture, filter, and dispatch these inputs directly into Windows desktop multitasking flows (Virtual Desktop switching, Task View, window cycling, and workspace snapping) with zero external vendor runtimes, near-zero CPU overhead, and negligible memory footprint (<5 MB static RAM budget, measured ~3.93 MB idle) [5, 6].
 
 ---
 
@@ -76,4 +76,4 @@ Under Windows 10 and 11, the Win32 API provides standard interception of mouse e
 | [3] | LowLevelMouseProc callback function | Microsoft Learn (Win32) | https://learn.microsoft.com/en-us/windows/win32/winmsg/lowlevelmouseproc | technical/win32-api |
 | [4] | MSLLHOOKSTRUCT structure | Microsoft Learn (Win32) | https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-msllhookstruct | technical/win32-api |
 | [5] | VirtualDesktop: Windows Virtual Desktop Management Tool | MScholtes (GitHub) | https://github.com/MScholtes/VirtualDesktop | architecture/os-integration |
-| [6] | Wira Desk Product Architecture & Performance Budget | Wira Desk Documentation | https://github.com/wiradigitalid/wira-desk | project/architecture |
+| [6] | Wira Desk Product Architecture & Performance Budget | Wira Desk Documentation | https://github.com/wiradeltaid/wira-desk | project/architecture |
