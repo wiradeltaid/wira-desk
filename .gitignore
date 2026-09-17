@@ -18,3 +18,11 @@ __pycache__/
 # `_bmad/`, `.claude/`, `.agents/`, and `.work/` are committed too — see CONTRIBUTING.md.
 # Local runner configuration (never commit personal runners/credentials)
 .control/custom-dispatch.yaml
+
+# Ephemeral smoke test artifacts
+.work/smoke/
+
+# Derived human-readable document projections (regenerated via validate.py --generate or /wdi-report render)
+/.what-rendered/
+/.how-rendered/
+
