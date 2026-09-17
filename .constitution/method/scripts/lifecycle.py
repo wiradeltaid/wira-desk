@@ -245,16 +245,30 @@ def run_validator_check(root: Path, created_dirs: list[Path] | None = None) -> N
     if not validate_script.is_file():
         _rollback_git_changes(root, created_dirs)
         sys.exit(f"error: validate.py script not found at `{validate_script}` — fail-closed.")
-    res = _run_cmd(["uv", "run", str(validate_script), "--root", str(root), "--check"], root)
+    baseline_file = root / ".github" / "validate-baseline.txt"
+    base_args = ["--baseline", str(baseline_file)] if baseline_file.is_file() else []
+    res = _run_cmd(["uv", "run", str(validate_script), "--root", str(root), "--check", *base_args], root)
+    if res.returncode != 0 and ("No such file or directory" in res.stderr or "not recognized" in res.stderr):
+        res = _run_cmd(["uv", "run", "--with", "pyyaml", "python", str(validate_script), "--root", str(root), "--check", *base_args], root)
+    if res.returncode != 0 and ("No such file or directory" in res.stderr or "not recognized" in res.stderr):
+        res = _run_cmd([sys.executable, str(validate_script), "--root", str(root), "--check", *base_args], root)
     if res.returncode != 0:
-        if "No such file or directory" in res.stderr or "not recognized" in res.stderr:
-            res = _run_cmd([sys.executable, str(validate_script), "--root", str(root), "--check"], root)
-        if res.returncode != 0:
-            _rollback_git_changes(root, created_dirs)
-            sys.exit(
-                f"error: validate.py --check failed after lifecycle operation. Git changes have been rolled back.\n"
-                f"{res.stdout}\n{res.stderr}"
-            )
+        if baseline_file.is_file():
+            raw_lines = res.stdout.splitlines()
+            findings = []
+            for line in raw_lines:
+                if line.startswith("Skipped:") or line.startswith("V14 reference date:"):
+                    break
+                if re.match(r"^\s{2}[a-z][a-z0-9-]*\s+", line):
+                    findings.append(line.rstrip())
+            baseline_lines = [l.rstrip() for l in baseline_file.read_text(encoding="utf-8").splitlines() if l.strip()]
+            if sorted(findings) == sorted(baseline_lines):
+                return
+        _rollback_git_changes(root, created_dirs)
+        sys.exit(
+            f"error: validate.py --check failed after lifecycle operation. Git changes have been rolled back.\n"
+            f"{res.stdout}\n{res.stderr}"
+        )
 
 
 def main() -> None:

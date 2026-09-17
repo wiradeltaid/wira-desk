@@ -64,6 +64,19 @@ git rev-parse --verify "refs/heads/<development_branch>" >/dev/null 2>&1 || git 
 - Task branches and worktrees are temporary mechanisms for isolated implementation.
 - Once a task or run branch is merged into `development_branch`, the local task worktree and branch SHOULD be pruned.
 - Intermediate task branches MUST NOT be left lingering on the remote; only the designated run branch or PR branch reaches the remote.
+- When synchronizing `development_branch`, agents SHOULD run `git fetch --prune origin` to prune stale remote-tracking references of branches already deleted on the remote.
+- For method-owned run branches (e.g. `autopilot/<mandate-id>`), once the pull request is confirmed merged into `development_branch`, the remote branch SHOULD be pruned (`git push origin --delete <branch>`). If PR merge status cannot be verified, the remote branch MUST NOT be deleted and MUST be reported as a residual remote branch.
+- Absolute branch immunity strictly applies to remote operations: an agent MUST NEVER delete or prune `primary_branch` or `development_branch` on any remote.
+
+### Working tree isolation models
+
+Isolation protects branch integrity and build state during implementation:
+1. **Linked worktree (`git worktree add`):** An additional isolated checkout directory. Ideal for multi-task workflows and environments without toolchain file locks.
+2. **Exclusive primary working tree:** The root repository checkout temporarily dedicated exclusively to a task branch or autopilot run branch (`autopilot/<mandate-id>`). This model is permitted where linked worktrees encounter filesystem or toolchain locks (e.g. Windows file locking on compiler output or artifact build directories), provided all three conditions hold:
+   - The working tree is clean (`git status --porcelain` empty) before switching to the run branch.
+   - The checkout is dedicated exclusively to the active run (no parallel builders, concurrent human edits, or competing processes sharing the root tree).
+   - Only one active mandate or task run executes on the primary tree at any given time.
+3. **Shared checkout (PROHIBITED for code changes):** A working tree with dirty state, unstaged edits, or concurrent uncoordinated activities.
 
 ## Red flags
 
