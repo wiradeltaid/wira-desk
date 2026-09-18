@@ -31,7 +31,7 @@ specs:
     # wrote it. DEF-1 is now `fixed` and `cargo test --workspace` exits 0 with 330 passing.
     # RTM: 14/14 green, promise progress 100%.
     depends_on: []
-    spec_folder: .scratch/w1-verify-0-1-0/
+    spec_folder: .archive/specs/w1-verify-0-1-0/
     spec_reviewed:
       date: '2026-08-21'
       sha: '7a0d260'
@@ -263,6 +263,7 @@ specs:
               - persistence::tests::reload_signal_is_harmless_when_no_daemon_is_running
 
   - id: W4
+    spec_folder: .archive/specs/w4-arrangement/
     release: "0.4.0"
     prd: [wira-desk]
     size: M
@@ -424,7 +425,7 @@ specs:
     size: M
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-1-percentage-and-thirds-snap/
+    spec_folder: .archive/specs/spec-1-percentage-and-thirds-snap/
     spec_reviewed:
       date: '2026-09-06'
       sha: '77bd03a'
@@ -470,7 +471,7 @@ specs:
     size: S
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-2-shortcuts-pane-fixes/
+    spec_folder: .archive/specs/spec-2-shortcuts-pane-fixes/
     fr: [FR-25]
     spec_reviewed:
       date: '2026-09-07'
@@ -529,7 +530,7 @@ specs:
     size: M
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-3-per-action-shortcut-enable-disable/
+    spec_folder: .archive/specs/spec-3-per-action-shortcut-enable-disable/
     fr: [FR-28, FR-29]
     spec_reviewed:
       date: '2026-09-07'
@@ -573,7 +574,7 @@ specs:
     size: M
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-4-shortcuts-pane-consolidation/
+    spec_folder: .archive/specs/spec-4-shortcuts-pane-consolidation/
     fr: [FR-15, FR-26, FR-28]
     spec_reviewed:
       date: '2026-09-07'
@@ -715,7 +716,7 @@ specs:
       sha: '55f7b3b'
       lenses: [edge-case-hunter]
     depends_on: [SPEC-4]
-    spec_folder: .scratch/spec-5-shortcuts-pane-follow-up/
+    spec_folder: .archive/specs/spec-5-shortcuts-pane-follow-up/
     fr: [FR-15, FR-26]
     tickets:
       - id: SPEC-5-01
@@ -785,7 +786,7 @@ specs:
       sha: '97c1b1d'
       lenses: [edge-case-hunter]
     depends_on: [SPEC-5]
-    spec_folder: .scratch/spec-6-shortcuts-pane-second-follow-up/
+    spec_folder: .archive/specs/spec-6-shortcuts-pane-second-follow-up/
     fr: [FR-15, FR-26]
     tickets:
       - id: SPEC-6-01
@@ -827,7 +828,7 @@ specs:
       sha: '05602b6'
       lenses: [edge-case-hunter]
     depends_on: [SPEC-6]
-    spec_folder: .scratch/spec-7-shortcuts-pane-third-follow-up/
+    spec_folder: .archive/specs/spec-7-shortcuts-pane-third-follow-up/
     fr: [FR-15, FR-26]
     tickets:
       - id: SPEC-7-01
@@ -847,7 +848,7 @@ specs:
     size: M
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-8-driverless-mouse-navigation/
+    spec_folder: .archive/specs/spec-8-driverless-mouse-navigation/
     fr: [FR-30, FR-31, FR-32]
     spec_reviewed:
       date: "2026-09-10"
@@ -893,7 +894,7 @@ specs:
     size: M
     status: closed
     depends_on: [SPEC-8]
-    spec_folder: .scratch/spec-9-mouse-and-settings-polish/
+    spec_folder: .archive/specs/spec-9-mouse-and-settings-polish/
     fr: [FR-30, FR-31, FR-32]
     spec_reviewed:
       date: "2026-09-11"
@@ -960,7 +961,7 @@ specs:
     size: M
     status: closed
     depends_on: [SPEC-9]
-    spec_folder: .scratch/spec-10-mouse-navigation-followup/
+    spec_folder: .archive/specs/spec-10-mouse-navigation-followup/
     fr: [FR-30, FR-31, FR-32]
     spec_reviewed:
       date: "2026-09-11"
@@ -1012,7 +1013,7 @@ specs:
     size: M
     status: closed
     depends_on: [SPEC-10]
-    spec_folder: .scratch/spec-11-app-distribution-and-branding/
+    spec_folder: .archive/specs/spec-11-app-distribution-and-branding/
     fr: []
     # `lenses` was widened to [structure, prose, edge-case-hunter] earlier in this same revision
     # round without a session actually dispatching bmad-review at this sha -- wdi-review forbids
@@ -1069,7 +1070,7 @@ specs:
     size: M
     status: closed
     depends_on: [SPEC-11]
-    spec_folder: .scratch/spec-12-about-pane-and-settings-polish/
+    spec_folder: .archive/specs/spec-12-about-pane-and-settings-polish/
     fr: []
     # Second-opinion peer review (Sonnet, 2026-09-12): structure+prose+edge-case-hunter pass over
     # SPEC.md and all three ticket files. Found and fixed in place, before this stamp: (1) the About
@@ -1135,7 +1136,7 @@ specs:
     size: M
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-13-same-app-visual-switcher/
+    spec_folder: .archive/specs/spec-13-same-app-visual-switcher/
     fr: []
     spec_reviewed:
       date: "2026-09-12"
@@ -1295,7 +1296,7 @@ specs:
       date: '2026-09-13'
       sha: 'f7c2739'
       lenses: [structure, prose, edge-case-hunter]
-    spec_folder: .scratch/spec-14-visual-switcher-refinements-and-settings-polish/
+    spec_folder: .archive/specs/spec-14-visual-switcher-refinements-and-settings-polish/
     fr: []
     tickets:
       - id: SPEC-14-01
@@ -1420,7 +1421,7 @@ specs:
     size: M
     status: closed
     depends_on: [SPEC-14]
-    spec_folder: .scratch/spec-15-visual-switcher-polish-and-lifecycle/
+    spec_folder: .archive/specs/spec-15-visual-switcher-polish-and-lifecycle/
     # Peer review (claude-opus-5, 2026-09-13) against the code, not the draft's own account of it.
     # Two changes it forced, both recorded in SPEC.md: the SPEC-15-03 -> SPEC-15-04 dependency edge
     # was BACKWARDS and is reversed (until the premature keydown cycle is gone, `active.foreground`
@@ -1582,7 +1583,7 @@ specs:
     size: S
     status: closed
     depends_on: [SPEC-15]
-    spec_folder: .scratch/spec-16-visual-switcher-lifecycle-and-settings-polish/
+    spec_folder: .archive/specs/spec-16-visual-switcher-lifecycle-and-settings-polish/
     spec_reviewed:
       date: '2026-09-13'
       sha: '2352725'
@@ -1636,7 +1637,7 @@ specs:
     size: S
     status: closed
     depends_on: [SPEC-16]
-    spec_folder: .scratch/spec-17-blind-backward-cycling-multi-window/
+    spec_folder: .archive/specs/spec-17-blind-backward-cycling-multi-window/
     fr: [FR-1, FR-2]
     spec_reviewed:
       date: '2026-09-13'
@@ -1659,7 +1660,7 @@ specs:
     size: S
     status: closed
     depends_on: [SPEC-17]
-    spec_folder: .scratch/spec-18-blind-backward-cycling-session-lifecycle/
+    spec_folder: .archive/specs/spec-18-blind-backward-cycling-session-lifecycle/
     fr: [FR-1, FR-2]
     spec_reviewed:
       date: '2026-09-13'
@@ -1682,7 +1683,7 @@ specs:
     size: S
     status: closed
     depends_on: [SPEC-18]
-    spec_folder: .scratch/spec-19-visual-switcher-mouse-selection-and-hold-threshold/
+    spec_folder: .archive/specs/spec-19-visual-switcher-mouse-selection-and-hold-threshold/
     spec_reviewed:
       date: '2026-09-14'
       sha: '3850073'
@@ -1706,7 +1707,7 @@ specs:
     size: S
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-20-static-crt-and-software-renderer/
+    spec_folder: .archive/specs/spec-20-static-crt-and-software-renderer/
     spec_reviewed:
       date: '2026-09-14'
       sha: 'c2ad4ea'
@@ -1732,7 +1733,7 @@ specs:
     size: S
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-21-installer-hardening-and-downgrade-prevention/
+    spec_folder: .archive/specs/spec-21-installer-hardening-and-downgrade-prevention/
     spec_reviewed:
       date: '2026-09-14'
       sha: '6ae977a'
@@ -1755,7 +1756,7 @@ specs:
     size: S
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-22-installer-dialog-formatting-and-clean-config/
+    spec_folder: .archive/specs/spec-22-installer-dialog-formatting-and-clean-config/
     spec_reviewed:
       date: '2026-09-14'
       sha: 'b470994'
@@ -1778,7 +1779,7 @@ specs:
     size: S
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-23-ready-memo-brevity-and-legacy-migration-retirement/
+    spec_folder: .archive/specs/spec-23-ready-memo-brevity-and-legacy-migration-retirement/
     spec_reviewed:
       date: '2026-09-14'
       sha: '1b7c446'
@@ -1802,7 +1803,7 @@ specs:
     size: S
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-24-snap-to-edge-default-percentage-to-67/
+    spec_folder: .archive/specs/spec-24-snap-to-edge-default-percentage-to-67/
     spec_reviewed:
       date: '2026-09-14'
       sha: 'feaa26a'
@@ -1828,7 +1829,7 @@ specs:
     size: S
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-25-restore-defaults-and-about-shortcuts-polish/
+    spec_folder: .archive/specs/spec-25-restore-defaults-and-about-shortcuts-polish/
     spec_reviewed:
       date: '2026-09-15'
       sha: 'a22a551'
@@ -1868,7 +1869,7 @@ specs:
     size: S
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-26-header-defaults-and-about-card-hierarchy/
+    spec_folder: .archive/specs/spec-26-header-defaults-and-about-card-hierarchy/
     spec_reviewed:
       date: '2026-09-15'
       sha: '0395587'
@@ -1906,7 +1907,7 @@ specs:
     size: S
     status: closed
     depends_on: []
-    spec_folder: .scratch/spec-27-tray-warning-reset-auto-start-isolation-and-settings-ui-polish/
+    spec_folder: .archive/specs/spec-27-tray-warning-reset-auto-start-isolation-and-settings-ui-polish/
     spec_reviewed:
       date: '2026-09-15'
       sha: 'e75be4b'
@@ -1949,7 +1950,7 @@ specs:
       sha: 'f4e29c7'
       lenses: [structure, prose, edge-case-hunter]
     depends_on: []
-    spec_folder: .scratch/spec-28-modal-dialog-height-and-realtime-tray-warning-cleanup/
+    spec_folder: .archive/specs/spec-28-modal-dialog-height-and-realtime-tray-warning-cleanup/
     fr: []
     tickets:
       - id: SPEC-28-01
