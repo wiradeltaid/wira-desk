@@ -21,7 +21,7 @@ touches:
 supersedes: null
 superseded_by: null
 created: '2026-09-18'
-accepted_by: kodesh87 (Product Owner, in session), 2026-09-18
+accepted_by: Wira (Product Owner, in session), 2026-09-18
 ---
 
 # DEC-043 — Autopilot mandate for SPEC-29 delivery

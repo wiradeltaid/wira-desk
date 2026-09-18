@@ -4,7 +4,7 @@
 
 Period: **the project's start → 2026-09-18**. This period has no left bound — there is no earlier report yet.
 
-Freshness: commit `6e54f539f222`. **The registry has uncommitted changes — the numbers below may not reflect what is on `main`.**
+Freshness: commit `c33e968aa8c4`. **The registry has uncommitted changes — the numbers below may not reflect what is on `main`.**
 
 ## Promise progress — 100%
 

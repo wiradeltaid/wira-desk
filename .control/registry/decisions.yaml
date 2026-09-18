@@ -1138,7 +1138,7 @@ decisions:
     title: Autopilot mandate for SPEC-29 delivery
     type: mandate
     status: applied
-    accepted_by: 'kodesh87, 2026-09-18'
+    accepted_by: 'Wira, 2026-09-18'
     file: decisions/DEC-043-autopilot-mandate-for-spec-29-delivery.md
     created: '2026-09-18'
     touches:
