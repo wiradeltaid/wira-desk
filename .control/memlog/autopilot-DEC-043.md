@@ -8,7 +8,7 @@ date: 2026-09-18
 
 ## Resume
 
-Iteration: 1 (boundary: 6e54f53)
+Iteration: 1 (boundary: 2ca949a)
 Run branch: autopilot/DEC-043, PR ready for owner merge
 Stopped at: Done — SPEC-29 delivered and closed under mandate DEC-043
 Blocked: —
