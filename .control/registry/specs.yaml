@@ -1974,3 +1974,37 @@ specs:
           - tray::tests::autostart_acl_warning_clears_when_task_unregistered_or_admin_only
           - tray::tests::autostart_acl_warning_persists_if_task_remains_registered_in_non_admin_path
           - tray::tests::critical_hook_state_persists_across_collision_cleanup
+
+  - id: SPEC-29
+    release: "0.3.0"
+    prd: [wira-desk]
+    size: S
+    status: open
+    spec_reviewed:
+      date: '2026-09-18'
+      sha: '5df5b49'
+      lenses: [structure, prose, edge-case-hunter]
+    depends_on: []
+    spec_folder: .scratch/spec-29-snap-custom-top-default-to-33/
+    fr: [FR-26]
+    tickets:
+      - id: SPEC-29-01
+        title: "Update custom-percentage top edge snap default percentage to 33%"
+        spec_folder: .scratch/spec-29-snap-custom-top-default-to-33/
+        component: settings
+        satisfies: [UC-9]
+        depends_on: []
+        touches:
+          - crates/shared/src/config.rs
+          - crates/shared/src/constants.rs
+          - crates/settings/src/persistence.rs
+          - README.md
+          - docs/CONFIGURATION.md
+          - .control/registry/requirements-wira-desk.yaml
+          - .what/window-management/04-usecases/UC-9-snap-window-custom-percentage.md
+        tests:
+          - config::tests::default_snapping_percentages_have_top_at_33_and_others_at_67
+          - config::tests::partial_snapping_percentages_preserve_explicit_values_and_default_omitted_fields
+          - config::tests::percent_snap_fields_roundtrip_through_toml
+          - persistence::tests::default_config_uses_frozen_shortcuts
+
