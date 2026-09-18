@@ -50,7 +50,7 @@ snap_percent_right_enabled = true
 percent_right = 67
 snap_percent_top = "ctrl+alt+shift+up"
 snap_percent_top_enabled = true
-percent_top = 67
+percent_top = 33
 snap_percent_bottom = "ctrl+alt+shift+down"
 snap_percent_bottom_enabled = true
 percent_bottom = 67
@@ -99,7 +99,7 @@ tilt_right = "task_view"
 - `visual_hold_delay_ms` (*integer*, default: `300`, range: `100..=500`): Duration in milliseconds to hold the chord before opening the visual switcher overlay.
 
 ### `[snapping]`
-- Configures one-keystroke window snapping to screen halves (50%), thirds (33%), and custom directional edge percentages (`1..=99%`, default `67%`).
+- Configures one-keystroke window snapping to screen halves (50%), thirds (33%), and custom directional edge percentages (`1..=99%`, left/right/bottom default `67%`, top default `33%`).
 
 ### `[layout]`
 - `move_next_monitor_shortcut`: Moves the active window to the next physical display monitor.

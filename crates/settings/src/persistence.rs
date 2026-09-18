@@ -480,7 +480,7 @@ mod tests {
         assert!(cfg.snapping.snap_third_right_enabled);
         assert_eq!(cfg.snapping.percent_left, 67);
         assert_eq!(cfg.snapping.percent_right, 67);
-        assert_eq!(cfg.snapping.percent_top, 67);
+        assert_eq!(cfg.snapping.percent_top, 33);
         assert_eq!(cfg.snapping.percent_bottom, 67);
         assert_eq!(
             cfg.layout.move_next_monitor_shortcut,

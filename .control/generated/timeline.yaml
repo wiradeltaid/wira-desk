@@ -1,4 +1,4 @@
-asof: '2026-09-15'
+asof: '2026-09-18'
 capabilities:
 - id: CAP-1
   text: Cycle focus among visible windows of the active application via a precise global shortcut.
@@ -9,7 +9,7 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
+  actual_start: '2026-09-18'
   actual_end: ''
   delta_days: null
   state: in-progress
@@ -21,7 +21,7 @@ capabilities:
     - SPEC-18-01
     - SPEC-19-01
     - W1-S1
-    actual_start: '2026-09-07'
+    actual_start: '2026-09-18'
     actual_end: ''
     state: in-progress
   - id: FR-4
@@ -31,7 +31,7 @@ capabilities:
     - SPEC-18-01
     - SPEC-19-01
     - W1-S1
-    actual_start: '2026-09-07'
+    actual_start: '2026-09-18'
     actual_end: ''
     state: in-progress
   - id: FR-5
@@ -41,7 +41,7 @@ capabilities:
     - SPEC-18-01
     - SPEC-19-01
     - W1-S1
-    actual_start: '2026-09-07'
+    actual_start: '2026-09-18'
     actual_end: ''
     state: in-progress
   - id: FR-6
@@ -51,7 +51,7 @@ capabilities:
     - SPEC-18-01
     - SPEC-19-01
     - W1-S1
-    actual_start: '2026-09-07'
+    actual_start: '2026-09-18'
     actual_end: ''
     state: in-progress
   waiting_on: []
@@ -64,7 +64,7 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
+  actual_start: '2026-09-18'
   actual_end: ''
   delta_days: null
   state: in-progress
@@ -74,7 +74,7 @@ capabilities:
     tickets:
     - W1-S6
     - W3-S1
-    actual_start: '2026-09-07'
+    actual_start: '2026-09-18'
     actual_end: ''
     state: in-progress
   waiting_on: []
@@ -87,8 +87,8 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
-  actual_end: '2026-09-07'
+  actual_start: '2026-09-18'
+  actual_end: '2026-09-18'
   delta_days: null
   state: done
   children:
@@ -96,8 +96,8 @@ capabilities:
     text: Provide View Logs in the tray menu opening the silent log file location.
     tickets:
     - W1-S3
-    actual_start: '2026-09-07'
-    actual_end: '2026-09-07'
+    actual_start: '2026-09-18'
+    actual_end: '2026-09-18'
     state: done
   waiting_on: []
 - id: CAP-12
@@ -110,19 +110,19 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
-  actual_end: '2026-09-07'
+  actual_start: ''
+  actual_end: ''
   delta_days: null
-  state: done
+  state: not-started
   children:
   - id: FR-23
     text: Move the active window to the next physical monitor at the same proportion of the work area,
       same virtual desktop.
     tickets:
     - W4-S3
-    actual_start: '2026-09-07'
-    actual_end: '2026-09-07'
-    state: done
+    actual_start: ''
+    actual_end: ''
+    state: not-started
   waiting_on: []
 - id: CAP-13
   text: Check whether a newer release is available, on a schedule and on request, without any other network
@@ -134,8 +134,8 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
-  actual_end: '2026-09-07'
+  actual_start: '2026-09-18'
+  actual_end: '2026-09-18'
   delta_days: null
   state: done
   children:
@@ -151,8 +151,8 @@ capabilities:
       the installer.
     tickets:
     - SPEC-2-02
-    actual_start: '2026-09-07'
-    actual_end: '2026-09-07'
+    actual_start: '2026-09-18'
+    actual_end: '2026-09-18'
     state: done
   waiting_on: []
 - id: CAP-14
@@ -164,7 +164,7 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
+  actual_start: '2026-09-18'
   actual_end: ''
   delta_days: null
   state: in-progress
@@ -176,11 +176,12 @@ capabilities:
     - SPEC-1-01
     - SPEC-2-01
     - SPEC-24-01
+    - SPEC-29-01
     - SPEC-4-02
     - SPEC-5-03
     - SPEC-6-02
     - SPEC-7-01
-    actual_start: '2026-09-07'
+    actual_start: '2026-09-18'
     actual_end: ''
     state: in-progress
   waiting_on: []
@@ -193,8 +194,8 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
-  actual_end: '2026-09-07'
+  actual_start: '2026-09-18'
+  actual_end: '2026-09-18'
   delta_days: null
   state: done
   children:
@@ -202,8 +203,8 @@ capabilities:
     text: Snap the active window to the left, middle, or right third of the current monitor.
     tickets:
     - SPEC-1-02
-    actual_start: '2026-09-07'
-    actual_end: '2026-09-07'
+    actual_start: '2026-09-18'
+    actual_end: '2026-09-18'
     state: done
   waiting_on: []
 - id: CAP-16
@@ -216,8 +217,8 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
-  actual_end: '2026-09-08'
+  actual_start: '2026-09-18'
+  actual_end: '2026-09-18'
   delta_days: null
   state: done
   children:
@@ -227,16 +228,16 @@ capabilities:
     tickets:
     - SPEC-3-01
     - SPEC-4-03
-    actual_start: '2026-09-07'
-    actual_end: '2026-09-08'
+    actual_start: '2026-09-18'
+    actual_end: '2026-09-18'
     state: done
   - id: FR-29
     text: A shortcut action the user turned off is not registered at the keyboard hook, so its chord passes
       through to Windows.
     tickets:
     - SPEC-3-02
-    actual_start: '2026-09-07'
-    actual_end: '2026-09-07'
+    actual_start: '2026-09-18'
+    actual_end: '2026-09-18'
     state: done
   waiting_on: []
 - id: CAP-17
@@ -249,7 +250,7 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-10'
+  actual_start: '2026-09-18'
   actual_end: ''
   delta_days: null
   state: in-progress
@@ -263,8 +264,8 @@ capabilities:
     - SPEC-8-02
     - SPEC-9-01
     - SPEC-9-06
-    actual_start: '2026-09-10'
-    actual_end: '2026-09-11'
+    actual_start: '2026-09-18'
+    actual_end: '2026-09-18'
     state: done
   - id: FR-31
     text: Dispatch configured actions for mouse inputs, with debounce filtering for tilt-wheel burst signals.
@@ -274,8 +275,8 @@ capabilities:
     - SPEC-8-02
     - SPEC-9-01
     - SPEC-9-06
-    actual_start: '2026-09-10'
-    actual_end: '2026-09-11'
+    actual_start: '2026-09-18'
+    actual_end: '2026-09-18'
     state: done
   - id: FR-32
     text: Dedicated Mouse pane in Settings provides a master toggle and curated action preset dropdowns
@@ -291,7 +292,7 @@ capabilities:
     - SPEC-9-03
     - SPEC-9-04
     - SPEC-9-05
-    actual_start: '2026-09-10'
+    actual_start: '2026-09-18'
     actual_end: ''
     state: in-progress
   waiting_on: []
@@ -304,8 +305,8 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
-  actual_end: '2026-09-07'
+  actual_start: '2026-09-18'
+  actual_end: '2026-09-18'
   delta_days: null
   state: done
   children:
@@ -313,8 +314,8 @@ capabilities:
     text: Snap the active window to the left or right half and maximize it with Ctrl+Alt shortcuts, DPI-aware.
     tickets:
     - W1-S2
-    actual_start: '2026-09-07'
-    actual_end: '2026-09-07'
+    actual_start: '2026-09-18'
+    actual_end: '2026-09-18'
     state: done
   - id: FR-15
     text: Apply overlapping stack layout on small monitors with up to three half-width windows.
@@ -326,8 +327,8 @@ capabilities:
     text: Snap the active window to the top or bottom half of the current monitor, DPI-aware.
     tickets:
     - W1-S2
-    actual_start: '2026-09-07'
-    actual_end: '2026-09-07'
+    actual_start: '2026-09-18'
+    actual_end: '2026-09-18'
     state: done
   waiting_on: []
 - id: CAP-3
@@ -339,7 +340,7 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
+  actual_start: '2026-09-18'
   actual_end: ''
   delta_days: null
   state: in-progress
@@ -365,7 +366,7 @@ capabilities:
     - SPEC-7-01
     - W1-S4
     - W3-S1
-    actual_start: '2026-09-07'
+    actual_start: '2026-09-18'
     actual_end: ''
     state: in-progress
   waiting_on: []
@@ -399,7 +400,7 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
+  actual_start: '2026-09-18'
   actual_end: ''
   delta_days: null
   state: in-progress
@@ -416,7 +417,7 @@ capabilities:
     tickets:
     - W1-S5
     - W2-S1
-    actual_start: '2026-09-07'
+    actual_start: '2026-09-18'
     actual_end: ''
     state: in-progress
   - id: FR-18
@@ -440,7 +441,7 @@ capabilities:
     - SPEC-7-01
     - W1-S4
     - W3-S1
-    actual_start: '2026-09-07'
+    actual_start: '2026-09-18'
     actual_end: ''
     state: in-progress
   - id: FR-19
@@ -486,7 +487,7 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
+  actual_start: '2026-09-18'
   actual_end: ''
   delta_days: null
   state: in-progress
@@ -498,7 +499,7 @@ capabilities:
     - SPEC-18-01
     - SPEC-19-01
     - W1-S1
-    actual_start: '2026-09-07'
+    actual_start: '2026-09-18'
     actual_end: ''
     state: in-progress
   waiting_on: []
@@ -511,7 +512,7 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
+  actual_start: '2026-09-18'
   actual_end: ''
   delta_days: null
   state: in-progress
@@ -523,7 +524,7 @@ capabilities:
     - SPEC-18-01
     - SPEC-19-01
     - W1-S1
-    actual_start: '2026-09-07'
+    actual_start: '2026-09-18'
     actual_end: ''
     state: in-progress
   waiting_on: []
@@ -536,8 +537,8 @@ capabilities:
   planned_start: ''
   planned_end: ''
   estimate_mandays: 0
-  actual_start: '2026-09-07'
-  actual_end: '2026-09-07'
+  actual_start: '2026-09-18'
+  actual_end: '2026-09-18'
   delta_days: null
   state: done
   children:
@@ -545,15 +546,15 @@ capabilities:
     text: Re-create the tray icon when TaskbarCreated is broadcast after explorer restarts.
     tickets:
     - W1-S3
-    actual_start: '2026-09-07'
-    actual_end: '2026-09-07'
+    actual_start: '2026-09-18'
+    actual_end: '2026-09-18'
     state: done
   - id: FR-11
     text: Apply the three-tier error protocol for startup fatal, runtime warning, and hook-dead critical.
     tickets:
     - W1-S3
-    actual_start: '2026-09-07'
-    actual_end: '2026-09-07'
+    actual_start: '2026-09-18'
+    actual_end: '2026-09-18'
     state: done
   - id: FR-9
     text: Run tray-resident using native Win32 APIs without a third-party GUI framework in the daemon.

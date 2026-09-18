@@ -1,13 +1,13 @@
-asof: '2026-09-15'
+asof: '2026-09-18'
 since: ''
 since_report: ''
-sha: 09c18a4e9115bc0ce0faa1c44f57ba6843646624
-registry_dirty: false
+sha: c33e968aa8c4344ca4d5bc671a60b28d03592d6d
+registry_dirty: true
 uncommitted_tickets: []
 promise_progress: 100%
 rtm_rows:
-  green: 102
-  counted: 102
+  green: 103
+  counted: 103
   excluded_no_uc: 8
 work_progress:
 - spec: SPEC-1
@@ -115,6 +115,11 @@ work_progress:
   tickets_done: 2
   tickets_total: 2
   work_progress: 100%
+- spec: SPEC-29
+  status: closed
+  tickets_done: 1
+  tickets_total: 1
+  work_progress: 100%
 - spec: SPEC-3
   status: closed
   tickets_done: 2
@@ -184,7 +189,7 @@ proven:
   - persistence::tests::an_out_of_range_percentage_is_rejected_before_save
   - app::tests::field_declaration_order_places_percent_snap_ahead_of_stack
   - commands::tests::roundtrip_all_commands
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-27
   UC: UC-10
   ticket: SPEC-1-02
@@ -195,7 +200,95 @@ proven:
   - config::tests::third_snap_fields_roundtrip_through_toml
   - app::tests::field_declaration_order_includes_third_snap_fields
   - commands::tests::roundtrip_all_commands
-  closed: '2026-09-07'
+  closed: '2026-09-18'
+- FR: FR-32
+  UC: UC-14
+  ticket: SPEC-10-01
+  test:
+  - config::tests::snap_middle_third_display_label_matches_shortcuts_pane
+  - app::tests::mouse_preset_dropdown_displays_snap_to_middle_third
+  closed: '2026-09-18'
+- FR: FR-32
+  UC: UC-14
+  ticket: SPEC-10-02
+  test:
+  - app::tests::switching_panes_while_dropdown_open_automatically_dismisses_overlay
+  - app::tests::clicking_sidebar_outside_content_dismisses_preset_overlay
+  closed: '2026-09-18'
+- FR: FR-30
+  UC: UC-13
+  ticket: SPEC-10-03
+  test:
+  - config::tests::reload_with_all_20_mouse_action_presets_is_accepted
+  - worker::tests::snap_commands_from_mouse_dispatch_to_planning
+  - commands::tests::all_mouse_action_presets_have_corresponding_command_execution
+  closed: '2026-09-18'
+- FR: FR-31
+  UC: UC-13
+  ticket: SPEC-10-03
+  test:
+  - config::tests::reload_with_all_20_mouse_action_presets_is_accepted
+  - worker::tests::snap_commands_from_mouse_dispatch_to_planning
+  - commands::tests::all_mouse_action_presets_have_corresponding_command_execution
+  closed: '2026-09-18'
+- FR: FR-30
+  UC: UC-13
+  ticket: SPEC-10-04
+  test:
+  - hook::tests::tilt_hold_with_rapid_hardware_repeats_swallows_subsequent_ticks
+  - hook::tests::tilt_hold_alternating_directions_maintains_lockout_per_gesture
+  - hook::tests::tilt_quiet_period_boundary_at_399ms_and_400ms
+  closed: '2026-09-18'
+- FR: FR-31
+  UC: UC-13
+  ticket: SPEC-10-04
+  test:
+  - hook::tests::tilt_hold_with_rapid_hardware_repeats_swallows_subsequent_ticks
+  - hook::tests::tilt_hold_alternating_directions_maintains_lockout_per_gesture
+  - hook::tests::tilt_quiet_period_boundary_at_399ms_and_400ms
+  closed: '2026-09-18'
+- FR: FR-1
+  UC: UC-1
+  ticket: SPEC-17-01
+  test:
+  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
+  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
+  closed: '2026-09-18'
+- FR: FR-2
+  UC: UC-1
+  ticket: SPEC-17-01
+  test:
+  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
+  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
+  closed: '2026-09-18'
+- FR: FR-3
+  UC: UC-1
+  ticket: SPEC-17-01
+  test:
+  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
+  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
+  closed: '2026-09-18'
+- FR: FR-4
+  UC: UC-1
+  ticket: SPEC-17-01
+  test:
+  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
+  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
+  closed: '2026-09-18'
+- FR: FR-5
+  UC: UC-1
+  ticket: SPEC-17-01
+  test:
+  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
+  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
+  closed: '2026-09-18'
+- FR: FR-6
+  UC: UC-1
+  ticket: SPEC-17-01
+  test:
+  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
+  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
+  closed: '2026-09-18'
 - FR: FR-18
   UC: UC-4
   ticket: SPEC-2-01
@@ -206,7 +299,7 @@ proven:
   - shortcut_row_slint_snapshot::tests::typed_percentage_survives_cross_row_stepper_click
   - persistence::tests::an_out_of_range_percentage_typed_then_saved_is_refused
   - layout_pane_slint_snapshot::tests::out_of_range_stack_width_is_refused_not_clamped
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-26
   UC: UC-9
   ticket: SPEC-2-01
@@ -217,7 +310,7 @@ proven:
   - shortcut_row_slint_snapshot::tests::typed_percentage_survives_cross_row_stepper_click
   - persistence::tests::an_out_of_range_percentage_typed_then_saved_is_refused
   - layout_pane_slint_snapshot::tests::out_of_range_stack_width_is_refused_not_clamped
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-7
   UC: UC-4
   ticket: SPEC-2-01
@@ -228,7 +321,7 @@ proven:
   - shortcut_row_slint_snapshot::tests::typed_percentage_survives_cross_row_stepper_click
   - persistence::tests::an_out_of_range_percentage_typed_then_saved_is_refused
   - layout_pane_slint_snapshot::tests::out_of_range_stack_width_is_refused_not_clamped
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-25
   UC: UC-8
   ticket: SPEC-2-02
@@ -241,7 +334,52 @@ proven:
   - updatecheck::tests::a_version_is_announced_once_however_often_it_is_found
   - updatecheck::tests::a_run_of_failures_announces_once
   - updatecheck::tests::a_success_ends_the_failure_run
-  closed: '2026-09-07'
+  closed: '2026-09-18'
+- FR: FR-18
+  UC: UC-4
+  ticket: SPEC-25-01
+  test:
+  - app::tests::restore_shortcuts_defaults_every_field_and_preserves_non_shortcut_preferences
+  - app::tests::restore_shortcuts_is_dirty_only_when_draft_differs_from_saved
+  - app::tests::revert_after_shortcut_restore_returns_to_the_saved_legacy_configuration
+  - app::tests::fix_stack_conflict_requires_the_exact_pair_and_never_creates_a_third_conflict
+  - shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_the_draft
+  - shortcut_row_slint_snapshot::tests::restore_shortcuts_discards_pending_percentage_and_cancels_capture
+  - shortcut_row_slint_snapshot::tests::legacy_stack_conflict_banner_repairs_only_when_safe
+  closed: '2026-09-18'
+- FR: FR-7
+  UC: UC-4
+  ticket: SPEC-25-01
+  test:
+  - app::tests::restore_shortcuts_defaults_every_field_and_preserves_non_shortcut_preferences
+  - app::tests::restore_shortcuts_is_dirty_only_when_draft_differs_from_saved
+  - app::tests::revert_after_shortcut_restore_returns_to_the_saved_legacy_configuration
+  - app::tests::fix_stack_conflict_requires_the_exact_pair_and_never_creates_a_third_conflict
+  - shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_the_draft
+  - shortcut_row_slint_snapshot::tests::restore_shortcuts_discards_pending_percentage_and_cancels_capture
+  - shortcut_row_slint_snapshot::tests::legacy_stack_conflict_banner_repairs_only_when_safe
+  closed: '2026-09-18'
+- FR: FR-18
+  UC: UC-4
+  ticket: SPEC-28-01
+  test:
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
+  closed: '2026-09-18'
+- FR: FR-32
+  UC: UC-14
+  ticket: SPEC-28-01
+  test:
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
+  closed: '2026-09-18'
+- FR: FR-7
+  UC: UC-4
+  ticket: SPEC-28-01
+  test:
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
+  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
+  closed: '2026-09-18'
 - FR: FR-28
   UC: UC-11
   ticket: SPEC-3-01
@@ -252,7 +390,7 @@ proven:
   - persistence::tests::a_config_predating_the_enabled_field_loads_every_action_enabled
   - app::tests::disabling_an_action_retains_its_stored_chord
   - app::tests::re_enabling_an_action_restores_its_prior_chord
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-29
   UC: UC-12
   ticket: SPEC-3-02
@@ -261,7 +399,7 @@ proven:
   - hook::tests::a_disabled_actions_chord_falls_through_to_call_next_hook_ex
   - hook::tests::a_disabled_field_shares_a_chord_with_an_enabled_field_without_collision
   - arrangement::stack::tests::stack_planner_no_longer_reads_a_layout_level_toggle
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-18
   UC: UC-4
   ticket: SPEC-4-01
@@ -275,7 +413,7 @@ proven:
   - app::tests::the_group_headings_have_one_home
   - hook::tests::the_row_table_binds_every_chord_to_its_own_action
   - persistence::tests::a_duplicate_names_the_holder_by_the_shared_declared_order
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-7
   UC: UC-4
   ticket: SPEC-4-01
@@ -289,7 +427,7 @@ proven:
   - app::tests::the_group_headings_have_one_home
   - hook::tests::the_row_table_binds_every_chord_to_its_own_action
   - persistence::tests::a_duplicate_names_the_holder_by_the_shared_declared_order
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-18
   UC: UC-4
   ticket: SPEC-4-02
@@ -303,7 +441,7 @@ proven:
   - app::tests::the_stack_row_carries_its_own_percent_bounds
   - app::tests::every_percentage_row_reaches_all_four_percent_seams
   - theme::tests::every_rendered_percent_control_name_comes_from_theme
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-26
   UC: UC-9
   ticket: SPEC-4-02
@@ -317,7 +455,7 @@ proven:
   - app::tests::the_stack_row_carries_its_own_percent_bounds
   - app::tests::every_percentage_row_reaches_all_four_percent_seams
   - theme::tests::every_rendered_percent_control_name_comes_from_theme
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-7
   UC: UC-4
   ticket: SPEC-4-02
@@ -331,7 +469,292 @@ proven:
   - app::tests::the_stack_row_carries_its_own_percent_bounds
   - app::tests::every_percentage_row_reaches_all_four_percent_seams
   - theme::tests::every_rendered_percent_control_name_comes_from_theme
-  closed: '2026-09-07'
+  closed: '2026-09-18'
+- FR: FR-18
+  UC: UC-4
+  ticket: SPEC-4-03
+  test:
+  - shortcut_row_slint_snapshot::tests::description_renders_as_a_tooltip_not_a_visible_line
+  - shortcut_row_slint_snapshot::tests::control_cluster_and_toggle_share_one_vertical_centre
+  - shortcut_row_slint_snapshot::tests::row_height_is_independent_of_description_length
+  - shortcuts_pane_slint_snapshot::tests::five_groups_fit_the_default_window_width_with_no_horizontal_scroll
+  - shortcuts_pane_slint_snapshot::tests::all_five_group_headings_are_in_the_rendered_tree
+  - theme::tests::shortcut_per_row_labels_derive_from_theme_constants
+  closed: '2026-09-18'
+- FR: FR-28
+  UC: UC-11
+  ticket: SPEC-4-03
+  test:
+  - shortcut_row_slint_snapshot::tests::description_renders_as_a_tooltip_not_a_visible_line
+  - shortcut_row_slint_snapshot::tests::control_cluster_and_toggle_share_one_vertical_centre
+  - shortcut_row_slint_snapshot::tests::row_height_is_independent_of_description_length
+  - shortcuts_pane_slint_snapshot::tests::five_groups_fit_the_default_window_width_with_no_horizontal_scroll
+  - shortcuts_pane_slint_snapshot::tests::all_five_group_headings_are_in_the_rendered_tree
+  - theme::tests::shortcut_per_row_labels_derive_from_theme_constants
+  closed: '2026-09-18'
+- FR: FR-7
+  UC: UC-4
+  ticket: SPEC-4-03
+  test:
+  - shortcut_row_slint_snapshot::tests::description_renders_as_a_tooltip_not_a_visible_line
+  - shortcut_row_slint_snapshot::tests::control_cluster_and_toggle_share_one_vertical_centre
+  - shortcut_row_slint_snapshot::tests::row_height_is_independent_of_description_length
+  - shortcuts_pane_slint_snapshot::tests::five_groups_fit_the_default_window_width_with_no_horizontal_scroll
+  - shortcuts_pane_slint_snapshot::tests::all_five_group_headings_are_in_the_rendered_tree
+  - theme::tests::shortcut_per_row_labels_derive_from_theme_constants
+  closed: '2026-09-18'
+- FR: FR-18
+  UC: UC-4
+  ticket: SPEC-4-04
+  test:
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_out_of_range_is_refused
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_stack_percentage
+  closed: '2026-09-18'
+- FR: FR-7
+  UC: UC-4
+  ticket: SPEC-4-04
+  test:
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_out_of_range_is_refused
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_stack_percentage
+  closed: '2026-09-18'
+- FR: FR-18
+  UC: UC-4
+  ticket: SPEC-4-05
+  test:
+  - shortcut_row_slint_snapshot::tests::an_unconsumed_key_still_reaches_rust_after_focus_moves_into_a_row
+  - shortcut_row_slint_snapshot::tests::tab_is_forwarded_to_rust_before_it_is_rejected_for_focus_traversal
+  - shortcut_row_slint_snapshot::tests::description_renders_as_a_tooltip_not_a_visible_line
+  closed: '2026-09-18'
+- FR: FR-7
+  UC: UC-4
+  ticket: SPEC-4-05
+  test:
+  - shortcut_row_slint_snapshot::tests::an_unconsumed_key_still_reaches_rust_after_focus_moves_into_a_row
+  - shortcut_row_slint_snapshot::tests::tab_is_forwarded_to_rust_before_it_is_rejected_for_focus_traversal
+  - shortcut_row_slint_snapshot::tests::description_renders_as_a_tooltip_not_a_visible_line
+  closed: '2026-09-18'
+- FR: FR-18
+  UC: UC-4
+  ticket: SPEC-5-01
+  test:
+  - shortcut_row_slint_snapshot::tests::tooltip_does_not_overlap_the_row_title
+  - shortcut_row_slint_snapshot::tests::tooltip_height_fits_its_own_text
+  closed: '2026-09-18'
+- FR: FR-7
+  UC: UC-4
+  ticket: SPEC-5-01
+  test:
+  - shortcut_row_slint_snapshot::tests::tooltip_does_not_overlap_the_row_title
+  - shortcut_row_slint_snapshot::tests::tooltip_height_fits_its_own_text
+  closed: '2026-09-18'
+- FR: FR-18
+  UC: UC-4
+  ticket: SPEC-5-02
+  test:
+  - shortcut_row_slint_snapshot::tests::row_height_is_identical_toggle_on_and_toggle_off
+  closed: '2026-09-18'
+- FR: FR-7
+  UC: UC-4
+  ticket: SPEC-5-02
+  test:
+  - shortcut_row_slint_snapshot::tests::row_height_is_identical_toggle_on_and_toggle_off
+  closed: '2026-09-18'
+- FR: FR-18
+  UC: UC-4
+  ticket: SPEC-5-03
+  test:
+  - shortcut_row_slint_snapshot::tests::a_multi_digit_keystroke_sequence_keeps_each_intermediate_digit_before_departure
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_out_of_range_is_refused
+  closed: '2026-09-18'
+- FR: FR-26
+  UC: UC-9
+  ticket: SPEC-5-03
+  test:
+  - shortcut_row_slint_snapshot::tests::a_multi_digit_keystroke_sequence_keeps_each_intermediate_digit_before_departure
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_out_of_range_is_refused
+  closed: '2026-09-18'
+- FR: FR-7
+  UC: UC-4
+  ticket: SPEC-5-03
+  test:
+  - shortcut_row_slint_snapshot::tests::a_multi_digit_keystroke_sequence_keeps_each_intermediate_digit_before_departure
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_out_of_range_is_refused
+  closed: '2026-09-18'
+- FR: FR-18
+  UC: UC-4
+  ticket: SPEC-6-01
+  test:
+  - shortcut_row_slint_snapshot::tests::tooltip_paints_above_the_next_row_when_it_overflows_into_it
+  - shortcuts_pane_slint_snapshot::tests::the_last_rows_tooltip_paints_above_the_key_check_panel
+  closed: '2026-09-18'
+- FR: FR-7
+  UC: UC-4
+  ticket: SPEC-6-01
+  test:
+  - shortcut_row_slint_snapshot::tests::tooltip_paints_above_the_next_row_when_it_overflows_into_it
+  - shortcuts_pane_slint_snapshot::tests::the_last_rows_tooltip_paints_above_the_key_check_panel
+  closed: '2026-09-18'
+- FR: FR-18
+  UC: UC-4
+  ticket: SPEC-6-02
+  test:
+  - shortcut_row_slint_snapshot::tests::stepper_recovers_from_an_above_max_typed_value
+  - shortcut_row_slint_snapshot::tests::stepper_recovers_from_a_below_min_typed_value
+  - shortcut_row_slint_snapshot::tests::stack_row_stepper_recovers_from_an_out_of_range_typed_value
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
+  - shortcut_row_slint_snapshot::tests::a_multi_digit_keystroke_sequence_keeps_each_intermediate_digit_before_departure
+  closed: '2026-09-18'
+- FR: FR-26
+  UC: UC-9
+  ticket: SPEC-6-02
+  test:
+  - shortcut_row_slint_snapshot::tests::stepper_recovers_from_an_above_max_typed_value
+  - shortcut_row_slint_snapshot::tests::stepper_recovers_from_a_below_min_typed_value
+  - shortcut_row_slint_snapshot::tests::stack_row_stepper_recovers_from_an_out_of_range_typed_value
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
+  - shortcut_row_slint_snapshot::tests::a_multi_digit_keystroke_sequence_keeps_each_intermediate_digit_before_departure
+  closed: '2026-09-18'
+- FR: FR-7
+  UC: UC-4
+  ticket: SPEC-6-02
+  test:
+  - shortcut_row_slint_snapshot::tests::stepper_recovers_from_an_above_max_typed_value
+  - shortcut_row_slint_snapshot::tests::stepper_recovers_from_a_below_min_typed_value
+  - shortcut_row_slint_snapshot::tests::stack_row_stepper_recovers_from_an_out_of_range_typed_value
+  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
+  - shortcut_row_slint_snapshot::tests::a_multi_digit_keystroke_sequence_keeps_each_intermediate_digit_before_departure
+  closed: '2026-09-18'
+- FR: FR-18
+  UC: UC-4
+  ticket: SPEC-7-01
+  test:
+  - shortcut_row_slint_snapshot::tests::typed_percentage_above_max_reverts_on_enter
+  - shortcut_row_slint_snapshot::tests::typed_percentage_below_min_reverts_on_enter
+  - shortcut_row_slint_snapshot::tests::typed_percentage_out_of_range_reverts_on_blur
+  - shortcut_row_slint_snapshot::tests::stack_row_typed_percentage_out_of_range_reverts_on_enter
+  closed: '2026-09-18'
+- FR: FR-26
+  UC: UC-9
+  ticket: SPEC-7-01
+  test:
+  - shortcut_row_slint_snapshot::tests::typed_percentage_above_max_reverts_on_enter
+  - shortcut_row_slint_snapshot::tests::typed_percentage_below_min_reverts_on_enter
+  - shortcut_row_slint_snapshot::tests::typed_percentage_out_of_range_reverts_on_blur
+  - shortcut_row_slint_snapshot::tests::stack_row_typed_percentage_out_of_range_reverts_on_enter
+  closed: '2026-09-18'
+- FR: FR-7
+  UC: UC-4
+  ticket: SPEC-7-01
+  test:
+  - shortcut_row_slint_snapshot::tests::typed_percentage_above_max_reverts_on_enter
+  - shortcut_row_slint_snapshot::tests::typed_percentage_below_min_reverts_on_enter
+  - shortcut_row_slint_snapshot::tests::typed_percentage_out_of_range_reverts_on_blur
+  - shortcut_row_slint_snapshot::tests::stack_row_typed_percentage_out_of_range_reverts_on_enter
+  closed: '2026-09-18'
+- FR: FR-32
+  UC: UC-14
+  ticket: SPEC-8-01
+  test:
+  - config::tests::mouse_config_roundtrips_through_toml
+  - config::tests::missing_mouse_section_defaults_safely
+  - config::tests::mouse_action_preset_slug_parsing
+  - persistence::tests::mouse_preferences_save_and_reload_signal
+  - persistence::tests::invalid_mouse_preset_string_is_rejected
+  - app::tests::mouse_pane_loads_configured_presets
+  - app::tests::toggling_mouse_navigation_updates_draft
+  - app::tests::five_pane_focus_order_includes_mouse
+  closed: '2026-09-18'
+- FR: FR-30
+  UC: UC-13
+  ticket: SPEC-8-02
+  test:
+  - commands::tests::frozen_command_wire_values_extended_for_mouse
+  - hook::tests::mouse_hook_passes_mousemove_without_interception
+  - hook::tests::mouse_hook_swallows_mapped_xbuttons_down_and_up
+  - hook::tests::unmapped_mouse_buttons_pass_through
+  - hook::tests::vm_bypass_passes_mouse_events_through
+  - hook::tests::tilt_wheel_debounce_drops_rapid_burst_ticks_at_150ms
+  - hook::tests::tilt_wheel_satisfying_debounce_enqueues_command
+  - hook::tests::ring_full_increments_dropped_metric_on_mouse_event
+  - hook::tests::dual_hook_heartbeat_refreshes_both_handles
+  - worker::tests::mouse_virtual_desktop_commands_dispatch_safely
+  closed: '2026-09-18'
+- FR: FR-31
+  UC: UC-13
+  ticket: SPEC-8-02
+  test:
+  - commands::tests::frozen_command_wire_values_extended_for_mouse
+  - hook::tests::mouse_hook_passes_mousemove_without_interception
+  - hook::tests::mouse_hook_swallows_mapped_xbuttons_down_and_up
+  - hook::tests::unmapped_mouse_buttons_pass_through
+  - hook::tests::vm_bypass_passes_mouse_events_through
+  - hook::tests::tilt_wheel_debounce_drops_rapid_burst_ticks_at_150ms
+  - hook::tests::tilt_wheel_satisfying_debounce_enqueues_command
+  - hook::tests::ring_full_increments_dropped_metric_on_mouse_event
+  - hook::tests::dual_hook_heartbeat_refreshes_both_handles
+  - worker::tests::mouse_virtual_desktop_commands_dispatch_safely
+  closed: '2026-09-18'
+- FR: FR-30
+  UC: UC-13
+  ticket: SPEC-9-01
+  test:
+  - log::tests::shared_log_rotation_caps_file_at_1mb
+  - util::tests::debug_trace_rotates_at_cap_when_debug_assertions_active
+  closed: '2026-09-18'
+- FR: FR-31
+  UC: UC-13
+  ticket: SPEC-9-01
+  test:
+  - log::tests::shared_log_rotation_caps_file_at_1mb
+  - util::tests::debug_trace_rotates_at_cap_when_debug_assertions_active
+  closed: '2026-09-18'
+- FR: FR-32
+  UC: UC-14
+  ticket: SPEC-9-02
+  test:
+  - app::tests::toggle_switches_are_vertically_centered_in_cards
+  closed: '2026-09-18'
+- FR: FR-32
+  UC: UC-14
+  ticket: SPEC-9-03
+  test:
+  - app::tests::card_dividers_render_full_bleed_across_panes
+  closed: '2026-09-18'
+- FR: FR-32
+  UC: UC-14
+  ticket: SPEC-9-04
+  test:
+  - config::tests::expanded_mouse_presets_roundtrip_and_parse
+  - hook::tests::all_expanded_presets_map_to_valid_commands
+  closed: '2026-09-18'
+- FR: FR-32
+  UC: UC-14
+  ticket: SPEC-9-05
+  test:
+  - app::tests::mouse_preset_dropdown_opens_overlay_with_groups
+  - app::tests::selecting_preset_from_dropdown_updates_draft
+  closed: '2026-09-18'
+- FR: FR-30
+  UC: UC-13
+  ticket: SPEC-9-06
+  test:
+  - hook::tests::tilt_hold_without_release_fires_exactly_once
+  - hook::tests::tilt_second_actuation_after_quiet_period_fires_again
+  - config::tests::default_tilt_directions_are_inverted
+  closed: '2026-09-18'
+- FR: FR-31
+  UC: UC-13
+  ticket: SPEC-9-06
+  test:
+  - hook::tests::tilt_hold_without_release_fires_exactly_once
+  - hook::tests::tilt_second_actuation_after_quiet_period_fires_again
+  - config::tests::default_tilt_directions_are_inverted
+  closed: '2026-09-18'
 - FR: FR-1
   UC: UC-1
   ticket: W1-S1
@@ -341,7 +764,7 @@ proven:
   - cycling::tests::multi_process_same_executable_groups_together
   - cycling::tests::excluded_windows_are_skipped
   - cycling::tests::invalid_target_continues_to_next_candidate
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-2
   UC: UC-1
   ticket: W1-S1
@@ -351,7 +774,7 @@ proven:
   - cycling::tests::multi_process_same_executable_groups_together
   - cycling::tests::excluded_windows_are_skipped
   - cycling::tests::invalid_target_continues_to_next_candidate
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-3
   UC: UC-1
   ticket: W1-S1
@@ -361,7 +784,7 @@ proven:
   - cycling::tests::multi_process_same_executable_groups_together
   - cycling::tests::excluded_windows_are_skipped
   - cycling::tests::invalid_target_continues_to_next_candidate
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-4
   UC: UC-1
   ticket: W1-S1
@@ -371,7 +794,7 @@ proven:
   - cycling::tests::multi_process_same_executable_groups_together
   - cycling::tests::excluded_windows_are_skipped
   - cycling::tests::invalid_target_continues_to_next_candidate
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-5
   UC: UC-1
   ticket: W1-S1
@@ -381,7 +804,7 @@ proven:
   - cycling::tests::multi_process_same_executable_groups_together
   - cycling::tests::excluded_windows_are_skipped
   - cycling::tests::invalid_target_continues_to_next_candidate
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-6
   UC: UC-1
   ticket: W1-S1
@@ -391,7 +814,7 @@ proven:
   - cycling::tests::multi_process_same_executable_groups_together
   - cycling::tests::excluded_windows_are_skipped
   - cycling::tests::invalid_target_continues_to_next_candidate
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-14
   UC: UC-2
   ticket: W1-S2
@@ -399,7 +822,7 @@ proven:
   - arrangement::snap::tests::snap_left_returns_left_half
   - arrangement::snap::tests::snap_right_returns_complementary_half
   - arrangement::snap::tests::halves_tile_the_work_area_without_gap_or_overlap
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-22
   UC: UC-2
   ticket: W1-S2
@@ -407,28 +830,28 @@ proven:
   - arrangement::snap::tests::snap_left_returns_left_half
   - arrangement::snap::tests::snap_right_returns_complementary_half
   - arrangement::snap::tests::halves_tile_the_work_area_without_gap_or_overlap
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-10
   UC: UC-3
   ticket: W1-S3
   test:
   - tray::tests::next_hook_check_state_escalates_after_threshold
   - tray::tests::next_hook_check_state_resets_on_success
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-11
   UC: UC-3
   ticket: W1-S3
   test:
   - tray::tests::next_hook_check_state_escalates_after_threshold
   - tray::tests::next_hook_check_state_resets_on_success
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-12
   UC: UC-3
   ticket: W1-S3
   test:
   - tray::tests::next_hook_check_state_escalates_after_threshold
   - tray::tests::next_hook_check_state_resets_on_success
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-18
   UC: UC-4
   ticket: W1-S4
@@ -452,7 +875,7 @@ proven:
   - persistence::tests::default_config_uses_frozen_shortcuts
   - persistence::tests::reload_uses_the_frozen_message_identifier
   - persistence::tests::reload_signal_is_harmless_when_no_daemon_is_running
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-7
   UC: UC-4
   ticket: W1-S4
@@ -476,7 +899,7 @@ proven:
   - persistence::tests::default_config_uses_frozen_shortcuts
   - persistence::tests::reload_uses_the_frozen_message_identifier
   - persistence::tests::reload_signal_is_harmless_when_no_daemon_is_running
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-17
   UC: UC-5
   ticket: W1-S5
@@ -491,7 +914,7 @@ proven:
   - persistence::tests::explicit_flag_forces_onboarding
   - persistence::tests::onboarding_flag_is_the_frozen_spelling
   - persistence::tests::completing_onboarding_writes_a_valid_config_so_it_does_not_repeat
-  closed: '2026-09-07'
+  closed: '2026-09-18'
 - FR: FR-13
   UC: UC-6
   ticket: W1-S6
@@ -499,668 +922,224 @@ proven:
   - autostart::tests::create_args_carries_logon_elevation_flags
   - autostart::tests::create_args_wraps_exe_path_in_quotes
   - autostart::tests::query_and_delete_target_the_pinned_task_name
-  closed: '2026-09-07'
-- FR: FR-23
-  UC: UC-7
-  ticket: W4-S3
-  test:
-  - arrangement::monitor::tests::single_monitor_yields_an_empty_plan
-  - arrangement::monitor::tests::next_monitor_wraps_from_last_to_first
-  - arrangement::monitor::tests::a_left_half_stays_a_left_half_across_monitors
-  - arrangement::monitor::tests::proportional_mapping_survives_a_resolution_difference
-  - arrangement::monitor::tests::empty_destination_work_area_is_rejected
-  closed: '2026-09-07'
-- FR: FR-18
-  UC: UC-4
-  ticket: SPEC-4-03
-  test:
-  - shortcut_row_slint_snapshot::tests::description_renders_as_a_tooltip_not_a_visible_line
-  - shortcut_row_slint_snapshot::tests::control_cluster_and_toggle_share_one_vertical_centre
-  - shortcut_row_slint_snapshot::tests::row_height_is_independent_of_description_length
-  - shortcuts_pane_slint_snapshot::tests::five_groups_fit_the_default_window_width_with_no_horizontal_scroll
-  - shortcuts_pane_slint_snapshot::tests::all_five_group_headings_are_in_the_rendered_tree
-  - theme::tests::shortcut_per_row_labels_derive_from_theme_constants
-  closed: '2026-09-08'
-- FR: FR-28
-  UC: UC-11
-  ticket: SPEC-4-03
-  test:
-  - shortcut_row_slint_snapshot::tests::description_renders_as_a_tooltip_not_a_visible_line
-  - shortcut_row_slint_snapshot::tests::control_cluster_and_toggle_share_one_vertical_centre
-  - shortcut_row_slint_snapshot::tests::row_height_is_independent_of_description_length
-  - shortcuts_pane_slint_snapshot::tests::five_groups_fit_the_default_window_width_with_no_horizontal_scroll
-  - shortcuts_pane_slint_snapshot::tests::all_five_group_headings_are_in_the_rendered_tree
-  - theme::tests::shortcut_per_row_labels_derive_from_theme_constants
-  closed: '2026-09-08'
-- FR: FR-7
-  UC: UC-4
-  ticket: SPEC-4-03
-  test:
-  - shortcut_row_slint_snapshot::tests::description_renders_as_a_tooltip_not_a_visible_line
-  - shortcut_row_slint_snapshot::tests::control_cluster_and_toggle_share_one_vertical_centre
-  - shortcut_row_slint_snapshot::tests::row_height_is_independent_of_description_length
-  - shortcuts_pane_slint_snapshot::tests::five_groups_fit_the_default_window_width_with_no_horizontal_scroll
-  - shortcuts_pane_slint_snapshot::tests::all_five_group_headings_are_in_the_rendered_tree
-  - theme::tests::shortcut_per_row_labels_derive_from_theme_constants
-  closed: '2026-09-08'
-- FR: FR-18
-  UC: UC-4
-  ticket: SPEC-4-04
-  test:
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_out_of_range_is_refused
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_stack_percentage
-  closed: '2026-09-08'
-- FR: FR-7
-  UC: UC-4
-  ticket: SPEC-4-04
-  test:
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_out_of_range_is_refused
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_stack_percentage
-  closed: '2026-09-08'
-- FR: FR-18
-  UC: UC-4
-  ticket: SPEC-4-05
-  test:
-  - shortcut_row_slint_snapshot::tests::an_unconsumed_key_still_reaches_rust_after_focus_moves_into_a_row
-  - shortcut_row_slint_snapshot::tests::tab_is_forwarded_to_rust_before_it_is_rejected_for_focus_traversal
-  - shortcut_row_slint_snapshot::tests::description_renders_as_a_tooltip_not_a_visible_line
-  closed: '2026-09-08'
-- FR: FR-7
-  UC: UC-4
-  ticket: SPEC-4-05
-  test:
-  - shortcut_row_slint_snapshot::tests::an_unconsumed_key_still_reaches_rust_after_focus_moves_into_a_row
-  - shortcut_row_slint_snapshot::tests::tab_is_forwarded_to_rust_before_it_is_rejected_for_focus_traversal
-  - shortcut_row_slint_snapshot::tests::description_renders_as_a_tooltip_not_a_visible_line
-  closed: '2026-09-08'
-- FR: FR-18
-  UC: UC-4
-  ticket: SPEC-5-01
-  test:
-  - shortcut_row_slint_snapshot::tests::tooltip_does_not_overlap_the_row_title
-  - shortcut_row_slint_snapshot::tests::tooltip_height_fits_its_own_text
-  closed: '2026-09-08'
-- FR: FR-7
-  UC: UC-4
-  ticket: SPEC-5-01
-  test:
-  - shortcut_row_slint_snapshot::tests::tooltip_does_not_overlap_the_row_title
-  - shortcut_row_slint_snapshot::tests::tooltip_height_fits_its_own_text
-  closed: '2026-09-08'
-- FR: FR-18
-  UC: UC-4
-  ticket: SPEC-5-02
-  test:
-  - shortcut_row_slint_snapshot::tests::row_height_is_identical_toggle_on_and_toggle_off
-  closed: '2026-09-08'
-- FR: FR-7
-  UC: UC-4
-  ticket: SPEC-5-02
-  test:
-  - shortcut_row_slint_snapshot::tests::row_height_is_identical_toggle_on_and_toggle_off
-  closed: '2026-09-08'
-- FR: FR-18
-  UC: UC-4
-  ticket: SPEC-5-03
-  test:
-  - shortcut_row_slint_snapshot::tests::a_multi_digit_keystroke_sequence_keeps_each_intermediate_digit_before_departure
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_out_of_range_is_refused
-  closed: '2026-09-08'
-- FR: FR-26
-  UC: UC-9
-  ticket: SPEC-5-03
-  test:
-  - shortcut_row_slint_snapshot::tests::a_multi_digit_keystroke_sequence_keeps_each_intermediate_digit_before_departure
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_out_of_range_is_refused
-  closed: '2026-09-08'
-- FR: FR-7
-  UC: UC-4
-  ticket: SPEC-5-03
-  test:
-  - shortcut_row_slint_snapshot::tests::a_multi_digit_keystroke_sequence_keeps_each_intermediate_digit_before_departure
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_out_of_range_is_refused
-  closed: '2026-09-08'
-- FR: FR-18
-  UC: UC-4
-  ticket: SPEC-6-01
-  test:
-  - shortcut_row_slint_snapshot::tests::tooltip_paints_above_the_next_row_when_it_overflows_into_it
-  - shortcuts_pane_slint_snapshot::tests::the_last_rows_tooltip_paints_above_the_key_check_panel
-  closed: '2026-09-08'
-- FR: FR-7
-  UC: UC-4
-  ticket: SPEC-6-01
-  test:
-  - shortcut_row_slint_snapshot::tests::tooltip_paints_above_the_next_row_when_it_overflows_into_it
-  - shortcuts_pane_slint_snapshot::tests::the_last_rows_tooltip_paints_above_the_key_check_panel
-  closed: '2026-09-08'
-- FR: FR-18
-  UC: UC-4
-  ticket: SPEC-6-02
-  test:
-  - shortcut_row_slint_snapshot::tests::stepper_recovers_from_an_above_max_typed_value
-  - shortcut_row_slint_snapshot::tests::stepper_recovers_from_a_below_min_typed_value
-  - shortcut_row_slint_snapshot::tests::stack_row_stepper_recovers_from_an_out_of_range_typed_value
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
-  - shortcut_row_slint_snapshot::tests::a_multi_digit_keystroke_sequence_keeps_each_intermediate_digit_before_departure
-  closed: '2026-09-08'
-- FR: FR-26
-  UC: UC-9
-  ticket: SPEC-6-02
-  test:
-  - shortcut_row_slint_snapshot::tests::stepper_recovers_from_an_above_max_typed_value
-  - shortcut_row_slint_snapshot::tests::stepper_recovers_from_a_below_min_typed_value
-  - shortcut_row_slint_snapshot::tests::stack_row_stepper_recovers_from_an_out_of_range_typed_value
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
-  - shortcut_row_slint_snapshot::tests::a_multi_digit_keystroke_sequence_keeps_each_intermediate_digit_before_departure
-  closed: '2026-09-08'
-- FR: FR-7
-  UC: UC-4
-  ticket: SPEC-6-02
-  test:
-  - shortcut_row_slint_snapshot::tests::stepper_recovers_from_an_above_max_typed_value
-  - shortcut_row_slint_snapshot::tests::stepper_recovers_from_a_below_min_typed_value
-  - shortcut_row_slint_snapshot::tests::stack_row_stepper_recovers_from_an_out_of_range_typed_value
-  - shortcut_row_slint_snapshot::tests::a_real_keystroke_sequence_commits_a_typed_percentage
-  - shortcut_row_slint_snapshot::tests::a_multi_digit_keystroke_sequence_keeps_each_intermediate_digit_before_departure
-  closed: '2026-09-08'
-- FR: FR-18
-  UC: UC-4
-  ticket: SPEC-7-01
-  test:
-  - shortcut_row_slint_snapshot::tests::typed_percentage_above_max_reverts_on_enter
-  - shortcut_row_slint_snapshot::tests::typed_percentage_below_min_reverts_on_enter
-  - shortcut_row_slint_snapshot::tests::typed_percentage_out_of_range_reverts_on_blur
-  - shortcut_row_slint_snapshot::tests::stack_row_typed_percentage_out_of_range_reverts_on_enter
-  closed: '2026-09-08'
-- FR: FR-26
-  UC: UC-9
-  ticket: SPEC-7-01
-  test:
-  - shortcut_row_slint_snapshot::tests::typed_percentage_above_max_reverts_on_enter
-  - shortcut_row_slint_snapshot::tests::typed_percentage_below_min_reverts_on_enter
-  - shortcut_row_slint_snapshot::tests::typed_percentage_out_of_range_reverts_on_blur
-  - shortcut_row_slint_snapshot::tests::stack_row_typed_percentage_out_of_range_reverts_on_enter
-  closed: '2026-09-08'
-- FR: FR-7
-  UC: UC-4
-  ticket: SPEC-7-01
-  test:
-  - shortcut_row_slint_snapshot::tests::typed_percentage_above_max_reverts_on_enter
-  - shortcut_row_slint_snapshot::tests::typed_percentage_below_min_reverts_on_enter
-  - shortcut_row_slint_snapshot::tests::typed_percentage_out_of_range_reverts_on_blur
-  - shortcut_row_slint_snapshot::tests::stack_row_typed_percentage_out_of_range_reverts_on_enter
-  closed: '2026-09-08'
-- FR: FR-32
-  UC: UC-14
-  ticket: SPEC-8-01
-  test:
-  - config::tests::mouse_config_roundtrips_through_toml
-  - config::tests::missing_mouse_section_defaults_safely
-  - config::tests::mouse_action_preset_slug_parsing
-  - persistence::tests::mouse_preferences_save_and_reload_signal
-  - persistence::tests::invalid_mouse_preset_string_is_rejected
-  - app::tests::mouse_pane_loads_configured_presets
-  - app::tests::toggling_mouse_navigation_updates_draft
-  - app::tests::five_pane_focus_order_includes_mouse
-  closed: '2026-09-10'
-- FR: FR-30
-  UC: UC-13
-  ticket: SPEC-8-02
-  test:
-  - commands::tests::frozen_command_wire_values_extended_for_mouse
-  - hook::tests::mouse_hook_passes_mousemove_without_interception
-  - hook::tests::mouse_hook_swallows_mapped_xbuttons_down_and_up
-  - hook::tests::unmapped_mouse_buttons_pass_through
-  - hook::tests::vm_bypass_passes_mouse_events_through
-  - hook::tests::tilt_wheel_debounce_drops_rapid_burst_ticks_at_150ms
-  - hook::tests::tilt_wheel_satisfying_debounce_enqueues_command
-  - hook::tests::ring_full_increments_dropped_metric_on_mouse_event
-  - hook::tests::dual_hook_heartbeat_refreshes_both_handles
-  - worker::tests::mouse_virtual_desktop_commands_dispatch_safely
-  closed: '2026-09-10'
-- FR: FR-31
-  UC: UC-13
-  ticket: SPEC-8-02
-  test:
-  - commands::tests::frozen_command_wire_values_extended_for_mouse
-  - hook::tests::mouse_hook_passes_mousemove_without_interception
-  - hook::tests::mouse_hook_swallows_mapped_xbuttons_down_and_up
-  - hook::tests::unmapped_mouse_buttons_pass_through
-  - hook::tests::vm_bypass_passes_mouse_events_through
-  - hook::tests::tilt_wheel_debounce_drops_rapid_burst_ticks_at_150ms
-  - hook::tests::tilt_wheel_satisfying_debounce_enqueues_command
-  - hook::tests::ring_full_increments_dropped_metric_on_mouse_event
-  - hook::tests::dual_hook_heartbeat_refreshes_both_handles
-  - worker::tests::mouse_virtual_desktop_commands_dispatch_safely
-  closed: '2026-09-10'
-- FR: FR-32
-  UC: UC-14
-  ticket: SPEC-10-01
-  test:
-  - config::tests::snap_middle_third_display_label_matches_shortcuts_pane
-  - app::tests::mouse_preset_dropdown_displays_snap_to_middle_third
-  closed: '2026-09-11'
-- FR: FR-32
-  UC: UC-14
-  ticket: SPEC-10-02
-  test:
-  - app::tests::switching_panes_while_dropdown_open_automatically_dismisses_overlay
-  - app::tests::clicking_sidebar_outside_content_dismisses_preset_overlay
-  closed: '2026-09-11'
-- FR: FR-30
-  UC: UC-13
-  ticket: SPEC-10-03
-  test:
-  - config::tests::reload_with_all_20_mouse_action_presets_is_accepted
-  - worker::tests::snap_commands_from_mouse_dispatch_to_planning
-  - commands::tests::all_mouse_action_presets_have_corresponding_command_execution
-  closed: '2026-09-11'
-- FR: FR-31
-  UC: UC-13
-  ticket: SPEC-10-03
-  test:
-  - config::tests::reload_with_all_20_mouse_action_presets_is_accepted
-  - worker::tests::snap_commands_from_mouse_dispatch_to_planning
-  - commands::tests::all_mouse_action_presets_have_corresponding_command_execution
-  closed: '2026-09-11'
-- FR: FR-30
-  UC: UC-13
-  ticket: SPEC-10-04
-  test:
-  - hook::tests::tilt_hold_with_rapid_hardware_repeats_swallows_subsequent_ticks
-  - hook::tests::tilt_hold_alternating_directions_maintains_lockout_per_gesture
-  - hook::tests::tilt_quiet_period_boundary_at_399ms_and_400ms
-  closed: '2026-09-11'
-- FR: FR-31
-  UC: UC-13
-  ticket: SPEC-10-04
-  test:
-  - hook::tests::tilt_hold_with_rapid_hardware_repeats_swallows_subsequent_ticks
-  - hook::tests::tilt_hold_alternating_directions_maintains_lockout_per_gesture
-  - hook::tests::tilt_quiet_period_boundary_at_399ms_and_400ms
-  closed: '2026-09-11'
-- FR: FR-30
-  UC: UC-13
-  ticket: SPEC-9-01
-  test:
-  - log::tests::shared_log_rotation_caps_file_at_1mb
-  - util::tests::debug_trace_rotates_at_cap_when_debug_assertions_active
-  closed: '2026-09-11'
-- FR: FR-31
-  UC: UC-13
-  ticket: SPEC-9-01
-  test:
-  - log::tests::shared_log_rotation_caps_file_at_1mb
-  - util::tests::debug_trace_rotates_at_cap_when_debug_assertions_active
-  closed: '2026-09-11'
-- FR: FR-32
-  UC: UC-14
-  ticket: SPEC-9-02
-  test:
-  - app::tests::toggle_switches_are_vertically_centered_in_cards
-  closed: '2026-09-11'
-- FR: FR-32
-  UC: UC-14
-  ticket: SPEC-9-03
-  test:
-  - app::tests::card_dividers_render_full_bleed_across_panes
-  closed: '2026-09-11'
-- FR: FR-32
-  UC: UC-14
-  ticket: SPEC-9-04
-  test:
-  - config::tests::expanded_mouse_presets_roundtrip_and_parse
-  - hook::tests::all_expanded_presets_map_to_valid_commands
-  closed: '2026-09-11'
-- FR: FR-32
-  UC: UC-14
-  ticket: SPEC-9-05
-  test:
-  - app::tests::mouse_preset_dropdown_opens_overlay_with_groups
-  - app::tests::selecting_preset_from_dropdown_updates_draft
-  closed: '2026-09-11'
-- FR: FR-30
-  UC: UC-13
-  ticket: SPEC-9-06
-  test:
-  - hook::tests::tilt_hold_without_release_fires_exactly_once
-  - hook::tests::tilt_second_actuation_after_quiet_period_fires_again
-  - config::tests::default_tilt_directions_are_inverted
-  closed: '2026-09-11'
-- FR: FR-31
-  UC: UC-13
-  ticket: SPEC-9-06
-  test:
-  - hook::tests::tilt_hold_without_release_fires_exactly_once
-  - hook::tests::tilt_second_actuation_after_quiet_period_fires_again
-  - config::tests::default_tilt_directions_are_inverted
-  closed: '2026-09-11'
-- FR: FR-1
-  UC: UC-1
-  ticket: SPEC-17-01
-  test:
-  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
-  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
-  closed: '2026-09-13'
-- FR: FR-2
-  UC: UC-1
-  ticket: SPEC-17-01
-  test:
-  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
-  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
-  closed: '2026-09-13'
-- FR: FR-3
-  UC: UC-1
-  ticket: SPEC-17-01
-  test:
-  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
-  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
-  closed: '2026-09-13'
-- FR: FR-4
-  UC: UC-1
-  ticket: SPEC-17-01
-  test:
-  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
-  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
-  closed: '2026-09-13'
-- FR: FR-5
-  UC: UC-1
-  ticket: SPEC-17-01
-  test:
-  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
-  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
-  closed: '2026-09-13'
-- FR: FR-6
-  UC: UC-1
-  ticket: SPEC-17-01
-  test:
-  - cycling::tests::backward_blind_cycle_traverses_all_eligible_windows
-  - worker::tests::repeated_backward_blind_cycles_visit_every_window_in_reverse
-  closed: '2026-09-13'
-- FR: FR-18
-  UC: UC-4
-  ticket: SPEC-25-01
-  test:
-  - app::tests::restore_shortcuts_defaults_every_field_and_preserves_non_shortcut_preferences
-  - app::tests::restore_shortcuts_is_dirty_only_when_draft_differs_from_saved
-  - app::tests::revert_after_shortcut_restore_returns_to_the_saved_legacy_configuration
-  - app::tests::fix_stack_conflict_requires_the_exact_pair_and_never_creates_a_third_conflict
-  - shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_the_draft
-  - shortcut_row_slint_snapshot::tests::restore_shortcuts_discards_pending_percentage_and_cancels_capture
-  - shortcut_row_slint_snapshot::tests::legacy_stack_conflict_banner_repairs_only_when_safe
-  closed: '2026-09-15'
-- FR: FR-7
-  UC: UC-4
-  ticket: SPEC-25-01
-  test:
-  - app::tests::restore_shortcuts_defaults_every_field_and_preserves_non_shortcut_preferences
-  - app::tests::restore_shortcuts_is_dirty_only_when_draft_differs_from_saved
-  - app::tests::revert_after_shortcut_restore_returns_to_the_saved_legacy_configuration
-  - app::tests::fix_stack_conflict_requires_the_exact_pair_and_never_creates_a_third_conflict
-  - shortcut_row_slint_snapshot::tests::header_restore_shortcuts_button_updates_the_draft
-  - shortcut_row_slint_snapshot::tests::restore_shortcuts_discards_pending_percentage_and_cancels_capture
-  - shortcut_row_slint_snapshot::tests::legacy_stack_conflict_banner_repairs_only_when_safe
-  closed: '2026-09-15'
-- FR: FR-18
-  UC: UC-4
-  ticket: SPEC-28-01
-  test:
-  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
-  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
-  closed: '2026-09-15'
-- FR: FR-32
-  UC: UC-14
-  ticket: SPEC-28-01
-  test:
-  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
-  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
-  closed: '2026-09-15'
-- FR: FR-7
-  UC: UC-4
-  ticket: SPEC-28-01
-  test:
-  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_has_compact_content_derived_height
-  - shortcut_row_slint_snapshot::tests::modal_reset_dialog_is_vertically_centered_in_window
-  closed: '2026-09-15'
+  closed: '2026-09-18'
 moved:
 - id: CAP-1
   kind: CAP
   event: started
-  date: '2026-09-07'
+  date: '2026-09-18'
 - id: CAP-10
   kind: CAP
   event: started
-  date: '2026-09-07'
+  date: '2026-09-18'
 - id: CAP-11
   kind: CAP
   event: closed
-  date: '2026-09-07'
+  date: '2026-09-18'
 - id: CAP-11
   kind: CAP
   event: started
-  date: '2026-09-07'
-- id: CAP-12
-  kind: CAP
-  event: closed
-  date: '2026-09-07'
-- id: CAP-12
-  kind: CAP
-  event: started
-  date: '2026-09-07'
+  date: '2026-09-18'
 - id: CAP-13
   kind: CAP
   event: closed
-  date: '2026-09-07'
+  date: '2026-09-18'
 - id: CAP-13
   kind: CAP
   event: started
-  date: '2026-09-07'
+  date: '2026-09-18'
 - id: CAP-14
   kind: CAP
   event: started
-  date: '2026-09-07'
+  date: '2026-09-18'
 - id: CAP-15
   kind: CAP
   event: closed
-  date: '2026-09-07'
+  date: '2026-09-18'
 - id: CAP-15
   kind: CAP
   event: started
-  date: '2026-09-07'
-- id: CAP-16
-  kind: CAP
-  event: started
-  date: '2026-09-07'
-- id: CAP-2
-  kind: CAP
-  event: closed
-  date: '2026-09-07'
-- id: CAP-2
-  kind: CAP
-  event: started
-  date: '2026-09-07'
-- id: CAP-3
-  kind: CAP
-  event: started
-  date: '2026-09-07'
-- id: CAP-5
-  kind: CAP
-  event: started
-  date: '2026-09-07'
-- id: CAP-7
-  kind: CAP
-  event: started
-  date: '2026-09-07'
-- id: CAP-8
-  kind: CAP
-  event: started
-  date: '2026-09-07'
-- id: CAP-9
-  kind: CAP
-  event: closed
-  date: '2026-09-07'
-- id: CAP-9
-  kind: CAP
-  event: started
-  date: '2026-09-07'
-- id: FR-1
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-10
-  kind: FR
-  event: closed
-  date: '2026-09-07'
-- id: FR-10
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-11
-  kind: FR
-  event: closed
-  date: '2026-09-07'
-- id: FR-11
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-12
-  kind: FR
-  event: closed
-  date: '2026-09-07'
-- id: FR-12
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-13
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-14
-  kind: FR
-  event: closed
-  date: '2026-09-07'
-- id: FR-14
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-17
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-18
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-2
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-22
-  kind: FR
-  event: closed
-  date: '2026-09-07'
-- id: FR-22
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-23
-  kind: FR
-  event: closed
-  date: '2026-09-07'
-- id: FR-23
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-25
-  kind: FR
-  event: closed
-  date: '2026-09-07'
-- id: FR-25
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-26
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-27
-  kind: FR
-  event: closed
-  date: '2026-09-07'
-- id: FR-27
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-28
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-29
-  kind: FR
-  event: closed
-  date: '2026-09-07'
-- id: FR-29
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-3
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-4
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-5
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-6
-  kind: FR
-  event: started
-  date: '2026-09-07'
-- id: FR-7
-  kind: FR
-  event: started
-  date: '2026-09-07'
+  date: '2026-09-18'
 - id: CAP-16
   kind: CAP
   event: closed
-  date: '2026-09-08'
-- id: FR-28
-  kind: FR
-  event: closed
-  date: '2026-09-08'
+  date: '2026-09-18'
+- id: CAP-16
+  kind: CAP
+  event: started
+  date: '2026-09-18'
 - id: CAP-17
   kind: CAP
   event: started
-  date: '2026-09-10'
+  date: '2026-09-18'
+- id: CAP-2
+  kind: CAP
+  event: closed
+  date: '2026-09-18'
+- id: CAP-2
+  kind: CAP
+  event: started
+  date: '2026-09-18'
+- id: CAP-3
+  kind: CAP
+  event: started
+  date: '2026-09-18'
+- id: CAP-5
+  kind: CAP
+  event: started
+  date: '2026-09-18'
+- id: CAP-7
+  kind: CAP
+  event: started
+  date: '2026-09-18'
+- id: CAP-8
+  kind: CAP
+  event: started
+  date: '2026-09-18'
+- id: CAP-9
+  kind: CAP
+  event: closed
+  date: '2026-09-18'
+- id: CAP-9
+  kind: CAP
+  event: started
+  date: '2026-09-18'
+- id: FR-1
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-10
+  kind: FR
+  event: closed
+  date: '2026-09-18'
+- id: FR-10
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-11
+  kind: FR
+  event: closed
+  date: '2026-09-18'
+- id: FR-11
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-12
+  kind: FR
+  event: closed
+  date: '2026-09-18'
+- id: FR-12
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-13
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-14
+  kind: FR
+  event: closed
+  date: '2026-09-18'
+- id: FR-14
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-17
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-18
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-2
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-22
+  kind: FR
+  event: closed
+  date: '2026-09-18'
+- id: FR-22
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-25
+  kind: FR
+  event: closed
+  date: '2026-09-18'
+- id: FR-25
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-26
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-27
+  kind: FR
+  event: closed
+  date: '2026-09-18'
+- id: FR-27
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-28
+  kind: FR
+  event: closed
+  date: '2026-09-18'
+- id: FR-28
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-29
+  kind: FR
+  event: closed
+  date: '2026-09-18'
+- id: FR-29
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-3
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-30
+  kind: FR
+  event: closed
+  date: '2026-09-18'
 - id: FR-30
   kind: FR
   event: started
-  date: '2026-09-10'
+  date: '2026-09-18'
+- id: FR-31
+  kind: FR
+  event: closed
+  date: '2026-09-18'
 - id: FR-31
   kind: FR
   event: started
-  date: '2026-09-10'
+  date: '2026-09-18'
 - id: FR-32
   kind: FR
   event: started
-  date: '2026-09-10'
-- id: FR-30
+  date: '2026-09-18'
+- id: FR-4
   kind: FR
-  event: closed
-  date: '2026-09-11'
-- id: FR-31
+  event: started
+  date: '2026-09-18'
+- id: FR-5
   kind: FR
-  event: closed
-  date: '2026-09-11'
+  event: started
+  date: '2026-09-18'
+- id: FR-6
+  kind: FR
+  event: started
+  date: '2026-09-18'
+- id: FR-7
+  kind: FR
+  event: started
+  date: '2026-09-18'
 late: []
 defects:
   opened: []
@@ -1171,6 +1150,12 @@ defects:
     violates:
     - NFR-4
     closed: '2026-08-22'
+  - id: DEF-11
+    title: The daemon's memory budget has never been measured on a fresh idle release build
+    root_cause: ''
+    violates:
+    - FR-9
+    closed: '2026-09-16'
   - id: DEF-13
     title: A percentage field resets to its last committed value mid-keystroke, before the user can finish
       typing a multi-digit number
@@ -1289,6 +1274,7 @@ defects:
   closed_by_root_cause:
     '?':
     - DEF-1
+    - DEF-11
     - DEF-13
     - DEF-14
     - DEF-15
@@ -1311,10 +1297,6 @@ defects:
   - id: DEF-10
     title: The publication gate cannot see .slint, and five findings its own pattern would report already
       sit there
-    reported: ''
-    age_days: null
-  - id: DEF-11
-    title: The daemon's memory budget has never been measured on a fresh idle release build
     reported: ''
     age_days: null
   - id: DEF-12
