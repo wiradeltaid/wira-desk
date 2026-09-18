@@ -103,7 +103,7 @@ pub struct SnappingConfig {
     pub percent_left: u32,
     /// Percentage of work-area width for right-edge snap (default 67).
     pub percent_right: u32,
-    /// Percentage of work-area height for top-edge snap (default 67).
+    /// Percentage of work-area height for top-edge snap (default 33).
     pub percent_top: u32,
     /// Percentage of work-area height for bottom-edge snap (default 67).
     pub percent_bottom: u32,
@@ -434,7 +434,7 @@ impl Default for SnappingConfig {
             snap_third_right_enabled: true,
             percent_left: crate::constants::DEFAULT_SNAP_PERCENT,
             percent_right: crate::constants::DEFAULT_SNAP_PERCENT,
-            percent_top: crate::constants::DEFAULT_SNAP_PERCENT,
+            percent_top: crate::constants::DEFAULT_SNAP_PERCENT_TOP,
             percent_bottom: crate::constants::DEFAULT_SNAP_PERCENT,
         }
     }
@@ -600,11 +600,11 @@ mod tests {
     }
 
     #[test]
-    fn default_snapping_percentages_are_67() {
+    fn default_snapping_percentages_have_top_at_33_and_others_at_67() {
         let cfg = Config::default();
         assert_eq!(cfg.snapping.percent_left, 67);
         assert_eq!(cfg.snapping.percent_right, 67);
-        assert_eq!(cfg.snapping.percent_top, 67);
+        assert_eq!(cfg.snapping.percent_top, 33);
         assert_eq!(cfg.snapping.percent_bottom, 67);
     }
 
@@ -617,15 +617,25 @@ mod tests {
         let cfg = Config::from_toml_str(toml).unwrap();
         assert_eq!(cfg.snapping.percent_left, 50);
         assert_eq!(cfg.snapping.percent_right, 67);
-        assert_eq!(cfg.snapping.percent_top, 67);
+        assert_eq!(cfg.snapping.percent_top, 33);
         assert_eq!(cfg.snapping.percent_bottom, 67);
 
         let serialized = cfg.to_toml_string().unwrap();
         let parsed = Config::from_toml_str(&serialized).unwrap();
         assert_eq!(parsed.snapping.percent_left, 50);
         assert_eq!(parsed.snapping.percent_right, 67);
-        assert_eq!(parsed.snapping.percent_top, 67);
+        assert_eq!(parsed.snapping.percent_top, 33);
         assert_eq!(parsed.snapping.percent_bottom, 67);
+
+        let toml_explicit_top = r#"
+            [snapping]
+            percent_top = 50
+        "#;
+        let cfg_explicit = Config::from_toml_str(toml_explicit_top).unwrap();
+        assert_eq!(cfg_explicit.snapping.percent_top, 50);
+        assert_eq!(cfg_explicit.snapping.percent_left, 67);
+        assert_eq!(cfg_explicit.snapping.percent_right, 67);
+        assert_eq!(cfg_explicit.snapping.percent_bottom, 67);
     }
 
     #[test]
@@ -778,7 +788,7 @@ mod tests {
         assert!(cfg.snap_third_right_enabled);
         assert_eq!(cfg.percent_left, 67);
         assert_eq!(cfg.percent_right, 67);
-        assert_eq!(cfg.percent_top, 67);
+        assert_eq!(cfg.percent_top, 33);
         assert_eq!(cfg.percent_bottom, 67);
     }
 

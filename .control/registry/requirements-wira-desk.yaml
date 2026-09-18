@@ -339,7 +339,7 @@ functional:
     statement: >-
       The system can snap and resize the active window against the left, right, top, or bottom
       edge of the current monitor's working area at a percentage the user sets independently per
-      direction in Settings (default 67%, instead of the fixed half), using dedicated
+      direction in Settings (default 67% for left, right, and bottom; default 33% for top; instead of the fixed half), using dedicated
       keyboard shortcuts (`Ctrl + Alt + Shift + Left/Right/Up/Down`), scaled to the target
       monitor's DPI.
     proof: >-

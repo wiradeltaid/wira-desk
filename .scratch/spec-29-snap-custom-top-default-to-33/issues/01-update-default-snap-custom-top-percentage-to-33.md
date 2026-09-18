@@ -3,7 +3,7 @@ id: SPEC-29-01
 component: settings
 satisfies: [UC-9, FR-26]
 blocked_by: []
-status: ready-for-agent
+status: closed
 touches:
   - crates/shared/src/config.rs
   - crates/shared/src/constants.rs
@@ -55,8 +55,8 @@ tests:
 
 ## Acceptance Criteria
 
-- [ ] **Default constants:** `DEFAULT_SNAP_PERCENT_TOP` is 33; `DEFAULT_SNAP_PERCENT` remains 67 (documented for left/right/bottom). Fresh `Config::default().snapping` has `percent_top == 33`, `percent_left == 67`, `percent_right == 67`, and `percent_bottom == 67`.
-- [ ] **Preservation of explicit values & omitted defaults:** Loading a TOML with explicit `percent_top = 50` preserves 50; omitting `percent_top` in a TOML defaults it to 33 in memory.
-- [ ] **Roundtrip:** All percentage fields roundtrip cleanly through serialization and deserialization.
-- [ ] **Corpus & docs:** `README.md`, `docs/CONFIGURATION.md`, `FR-26`, and `UC-9` accurately state top is 33% and left/right/bottom are 67%.
-- [ ] **Workspace Integrity:** Workspace tests, clippy, and formatting pass cleanly without regressions.
+- [x] **Default constants:** `DEFAULT_SNAP_PERCENT_TOP` is 33; `DEFAULT_SNAP_PERCENT` remains 67 (documented for left/right/bottom). Fresh `Config::default().snapping` has `percent_top == 33`, `percent_left == 67`, `percent_right == 67`, and `percent_bottom == 67`.
+- [x] **Preservation of explicit values & omitted defaults:** Loading a TOML with explicit `percent_top = 50` preserves 50; omitting `percent_top` in a TOML defaults it to 33 in memory.
+- [x] **Roundtrip:** All percentage fields roundtrip cleanly through serialization and deserialization.
+- [x] **Corpus & docs:** `README.md`, `docs/CONFIGURATION.md`, `FR-26`, and `UC-9` accurately state top is 33% and left/right/bottom are 67%.
+- [x] **Workspace Integrity:** Workspace tests, clippy, and formatting pass cleanly without regressions.

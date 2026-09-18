@@ -1979,7 +1979,7 @@ specs:
     release: "0.3.0"
     prd: [wira-desk]
     size: S
-    status: open
+    status: closed
     spec_reviewed:
       date: '2026-09-18'
       sha: '5df5b49'
@@ -1994,14 +1994,6 @@ specs:
         component: settings
         satisfies: [UC-9]
         depends_on: []
-        touches:
-          - crates/shared/src/config.rs
-          - crates/shared/src/constants.rs
-          - crates/settings/src/persistence.rs
-          - README.md
-          - docs/CONFIGURATION.md
-          - .control/registry/requirements-wira-desk.yaml
-          - .what/window-management/04-usecases/UC-9-snap-window-custom-percentage.md
         tests:
           - config::tests::default_snapping_percentages_have_top_at_33_and_others_at_67
           - config::tests::partial_snapping_percentages_preserve_explicit_values_and_default_omitted_fields

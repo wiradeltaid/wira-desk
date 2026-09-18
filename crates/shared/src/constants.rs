@@ -256,8 +256,11 @@ pub const HOOK_RETRY_DELAY_SECS: u64 = 1;
 /// failures per heartbeat (10 seconds between ticks), not blocking startup retries.
 pub const HOOK_CHECK_FAIL_THRESHOLD: u32 = 3;
 
-/// Default percentage for custom-percentage edge snap (67%).
+/// Default percentage for custom-percentage edge snap on left, right, and bottom edges (67%).
 pub const DEFAULT_SNAP_PERCENT: u32 = 67;
+
+/// Default percentage for custom-percentage top-edge snap (33%).
+pub const DEFAULT_SNAP_PERCENT_TOP: u32 = 33;
 
 /// Minimum allowed percentage for custom-percentage edge snap (1%).
 pub const MIN_SNAP_PERCENT: u32 = 1;

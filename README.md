@@ -38,7 +38,7 @@ Download loose `wiradesk.exe` and `wiradesk-settings.exe` into an administrator-
 ## Features
 
 - **Same-App Window Cycling:** ``Win + ` `` cycles only windows of the active app on the current monitor and virtual desktop (fallback: ``Alt + ` ``). Tap to cycle instantly, or hold 300 ms for the visual switcher overlay with live thumbnails.
-- **One-Key Zone Snapping:** Instant window snapping to halves (50%), thirds (33%), or directional custom percentages (default 67%) without opening a zone editor.
+- **One-Key Zone Snapping:** Instant window snapping to halves (50%), thirds (33%), or directional custom percentages (default 67%, top edge default 33%) without opening a zone editor.
 - **Driverless Mouse Navigation:** Maps thumb buttons (`XBUTTON1`/`XBUTTON2`) and horizontal tilt wheel to virtual desktop switching or 20 customizable presets without background vendor utilities.
 
 ### Default Shortcuts
@@ -48,7 +48,7 @@ Download loose `wiradesk.exe` and `wiradesk-settings.exe` into an administrator-
 | ``Win + ` `` | Cycle windows of current app (hold 300 ms for visual switcher overlay) |
 | ``Alt + ` `` | Fallback cycling shortcut |
 | `Ctrl+Alt+Left/Right/Up/Down` | Snap active window to that half (50%) |
-| `Ctrl+Alt+Shift+Left/Right/Up/Down` | Snap window to that edge at custom percentage (default 67%) |
+| `Ctrl+Alt+Shift+Left/Right/Up/Down` | Snap window to that edge at custom percentage (left/right/bottom default 67%, top default 33%) |
 | `Ctrl+Alt+1/2/3` | Snap window to left, middle, or right third |
 | `Ctrl+Alt+Enter` | Maximize window |
 | `Ctrl+Alt+Shift+Enter` | Move window to next monitor |

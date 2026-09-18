@@ -827,10 +827,10 @@ rtm:
   - config::tests::partial_snapping_percentages_preserve_explicit_values_and_default_omitted_fields
   - config::tests::percent_snap_fields_roundtrip_through_toml
   - persistence::tests::default_config_uses_frozen_shortcuts
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-3
   CAP: CAP-14
   FR: FR-26
