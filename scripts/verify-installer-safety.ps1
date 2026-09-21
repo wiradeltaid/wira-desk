@@ -91,6 +91,7 @@ if (-not (Test-Path $resolvedOut)) { New-Item -ItemType Directory -Path $resolve
 Copy-Item "target\release\wiradesk.exe", "target\release\wiradesk-settings.exe" $resolvedStage -Force
 Copy-Item "LICENSE", "NOTICE" $resolvedStage -Force
 Copy-Item "crates\daemon\wiradesk.ico" $resolvedStage -Force
+Copy-Item "assets\installer-logo*.png" $resolvedStage -Force
 
 # ----------------------------------------------------------------------------
 # 3. Direct ISPP Compile-Time Version Guard Tests using real packaging\wiradesk.iss

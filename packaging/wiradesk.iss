@@ -203,6 +203,7 @@ SetupIconFile={#STAGE_DIR}\wiradesk.ico
 UninstallDisplayIcon={app}\{#DaemonExe}
 UninstallDisplayName={#AppName}
 WizardStyle=modern
+WizardSmallImageFile={#STAGE_DIR}\installer-logo.png
 Compression=lzma2/max
 SolidCompression=yes
 OutputDir={#OUT_DIR}
@@ -482,6 +483,21 @@ begin
   end;
 
   Log(Format('InitializeSetup: Existing version %s is compatible with candidate %s.', [InstalledVer, CurrentVer]));
+end;
+
+{ Initialize wizard layout: aligns small logo margin to match PageNameLabel }
+procedure InitializeWizard();
+var
+  LogoSize: Integer;
+begin
+  LogoSize := WizardForm.MainPanel.ClientHeight - (WizardForm.PageNameLabel.Top * 2);
+  if LogoSize > 0 then
+  begin
+    WizardForm.WizardSmallBitmapImage.Top := WizardForm.PageNameLabel.Top;
+    WizardForm.WizardSmallBitmapImage.Width := LogoSize;
+    WizardForm.WizardSmallBitmapImage.Height := LogoSize;
+    WizardForm.WizardSmallBitmapImage.Left := WizardForm.MainPanel.ClientWidth - WizardForm.PageNameLabel.Left - LogoSize;
+  end;
 end;
 
 { Formats the Ready to Install wizard summary. }
