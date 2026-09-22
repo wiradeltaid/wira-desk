@@ -36,4 +36,5 @@ modules:
     channel: next
 ides:
   - claude-code
-  - cursor
+
+
