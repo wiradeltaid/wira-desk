@@ -6,8 +6,8 @@ created: 2026-08-21
 updated: 2026-08-25
 satisfies: [FR-7, FR-13, FR-16, FR-17, FR-18, FR-19, FR-20, FR-21, FR-25, FR-28, FR-32]
 reviewed:
-  date: '2026-09-07'
-  sha: 'f989238'
+  date: '2026-09-22'
+  sha: 'ebe20ec'
   lenses: [structure, prose]
 ---
 

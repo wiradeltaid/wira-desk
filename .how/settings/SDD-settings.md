@@ -7,9 +7,9 @@ updated: 2026-09-08
 realizes: [UC-4, UC-5, UC-6, UC-8, UC-11, UC-14]
 binds: [AD-1, AD-5, AD-11, AD-11a, AD-12, AD-13]
 reviewed:
-  date: '2026-09-08'
-  sha: '3b9d51c'
-  lenses: [structure, prose, edge-case-hunter]
+  date: '2026-09-22'
+  sha: 'ebe20ec'
+  lenses: [structure, prose]
 ---
 
 # SDD — settings
