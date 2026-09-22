@@ -1,8 +1,16 @@
 ---
 type: decision
 id: DEC-018
-status: accepted
-touches: []
+status: applied
+touches:
+  - crates/shared/src/constants.rs
+  - crates/daemon/src/hook.rs
+  - crates/settings/src/app.rs
+  - crates/settings/src/persistence.rs
+  - crates/settings/src/theme.rs
+  - .how/settings/SDD-settings.md
+  - .control/decisions/DEC-018-the-declared-shortcut-sequence-has-one-home-in-shared.md
+  - .control/registry/decisions.yaml
 supersedes: null
 superseded_by: null
 created: '2026-09-07'

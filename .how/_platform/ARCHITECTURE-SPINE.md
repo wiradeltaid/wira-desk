@@ -132,8 +132,7 @@ The paradigm maps to the execution units:
 
 - **Binds:** CAP-17
 - **Prevents:** Cursor micro-stutter, input lag, and OS unhooking timeouts from heavy processing in the mouse hook; accidental multi-trigger navigation jumps from physical tilt-wheel bounce.
-- **Rule:** The Hook Thread installs WH_MOUSE_LL on the same thread and message pump as WH_KEYBOARD_LL. WM_MOUSEMOVE is forwarded immediately via CallNextHookEx with zero synchronization locks, heap allocations, or logging. Auxiliary mouse inputs (WM_XBUTTONDOWN, WM_MOUSEHWHEEL) are swallowed (
-eturn 1) only when mapped to an active action; unmapped inputs pass through. Tilt wheel horizontal signals are filtered through a 150–200 ms debounce window before pushing a command to the ring buffer. All action executions (such as SendInput for virtual desktop transitions or window cycling) occur exclusively on the Worker Thread off the critical input path.
+- **Rule:** The Hook Thread installs WH_MOUSE_LL on the same thread and message pump as WH_KEYBOARD_LL. WM_MOUSEMOVE is forwarded immediately via CallNextHookEx with zero synchronization locks, heap allocations, or logging. Auxiliary mouse inputs (WM_XBUTTONDOWN, WM_MOUSEHWHEEL) are swallowed (`return 1`) only when mapped to an active action; unmapped inputs pass through. Tilt wheel horizontal signals are filtered through a 150–200 ms debounce window before pushing a command to the ring buffer. All action executions (such as SendInput for virtual desktop transitions or window cycling) occur exclusively on the Worker Thread off the critical input path.
 
 ### AD-14 — Monitor Enumeration: Stateless Just-in-Time
 

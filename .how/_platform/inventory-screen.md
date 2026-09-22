@@ -45,8 +45,7 @@ The system tray icon reflects the 3-Tier error protocol via visual overlays:
 | No | Screen | Route | States | Owning component | UC served |
 | --- | --- | --- | --- | --- | --- |
 | 1 | `settings/General` | `/general` | — | `settings` | `UC-6` |
-| 2 | `settings/Shortcuts` | `/shortcuts` | — | `settings` | `UC-4` |
-| 3 | `settings/Layout` | `/layout` | — | `settings` | `UC-2` |
+| 2 | `settings/Shortcuts` | `/shortcuts` | — | `settings` | `UC-4` · `UC-2` |
 | 8 | `settings/VmExceptions` | `/vm-exceptions` | — | `settings` | `UC-1` |
 | 4 | `settings/About` | `/about` | — | `settings` | `UC-4` |
 | 5 | `onboarding/Welcome` | `/welcome` | — | `settings` | `UC-5` |

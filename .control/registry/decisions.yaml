@@ -209,10 +209,20 @@ decisions:
 
   - id: DEC-014
     title: The Shortcuts pane regroups into five taxonomic groups, and Maximize moves out of Snap & Resize
-    status: accepted
+    status: applied
     file: decisions/DEC-014-the-shortcuts-pane-regroups-into-five-taxonomic-groups.md
     created: '2026-09-07'
-    touches: []
+    touches:
+      - crates/settings/src/app.rs
+      - crates/settings/src/persistence.rs
+      - crates/settings/ui/panes/shortcuts_pane.slint
+      - .how/settings/01-ux/DESIGN.md
+      - .how/settings/04-components/LC-settings-shell.md
+      - .how/settings/SDD-settings.md
+      - .what/settings/04-usecases/EXPERIENCE.md
+      - .how/_platform/inventory-screen.md
+      - .control/decisions/DEC-014-the-shortcuts-pane-regroups-into-five-taxonomic-groups.md
+      - .control/registry/decisions.yaml
 
   - id: DEC-015
     title: The hygiene gate permits internal ids under .scratch/
@@ -302,10 +312,18 @@ decisions:
 
   - id: DEC-018
     title: The declared shortcut sequence has one home in shared, and both crates assert against it
-    status: accepted
+    status: applied
     file: decisions/DEC-018-the-declared-shortcut-sequence-has-one-home-in-shared.md
     created: '2026-09-07'
-    touches: []
+    touches:
+      - crates/shared/src/constants.rs
+      - crates/daemon/src/hook.rs
+      - crates/settings/src/app.rs
+      - crates/settings/src/persistence.rs
+      - crates/settings/src/theme.rs
+      - .how/settings/SDD-settings.md
+      - .control/decisions/DEC-018-the-declared-shortcut-sequence-has-one-home-in-shared.md
+      - .control/registry/decisions.yaml
 
   - id: DEC-019
     title: Autopilot mandate for SPEC-5 delivery

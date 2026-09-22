@@ -1,8 +1,18 @@
 ---
 type: decision
 id: DEC-014
-status: accepted
-touches: []
+status: applied
+touches:
+  - crates/settings/src/app.rs
+  - crates/settings/src/persistence.rs
+  - crates/settings/ui/panes/shortcuts_pane.slint
+  - .how/settings/01-ux/DESIGN.md
+  - .how/settings/04-components/LC-settings-shell.md
+  - .how/settings/SDD-settings.md
+  - .what/settings/04-usecases/EXPERIENCE.md
+  - .how/_platform/inventory-screen.md
+  - .control/decisions/DEC-014-the-shortcuts-pane-regroups-into-five-taxonomic-groups.md
+  - .control/registry/decisions.yaml
 supersedes: null
 superseded_by: null
 created: '2026-09-07'
