@@ -2,7 +2,8 @@
 
 > Lightweight, native same-app window cycling, zone snapping, and driverless mouse navigation for Windows 11 - written in Rust 🦀
 
-[English](README.md) | [简体中文](docs/README.zh-CN.md) | [日本語](docs/README.ja.md) | [Bahasa Indonesia](docs/README.id.md)
+[English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
+[Website](https://wiradelta.id/wira-desk) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -21,10 +22,10 @@ scoop install wiradesk
 
 ### Setup Executable
 
-Download `WiraDesk-0.2.4-x64-setup.exe` from the [releases page](https://github.com/wiradeltaid/wira-desk/releases) (mirrored on [SourceForge](https://sourceforge.net/projects/wira-desk/files/latest/download)) and verify SHA-256:
+Download the installer (`WiraDesk-*-x64-setup.exe`) from the [releases page](https://github.com/wiradeltaid/wira-desk/releases) (mirrored on [SourceForge](https://sourceforge.net/projects/wira-desk/files/latest/download)) and verify SHA-256:
 
 ```powershell
-Get-FileHash .\WiraDesk-0.2.4-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 ```
 
 Installs elevated to `%ProgramFiles%\Wira Desk`. Auto-start is opt-in and configurable from Settings or the tray icon.
