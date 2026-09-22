@@ -27,7 +27,7 @@ This document catalogues all graphical user interface surfaces, dialogs, menus, 
 
 | Surface | ID | Owner | Container | Presentation | Trigger / Behavior |
 | --- | --- | --- | --- | --- | --- |
-| **Tray Context Menu** | `MNU-TRAY` | `window-management` | `daemon` (`wiradesk.exe`) | Native Win32 popup menu (`TrackPopupMenuEx`) | Right-click on tray icon. Items in order: **Settings**, **View Logs**, **Run at Startup** (toggle check), **Check for Updates**, **About**, **Exit**. |
+| **Tray Context Menu** | `MNU-TRAY` | `window-management` | `daemon` (`wiradesk.exe`) | Native Win32 popup menu (`AppendMenuW`/`TrackPopupMenu`) | Right-click on tray icon. Items in order: *(only when an update is available)* **Update to `<version>`...**, **Settings...**, **View Logs**, **Auto-Start** (toggle check), **About**, **Exit**. |
 | **Critical Toast Notification** | `NOTIF-TOAST` | `window-management` | `daemon` (`wiradesk.exe`) | Native Windows Toast Notification | Dispatched exactly 1x upon escalating to Tier 3 Critical (keyboard hook dead). Informs user that cycling is temporarily paused. |
 
 ## Tray Icon Visual States (AD-7 Protocol)

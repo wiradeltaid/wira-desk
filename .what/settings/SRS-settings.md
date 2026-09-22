@@ -19,7 +19,7 @@ The `settings` component provides the standalone on-demand graphical configurati
 
 ## Why
 
-Configuration customization and user onboarding are episodic, UI-intensive tasks that require rich graphical controls, accessibility tree support, and theme synchronization. Isolating these capabilities into a distinct executable spawned on-demand keeps the background daemon lean (<2 MB RAM), eliminates UI runtime memory bloat from the background service, and ensures rendering operations never stall input hooks.
+Configuration customization and user onboarding are episodic, UI-intensive tasks that require rich graphical controls, accessibility tree support, and theme synchronization. Isolating these capabilities into a distinct executable spawned on-demand keeps the background daemon lean (<5 MB private bytes, idle — DEC-027), eliminates UI runtime memory bloat from the background service, and ensures rendering operations never stall input hooks.
 
 ## Actor Register
 

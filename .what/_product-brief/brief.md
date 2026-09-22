@@ -46,7 +46,7 @@ Key capabilities include:
 | Developer / Designer | Reliable multi-window management across varied DPI multi-monitor setups with optional window snapping | secondary |
 | Productivity Mouse User | Native desktop and virtual desktop navigation via physical mouse buttons and tilt wheels without vendor suite bloat | secondary |
 | System Administrator | Seamless focus transitions into elevated tools and utilities without UIPI restrictions | secondary |
-| Enterprise IT Administrator | Zero-telemetry, offline-first utility that adheres to strict workstation resource budgets (<2 MB static RAM) | secondary |
+| Enterprise IT Administrator | Zero-telemetry, offline-first utility that adheres to strict workstation resource budgets (<5 MB static RAM, private bytes idle — DEC-027) | secondary |
 
 Shared goal across all roles: Window focus transitions and desktop navigation feel immediate, predictable, and invisible until a diagnostic intervention is explicitly requested.
 

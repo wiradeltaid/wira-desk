@@ -52,13 +52,15 @@ Wira Desk is an offline Windows desktop utility. It uses no HTTP/JSON error enve
 ## IPC Command Protocol
 
 - **Transport**: In-process lock-free static ring buffer (`16` slots). Zero heap allocation on hot input path.
-- **Payload**: Raw `u8` command enum defined in `crates/shared/src/commands.rs`:
+- **Payload**: Raw `u8` command enum defined in `crates/shared/src/commands.rs`, `0`-`29`. The first six, kept here as the running example:
   - `0`: `Nop`
   - `1`: `Cycle` (Win+Backtick)
   - `2`: `SnapLeft` (Ctrl+Alt+Left)
   - `3`: `SnapRight` (Ctrl+Alt+Right)
   - `4`: `SnapMaximize` (Ctrl+Alt+Enter)
   - `5`: `OverlappingStack` (Ctrl+Alt+Shift+S, `DEC-011`)
+
+  The full enumeration — including `9`-`19` (custom-percent/third snaps, mouse-navigation targets) and `20`-`29` (the visual switcher, `SPEC-14` corpus debt) — lives in `inventory-api.md`'s Ring Buffer Command row; this list is illustrative, not exhaustive.
 - **Queue Overflow Policy**: If the ring buffer is full (e.g. extreme spam), new incoming commands are dropped immediately by the Hook Thread.
 
 ## Security & Elevation

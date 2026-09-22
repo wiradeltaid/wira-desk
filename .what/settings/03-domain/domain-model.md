@@ -34,7 +34,6 @@ Conceptual domain model for the `settings` component. Represents domain entities
 | --- | --- | --- | --- |
 | `Pending` | `Completed` | User finishes interactive cycling simulation through mock windows | New User |
 | `Pending` | `Skipped` | User clicks or activates "Skip Tutorial" button | New User |
-| `Completed` / `Skipped` | `Pending` | User manually resets tutorial state from Settings advanced options | Power User |
 
 ### Shortcut Listening State
 

@@ -20,12 +20,13 @@ Settings dialogs and onboarding surfaces utilize the documented Windows UI typef
 
 ## Layout & Navigation Hierarchy
 
-Follows Windows 11 dialog spacing with a structured 4-pane vertical sidebar within the decoupled executable (`wiradesk-settings.exe`), per `DEC-014`:
-- **Panes (4)**:
+Follows Windows 11 dialog spacing with a structured 5-pane vertical sidebar within the decoupled executable (`wiradesk-settings.exe`), per `DEC-014` and `SPEC-8`:
+- **Panes (5)**:
   1. `General`: Startup integration (Task Scheduler), Spatial Lock, Virtual Desktop isolation, and UX Honesty controls.
   2. `Shortcuts`: **Every** editable chord, and the only pane that holds one — plus the one non-chord control that used to justify a `Layout` pane of its own (the Overlapping Stack width percentage; see below). Sixteen rows in five labelled card groups, taxonomy per `DEC-014` — *Switching* (2) · *Snap to half* (4) · *Snap to third* (3) · *Snap to custom* (4) · *Resize, move & arrange* (3: Maximize, Move to next monitor, Overlapping Stack) — which scroll, above a **pinned** Key check band that does not.
-  3. `VM & Exceptions`: Passthrough rules for virtualization guests (`mstsc.exe`, `vmconnect.exe`, `VMwareUnityWindow`).
-  4. `About`: Diagnostic build metadata, version info, active font rendering details, and memory footprint.
+  3. `Mouse`: Master toggle plus one action-preset dropdown per physical input — Thumb Button 1, Thumb Button 2, Tilt Wheel Left, Tilt Wheel Right (`FR-32`).
+  4. `VM & Exceptions`: Passthrough rules for virtualization guests (`mstsc.exe`, `vmconnect.exe`, `VMwareUnityWindow`).
+  5. `About`: Diagnostic build metadata, version info, active font rendering details, and memory footprint.
 - **Modular Grouping**: Each configuration group is rendered within a rounded Card Container (`#20242B`, radius 8px) with fine divider lines.
 - **Group Heading**: Inside the Shortcuts pane, each card carries a heading above it in the caption size, uppercase, letter-spaced, in the secondary text colour — the same treatment the About pane already uses for its metadata labels. A heading names a group; it is never itself interactive and never carries a chord. A heading also now carries meaning a row's title no longer has to repeat: under *Snap to custom*, a row reads `Snap to left edge`, not `Snap to left edge (custom %)` — the group name already says "custom", and restating it on every row is what the earlier three-group taxonomy needed and this one does not.
 - **Scroll hint**: A 34 px veil at the bottom edge of the scroll area — `transparent` to `bg_mica` over the lower 78% — with a chevron centred in it in `accent_primary`, bobbing 3 px either side of its resting line on a 900 ms ease-in-out. It fades in and out over 200 ms and its timer does not run while it is hidden. The chevron is **drawn as a path, never a font glyph**: neither loaded font carries a chevron codepoint, so a glyph would render as a box. The veil is a gradient rather than a solid strip because a hard edge reads as "the list ends here", which is the opposite of what the hint says.

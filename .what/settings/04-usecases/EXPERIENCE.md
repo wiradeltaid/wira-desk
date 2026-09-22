@@ -10,10 +10,10 @@ Wira Desk is an ultra-lightweight Windows desktop utility running silently in th
 
 Primary interaction is exclusively driven through global keyboard shortcuts.
 Secondary interaction is accessed via right-clicking the System Tray icon to summon the Context Menu:
+- *(shown only when an update is available)* Update to `<version>`...
 - Settings...
 - View Logs
 - Auto-Start *(toggle)*
-- Check for Updates...
 - About
 - Exit
 
@@ -30,6 +30,7 @@ Structure of the Settings Window (`wiradesk-settings.exe`):
   | Resize, move & arrange | Maximize · Move to next monitor · Overlapping stack, carrying its own width percentage inline | The whole monitor, a different monitor, or several windows at once |
 
   The groups name the literal shape of what an action snaps to, which is how someone hunting for "the one that puts a window on the left third" actually looks for it — the four percentage rows belong beside the halves and thirds they resemble, not filed under moving windows around. A row's title does not repeat its group: under *Snap to custom* a row reads `Snap to left edge`, because the heading already says custom. The Key check readout stays put while they scroll: it reports what the keyboard just did, so it has to be readable at the moment a chord is pressed rather than wherever the list happens to end. Within a group the rows follow the arrow keys — left, right, top, bottom; the order is the declared sequence, not the enum's numbering, and grouping never reorders it. There is no separate `Layout` pane: it held exactly one control, the Overlapping Stack width percentage, and `DEC-014` retires it once that percentage moves inline onto its own row here — the same `has_percent` pattern the custom-snap rows already use.
+- **Mouse**: Master toggle plus one action-preset dropdown per physical input — Thumb Button 1, Thumb Button 2, Tilt Wheel Left, Tilt Wheel Right.
 - **VM & Exceptions**: Virtualization and Remote Desktop passthrough rules (`mstsc.exe`, `vmconnect.exe`, `VMwareUnityWindow`).
 - **About**: Version information, project links, active typeface loader status, and diagnostic build metadata.
 

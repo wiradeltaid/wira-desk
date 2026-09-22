@@ -103,9 +103,10 @@ def derive_db(root: Path) -> "Derived":       # noqa: F821 — injected by the e
         "append-only formatted text written by `crates/daemon/src/log.rs`"
     )
     unread.append(
-        "`%APPDATA%\\WinTick\\config.toml` is read once by `crates/shared/src/migrate.rs` for "
-        "one-time migration. It is a legacy shape this product does not define, so its columns "
-        "are deliberately not derived"
+        "`%APPDATA%\\WinTick\\config.toml` was read once for one-time migration until `DEF-25` "
+        "(0.2.0) removed that path entirely — `crates/shared/src/config.rs`'s own tests now assert "
+        "legacy WinTick files are never modified or consumed. Left here as a historical note, not a "
+        "row: there is no migration reader left to derive columns from"
     )
     return Derived(rows=rows, unread=unread)                              # noqa: F821
 

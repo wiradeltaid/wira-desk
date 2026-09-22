@@ -24,10 +24,10 @@ User opens the Settings window and selects the "Mouse" tab in the sidebar.
 2. System displays the Mouse configuration pane featuring:
    - A master toggle: "Enable Mouse Navigation" (On/Off).
    - Four input configuration rows: Thumb Button 1 (Back), Thumb Button 2 (Forward), Tilt Wheel Left, Tilt Wheel Right.
-   - Each row displays a dropdown selector containing curated action presets (e.g. Next Virtual Desktop, Previous Virtual Desktop, Task View, Show Desktop, Cycle Same-App Window Forward/Backward, Snap Window Left/Right, or Default/Passthrough).
+   - Each row displays a dropdown selector containing curated action presets (e.g. Next Virtual Desktop, Previous Virtual Desktop, Task View, Show Desktop, Cycle Same-App Window Forward, Snap Window Left/Right, or Default/Passthrough).
 3. User toggles the master switch or changes the dropdown selection for one or more inputs.
 4. System marks the settings state as dirty and enables the Save button.
-5. User clicks Save (or presses Ctrl + S).
+5. User clicks Save.
 6. System serializes the configuration, writes `config.toml.tmp` atomically, and renames it over `%APPDATA%\WiraDesk\config.toml` (`BR-2`, `LBR-ST-2`).
 7. System dispatches `WM_APP_RELOAD_CONFIG` to the daemon hidden message window (`WiraDeskDaemonHiddenWindow`).
 8. System displays confirmation feedback, clears the dirty indicator, and the daemon reloads and activates the new mouse bindings immediately.
