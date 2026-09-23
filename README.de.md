@@ -65,7 +65,7 @@ Daumentasten wechseln standardmäßig zum vorherigen/nächsten virtuellen Deskto
 
 ## Warum Wira Desk
 
-Während PowerToys Window Hopper beinhaltet und Herstellertools Maustasten konfigurieren, belegen beide 150–500 MB RAM in mehreren Hintergrundprozessen. Wira Desk läuft als einzelner nativer Hintergrunddienst mit nur ca. 4.0 MB privatem Speicher (weit unter dem 5-MB-Budget) und ohne jegliche Telemetrie.
+Windows bietet kein integriertes Wechseln zwischen den Fenstern derselben App. PowerToys, ein separater Download von Microsoft, hat in Version 0.101 Window Hopper ergänzt (standardmäßig deaktiviert), und Herstellertools übernehmen die Maustasten; zusammen laufen dafür mehrere Hintergrundprozesse mit 150–500 MB RAM. Wira Desk läuft als einzelner nativer Hintergrunddienst mit etwa 4.0 MB privatem Speicher (unter dem 5-MB-Budget) und ohne Telemetrie.
 
 ---
 

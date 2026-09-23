@@ -65,7 +65,7 @@ Los botones del pulgar cambian por defecto al escritorio virtual anterior/siguie
 
 ## ¿Por qué Wira Desk?
 
-Mientras que PowerToys incluye Window Hopper y las herramientas de los fabricantes gestionan botones, ambos consumen entre 150 y 500 MB de RAM repartidos en múltiples procesos en segundo plano. Wira Desk se ejecuta como un único servicio nativo que consume aproximadamente 4.0 MB de memoria privada (muy por debajo del límite de 5 MB), con cero telemetría.
+Windows no incluye una forma nativa de alternar entre las ventanas de una misma aplicación. PowerToys, una descarga aparte de Microsoft, añadió Window Hopper en la versión 0.101 (desactivado por defecto), y las herramientas de los fabricantes gestionan los botones del ratón; en conjunto ejecutan varios procesos en segundo plano que usan entre 150 y 500 MB de RAM. Wira Desk se ejecuta como un único servicio nativo en segundo plano que usa unos 4.0 MB de memoria privada (por debajo de un límite de 5 MB), sin telemetría.
 
 ---
 

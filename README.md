@@ -63,7 +63,7 @@ Thumb buttons default to previous/next virtual desktop; tilt wheel defaults to S
 
 ## Why
 
-While PowerToys includes Window Hopper and vendor tools manage mouse buttons, they consume 150-500 MB of RAM across multiple background processes. Wira Desk runs as a single native background daemon consuming approximately 4.0 MB private memory (under 5 MB budget), with zero telemetry.
+Windows has no built-in same-app window cycling. PowerToys, a separate download from Microsoft, added Window Hopper in 0.101 (off by default), and vendor tools handle the mouse buttons; together they run several background processes using 150-500 MB of RAM. Wira Desk runs as a single native background daemon using about 4.0 MB of private memory (under a 5 MB budget), with zero telemetry.
 
 ---
 
