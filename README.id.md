@@ -9,7 +9,7 @@
 
 > **Pemberitahuan terjemahan:** Berkas ini merupakan terjemahan dari [README.md](README.md) untuk kenyamanan pembaca. Jika terdapat perbedaan makna atau penafsiran, berkas resmi berbahasa Inggris (`README.md`) yang menjadi acuan otoritatif. Seluruh dokumen teknis mendalam dan dokumen hukum dikelola dalam Bahasa Inggris.
 
-> **Jika Anda menjalankan PowerToys hanya untuk FancyZones, dan Logi Options+ hanya untuk tombol jempol, aplikasi ini menggantikan keduanya — satu proses tray alih-alih dua.**
+> **Jika Anda menjalankan PowerToys hanya untuk FancyZones, dan Logi Options+ hanya untuk tombol jempol, aplikasi ini menggantikan keduanya: satu proses tray, bukan dua.**
 >
 > Yang tidak digantikan: PowerRename, Awake, Color Picker, tata letak FancyZones kustom; Logitech Flow, profil per aplikasi, pengaturan baterai, atau pengalihan DPI.
 
@@ -65,7 +65,7 @@ Tombol jempol secara bawaan beralih ke desktop virtual sebelumnya/berikutnya; ti
 
 ## Mengapa Wira Desk
 
-Meskipun PowerToys menyediakan Window Hopper dan utilitas vendor mengelola tombol mouse, keduanya memakan 150–500 MB RAM di beberapa proses latar belakang. Wira Desk berjalan sebagai daemon latar belakang native tunggal yang hanya memakai sekitar 4.0 MB memori privat (di bawah anggaran 5 MB), dengan nol telemetri.
+Windows tidak punya fitur bawaan untuk berpindah antarjendela dari aplikasi yang sama. PowerToys, unduhan terpisah dari Microsoft, menambahkan Window Hopper di versi 0.101 (nonaktif secara default), sementara utilitas vendor mengatur tombol mouse; bersama-sama keduanya menjalankan beberapa proses latar belakang yang memakai 150–500 MB RAM. Wira Desk berjalan sebagai satu daemon latar belakang native yang memakai sekitar 4.0 MB memori privat (di bawah anggaran 5 MB), tanpa telemetri.
 
 ---
 

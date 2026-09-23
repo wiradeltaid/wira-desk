@@ -65,7 +65,7 @@ Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 
 ## 왜 Wira Desk인가
 
-PowerToys의 Window Hopper나 제조사 유틸리티는 여러 백그라운드 프로세스에서 150~500 MB의 메모리를 소비합니다. Wira Desk는 약 4.0 MB의 프라이빗 메모리(예산 한도 5 MB 이하)만 사용하는 단일 네이티브 데몬으로 작동하며, 원격 측정이나 외부 데이터 전송이 일절 없습니다.
+Windows에는 같은 앱의 창끼리만 전환하는 기본 기능이 없습니다. Microsoft가 별도로 배포하는 PowerToys는 0.101 버전에서 Window Hopper를 추가했고(기본값은 꺼짐), 마우스 버튼은 제조사 유틸리티가 맡습니다. 이들을 함께 쓰면 여러 백그라운드 프로세스가 150~500 MB의 RAM을 사용합니다. Wira Desk는 약 4.0 MB의 프라이빗 메모리(예산 5 MB 이하)를 쓰는 단일 네이티브 백그라운드 데몬으로 동작하며, 원격 측정이 없습니다.
 
 ---
 

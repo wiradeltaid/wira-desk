@@ -65,7 +65,7 @@ Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 
 ## 为什么选择 Wira Desk
 
-PowerToys 虽然包含 Window Hopper，厂商外设工具也能配置鼠标，但它们在多个后台进程中往往消耗 150–500 MB 内存。Wira Desk 作为一个独立原生后台守护进程运行，静态私有内存开销仅约 4.0 MB（远低于 5 MB 预算指标），且零遥测、零数据回传。
+Windows 没有内置的同一应用窗口切换功能。PowerToys 是 Microsoft 另行提供下载的工具，在 0.101 版加入了 Window Hopper（默认关闭），鼠标按键则由厂商外设工具负责；两者合计会运行多个后台进程，占用 150–500 MB 内存。Wira Desk 作为单个原生后台守护进程运行，私有内存约 4.0 MB（低于 5 MB 预算），且没有遥测。
 
 ---
 

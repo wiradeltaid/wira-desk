@@ -65,7 +65,7 @@ Os botões do polegar alternam por padrão para a área de trabalho virtual ante
 
 ## Por que escolher o Wira Desk
 
-Enquanto o PowerToys inclui o Window Hopper e as ferramentas dos fabricantes gerenciam botões, ambos consomem entre 150 e 500 MB de RAM distribuídos em múltiplos processos. O Wira Desk é executado como um único daemon nativo que consome apenas cerca de 4.0 MB de memória privada (bem abaixo do orçamento de 5 MB), com zero telemetria.
+O Windows não tem um recurso nativo para alternar entre as janelas de um mesmo aplicativo. O PowerToys, um download separado da Microsoft, adicionou o Window Hopper na versão 0.101 (desativado por padrão), e as ferramentas dos fabricantes cuidam dos botões do mouse; juntos, eles rodam vários processos em segundo plano que usam de 150 a 500 MB de RAM. O Wira Desk roda como um único daemon nativo em segundo plano que usa cerca de 4.0 MB de memória privada (abaixo de um orçamento de 5 MB), sem telemetria.
 
 ---
 

@@ -65,7 +65,7 @@ Les boutons de pouce basculent par défaut vers le bureau virtuel précédent/su
 
 ## Pourquoi Choisir Wira Desk
 
-Alors que PowerToys inclut Window Hopper et que les outils des fabricants gèrent les boutons, ils consomment entre 150 et 500 Mo de mémoire vive sur plusieurs processus d'arrière-plan. Wira Desk s'exécute comme un démon natif unique ne consommant qu'environ 4.0 Mo de mémoire privée (bien en deçà du budget de 5 Mo), avec zéro télémétrie.
+Windows n'offre pas de moyen intégré pour passer d'une fenêtre à l'autre d'une même application. PowerToys, un téléchargement séparé de Microsoft, a ajouté Window Hopper dans la version 0.101 (désactivé par défaut), et les outils des fabricants gèrent les boutons de la souris ; ensemble, ils font tourner plusieurs processus d'arrière-plan qui utilisent entre 150 et 500 Mo de mémoire vive. Wira Desk s'exécute comme un seul démon natif en arrière-plan utilisant environ 4.0 Mo de mémoire privée (sous un budget de 5 Mo), sans télémétrie.
 
 ---
 
