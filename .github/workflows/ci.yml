@@ -85,6 +85,33 @@ jobs:
         run: |
           .\scripts\verify-installer-safety.ps1 -StageDir stage -OutDir dist
 
+      - name: Stage release artifacts
+        shell: pwsh
+        run: |
+          $meta = cargo metadata --format-version 1 --no-deps --locked | ConvertFrom-Json
+          $version = ($meta.packages | Where-Object { $_.name -eq 'daemon' }).version
+
+          New-Item -ItemType Directory -Path portable -Force | Out-Null
+          Copy-Item target\release\wiradesk.exe, target\release\wiradesk-settings.exe portable\
+          Copy-Item LICENSE portable\LICENSE.txt
+          Copy-Item NOTICE portable\NOTICE.txt
+          $zipName = "WiraDesk-$version-x64-portable.zip"
+          Compress-Archive -Path portable\* -DestinationPath (Join-Path 'dist' $zipName) -Force
+          Remove-Item -Recurse -Force portable
+
+          $artifacts = @(
+            (Join-Path 'dist' "WiraDesk-$version-x64-setup.exe"),
+            (Join-Path 'dist' $zipName)
+          )
+          Get-FileHash $artifacts -Algorithm SHA256 |
+            ForEach-Object { '{0}  {1}' -f $_.Hash.ToLower(), (Split-Path $_.Path -Leaf) } |
+            Set-Content dist\SHA256SUMS -Encoding ascii
+
+      - name: Verify release artifacts
+        shell: pwsh
+        run: |
+          .\scripts\verify-release-artifacts.ps1 -DistDir dist
+
   secrets:
     runs-on: ubuntu-latest
     steps:

@@ -3,7 +3,7 @@ id: SPEC-30-07
 component: window-management
 satisfies: [FR-24]
 blocked_by: []
-status: ready-for-agent
+status: closed
 touches:
   - .github/workflows/release.yml
   - .github/workflows/ci.yml
@@ -19,7 +19,7 @@ tests:
 
 **Blocked by:** None (can start immediately, in parallel with SPEC-30-01 and SPEC-30-02)
 
-**Status:** ready-for-agent
+**Status:** closed
 
 ## Implementation Details
 
@@ -30,9 +30,9 @@ tests:
 
 ## Acceptance Criteria
 
-- [ ] Every guard and verification script is observed red on today's codebase before implementation, then green.
-- [ ] `scripts/verify-release-artifacts.ps1` executed against loose binaries layout fails as red.
-- [ ] Packaging layout producing installer + zip + checksums passes the verification script as green.
-- [ ] Staging and verification step in `ci.yml` passes cleanly.
-- [ ] `.github/workflows/release.yml:223` no longer contains reference to PR #426321.
-- [ ] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.
+- [x] Every guard and verification script is observed red on today's codebase before implementation, then green.
+- [x] `scripts/verify-release-artifacts.ps1` executed against loose binaries layout fails as red.
+- [x] Packaging layout producing installer + zip + checksums passes the verification script as green.
+- [x] Staging and verification step in `ci.yml` passes cleanly.
+- [x] `.github/workflows/release.yml:223` no longer contains reference to PR #426321.
+- [x] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.

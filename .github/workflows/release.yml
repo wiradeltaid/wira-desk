@@ -158,11 +158,22 @@ jobs:
       - name: Stage artefacts and checksums
         shell: pwsh
         run: |
-          # The loose executables ship beside the installer on purpose: `README.md`
-          # documents placing them by hand, and someone auditing a release should be able
-          # to check the program without running an installer to get at it.
-          Copy-Item target\release\wiradesk.exe, target\release\wiradesk-settings.exe dist\
-          Get-FileHash dist\*.exe -Algorithm SHA256 |
+          # Package the portable archive containing both binaries, LICENSE.txt, and NOTICE.txt.
+          # Loose binaries are eliminated from dist/ to ensure only the setup installer and the
+          # verified portable zip are published.
+          New-Item -ItemType Directory -Path portable -Force | Out-Null
+          Copy-Item target\release\wiradesk.exe, target\release\wiradesk-settings.exe portable\
+          Copy-Item LICENSE portable\LICENSE.txt
+          Copy-Item NOTICE portable\NOTICE.txt
+          $zipName = "WiraDesk-$env:VERSION-x64-portable.zip"
+          Compress-Archive -Path portable\* -DestinationPath (Join-Path 'dist' $zipName) -Force
+          Remove-Item -Recurse -Force portable
+
+          $artifacts = @(
+            (Join-Path 'dist' "WiraDesk-$env:VERSION-x64-setup.exe"),
+            (Join-Path 'dist' $zipName)
+          )
+          Get-FileHash $artifacts -Algorithm SHA256 |
             ForEach-Object { '{0}  {1}' -f $_.Hash.ToLower(), (Split-Path $_.Path -Leaf) } |
             Set-Content dist\SHA256SUMS -Encoding ascii
           Get-Content dist\SHA256SUMS
@@ -196,6 +207,11 @@ jobs:
           } | ConvertTo-Json | Set-Content dist\latest.json -Encoding utf8
           Get-Content dist\latest.json
 
+      - name: Verify release artifacts
+        shell: pwsh
+        run: |
+          .\scripts\verify-release-artifacts.ps1 -DistDir dist -Version $env:VERSION -RequireLatestJson
+
       - name: Publish
         shell: pwsh
         env:
@@ -212,15 +228,13 @@ jobs:
           # standing information, and the last two lines are a licence term.
           $wingetInstruction = if ($env:WINGET_LIVE -eq 'true') {
             @(
-              'Install with the setup executable, or through winget:',
+              'Install with the setup executable, portable archive, or through winget:',
               '',
               '    winget install WiraDeltaIndonesia.WiraDesk'
             ) -join "`n"
           } else {
             @(
-              'Install with the setup executable.',
-              '',
-              '*WinGet package submission pending official approval on microsoft/winget-pkgs (PR #426321).*'
+              'Install with the setup executable or portable archive.'
             ) -join "`n"
           }
 
@@ -252,8 +266,13 @@ jobs:
             'licence this project is released under. See LICENSE and deny.toml for which',
             'branch of Slint''s tri-licence applies.'
           ) -join "`n"
-          gh release create $env:GITHUB_REF_NAME `
-            (Get-ChildItem dist\*.exe | ForEach-Object { $_.FullName }) dist\SHA256SUMS dist\latest.json `
+          $releaseAssets = @(
+            (Join-Path 'dist' "WiraDesk-$env:VERSION-x64-setup.exe"),
+            (Join-Path 'dist' "WiraDesk-$env:VERSION-x64-portable.zip"),
+            (Join-Path 'dist' "SHA256SUMS"),
+            (Join-Path 'dist' "latest.json")
+          )
+          gh release create $env:GITHUB_REF_NAME $releaseAssets `
             --title $env:GITHUB_REF_NAME --notes $notes
 
       - name: Decide whether winget can be updated
