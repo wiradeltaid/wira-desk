@@ -2872,8 +2872,8 @@ pub(crate) mod tests {
             assert_eq!(window.get_current_pane(), 4);
 
             // Card 3 elements
-            let support = find_element_scrolling(&window, "Support development");
-            assert!(support.is_some(), "Support development button found");
+            let support = find_element_scrolling(&window, "Send a tip");
+            assert!(support.is_some(), "Send a tip button found");
 
             let issues = find_element_scrolling(&window, "Issue Tracker");
             assert!(issues.is_some(), "Issue Tracker button found");
@@ -2884,12 +2884,12 @@ pub(crate) mod tests {
             let reset_btn = find_element_scrolling(&window, "Reset all settings to defaults");
             assert!(reset_btn.is_some(), "Reset all settings button found");
 
-            // Card 4 elements
-            let publisher = find_element_scrolling(&window, "Publisher website (wiradelta.id)");
-            assert!(
-                publisher.is_some(),
-                "Publisher website link found in Card 4"
+            // Card 1 elements
+            let privacy = find_element_scrolling(
+                &window,
+                "What it stores and sends: wiradelta.id/wira-desk/privacy/",
             );
+            assert!(privacy.is_some(), "Privacy link found in Card 1");
 
             let _ = std::fs::remove_file(&save_path);
         });

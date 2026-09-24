@@ -13,7 +13,7 @@ Run branch: autopilot/DEC-044
 Stopped at: —
 Blocked: —
 Parked: —
-Next: SPEC-30-03 (About and General pane copy) / SPEC-30-07 (Portable zip and release artifact guard)
+Next: SPEC-30-07 (Portable zip and release artifact guard)
 
 ## Decisions
 
@@ -26,3 +26,4 @@ Next: SPEC-30-03 (About and General pane copy) / SPEC-30-07 (Portable zip and re
 | Iteration 1 | SPEC-30-01 implementation | Migrated descriptor to canonical wiradelta.id endpoint, enforced no-redirect policy and strict User-Agent contract | Retaining GitHub Releases descriptor URL and space-less UA | Endpoint drift and redirect hijacking risks | crates/shared/src/update.rs, crates/shared/src/https.rs, crates/settings/src/update.rs |
 | Iteration 1 | Peer review feedback | Added transport-level redirect policy tests, env isolation, and verified Terra review recommendations | Comparing enums only | Behavioral regression risks in redirect handling | crates/shared/src/https.rs, crates/shared/src/update.rs |
 | Iteration 1 | SPEC-30-02 implementation | Created Settings URL registry with trailing slashes and restricted browser allowlist | Inline ad-hoc URL strings and unpinned redirects | Subpath navigation vulnerabilities and redirect overhead | crates/settings/src/urls.rs, crates/settings/src/main.rs, crates/settings/src/update.rs |
+| Iteration 1 | SPEC-30-03 implementation | Synchronized About and General pane copy word-for-word with approved ops Section C fixture and removed all promotional slop | Retaining legacy marketing claims and British spellings | Drift from approved legal terms and brand SSOT | crates/settings/ui/panes/about_pane.slint, crates/settings/ui/panes/general_pane.slint, crates/settings/src/main.rs, crates/settings/src/app.rs |

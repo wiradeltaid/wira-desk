@@ -3138,7 +3138,7 @@ mod tests {
 
             let desc = find_about_element(
                 &window,
-                "Wira Desk accelerates desktop multitasking with smooth window switching, flexible edge snapping, and driverless mouse navigation.",
+                "Same-app window cycling, one-key snapping, and mouse button mapping for Windows 11.",
             );
             assert!(
                 desc.is_some(),
@@ -3160,13 +3160,10 @@ mod tests {
 
             assert_eq!(window.get_current_pane(), 4);
 
-            let disclosure = find_about_element(
-                &window,
-                "No telemetry, no account, no separate background service.\nUpdate checks run entirely in-process against GitHub Releases, which you can switch off.",
-            );
+            let source = include_str!("../ui/panes/about_pane.slint");
             assert!(
-                disclosure.is_some(),
-                "In-process disclosure with newline found in About pane"
+                source.contains("No account, no analytics, no crash reporting."),
+                "Privacy disclosure found in About pane"
             );
 
             let _ = std::fs::remove_file(&save_path);
@@ -3196,42 +3193,40 @@ mod tests {
                 "Issue Tracker button found in About pane"
             );
 
-            let pub_btn = find_about_element(&window, "Publisher website (wiradelta.id)");
-            assert!(
-                pub_btn.is_some(),
-                "Publisher website button found in About pane"
-            );
-
-            let support_btn = find_about_element(&window, "Support development");
+            let support_btn = find_about_element(&window, "Send a tip");
             assert!(
                 support_btn.is_some(),
-                "Support development button found in About pane"
+                "Send a tip button found in About pane"
             );
 
-            let legal_prefix = find_about_element(&window, "An open-source utility by ");
+            let source_link =
+                find_about_element(&window, "Source: github.com/wiradeltaid/wira-desk");
             assert!(
-                legal_prefix.is_some(),
-                "Attribution prefix found in About pane"
+                source_link.is_some(),
+                "Source code link found in About pane"
             );
 
-            let legal_link = find_about_element(&window, "Wira Delta Indonesia");
+            let privacy_link = find_about_element(
+                &window,
+                "What it stores and sends: wiradelta.id/wira-desk/privacy/",
+            );
             assert!(
-                legal_link.is_some(),
-                "Inline publisher link text found in About pane"
+                privacy_link.is_some(),
+                "Privacy policy link found in About pane"
             );
 
             // Verify callbacks can be invoked safely
-            window.invoke_open_publisher_url();
             window.invoke_open_source_url();
             window.invoke_open_support_url();
             window.invoke_open_issues_url();
+            window.invoke_open_privacy_url();
 
             let _ = std::fs::remove_file(&save_path);
         });
     }
 
     #[test]
-    fn about_pane_renders_inline_publisher_link_with_open_icon() {
+    fn about_pane_renders_inline_privacy_and_source_links() {
         crate::shortcut_row_slint_snapshot::tests::run_on_ui_thread(|| {
             let (window, model, save_path) =
                 crate::shortcut_row_slint_snapshot::tests::setup_shortcuts_window();
@@ -3240,15 +3235,16 @@ mod tests {
             crate::sync_model_to_ui(&window, &model.borrow());
             assert_eq!(window.get_current_pane(), 4);
 
-            let inline_link = find_about_element(&window, "Publisher website (wiradelta.id)");
-            assert!(
-                inline_link.is_some(),
-                "Inline publisher link with accessible-label found in About pane"
+            let privacy_link = find_about_element(
+                &window,
+                "What it stores and sends: wiradelta.id/wira-desk/privacy/",
             );
-            let inline_text = find_about_element(&window, "Wira Delta Indonesia");
+            assert!(privacy_link.is_some(), "Privacy link found in About pane");
+            let source_link =
+                find_about_element(&window, "Source: github.com/wiradeltaid/wira-desk");
             assert!(
-                inline_text.is_some(),
-                "Inline publisher link text found in About pane"
+                source_link.is_some(),
+                "Source code link found in About pane"
             );
 
             let _ = std::fs::remove_file(&save_path);
@@ -3256,7 +3252,7 @@ mod tests {
     }
 
     #[test]
-    fn about_pane_clicking_inline_publisher_opens_url() {
+    fn about_pane_clicking_privacy_opens_url() {
         crate::shortcut_row_slint_snapshot::tests::run_on_ui_thread(|| {
             let (window, model, save_path) =
                 crate::shortcut_row_slint_snapshot::tests::setup_shortcuts_window();
@@ -3266,14 +3262,14 @@ mod tests {
 
             let clicked = std::rc::Rc::new(std::cell::Cell::new(false));
             let clicked_clone = clicked.clone();
-            window.on_open_publisher_url(move || {
+            window.on_open_privacy_url(move || {
                 clicked_clone.set(true);
             });
 
-            window.invoke_open_publisher_url();
+            window.invoke_open_privacy_url();
             assert!(
                 clicked.get(),
-                "open_publisher_url callback invoked successfully"
+                "open_privacy_url callback invoked successfully"
             );
 
             let _ = std::fs::remove_file(&save_path);
@@ -3303,7 +3299,7 @@ mod tests {
     fn about_pane_card_dividers_span_the_card() {
         let source = include_str!("../ui/panes/about_pane.slint").replace("\r\n", "\n");
         assert!(
-            source.contains("VerticalLayout {\n            padding: 0px;\n            spacing: 0px;\n\n            // 1. GitHub Repository"),
+            source.contains("accessible-label: \"Support and recovery card\";\n\n        VerticalLayout {\n            padding: 0px;\n            spacing: 0px;"),
             "Card 3 must declare padding: 0px and spacing: 0px for full-bleed dividers"
         );
     }
@@ -3328,20 +3324,23 @@ mod tests {
             // Absolute content right-edge bound = 760 - 20 - 16 = 724px.
             let card_content_right_bound = window_width - 20.0 - 16.0;
 
-            let link_el = find_about_element(&window, "Publisher website (wiradelta.id)")
-                .expect("Inline publisher link must be instantiated in accessible tree");
+            let link_el = find_about_element(
+                &window,
+                "What it stores and sends: wiradelta.id/wira-desk/privacy/",
+            )
+            .expect("Privacy link must be instantiated in accessible tree");
             let link_right = link_el.absolute_position().x + link_el.size().width;
             assert!(
                 link_right <= card_content_right_bound,
-                "Inline link right edge ({link_right}) must not exceed card content boundary ({card_content_right_bound})"
+                "Privacy link right edge ({link_right}) must not exceed card content boundary ({card_content_right_bound})"
             );
 
-            let suffix_el = find_about_element(&window, " • Licensed under GPL-3.0")
-                .expect("Attribution suffix text must be instantiated in accessible tree");
-            let suffix_right = suffix_el.absolute_position().x + suffix_el.size().width;
+            let source_el = find_about_element(&window, "Source: github.com/wiradeltaid/wira-desk")
+                .expect("Source link must be instantiated in accessible tree");
+            let source_right = source_el.absolute_position().x + source_el.size().width;
             assert!(
-                suffix_right <= card_content_right_bound,
-                "Attribution suffix right edge ({suffix_right}) must not exceed card content boundary ({card_content_right_bound})"
+                source_right <= card_content_right_bound,
+                "Source link right edge ({source_right}) must not exceed card content boundary ({card_content_right_bound})"
             );
 
             let _ = std::fs::remove_file(&save_path);
@@ -3383,7 +3382,7 @@ mod tests {
                 "Hold delay caption must have wrap: word-wrap"
             );
             assert!(
-                source.contains("overlay appears\\n(100–500 ms)."),
+                source.contains("overlay appears\\n(100 to 500 ms)."),
                 "Hold delay caption must have dedicated newline for bounds"
             );
 
@@ -3705,8 +3704,8 @@ mod tests {
 
             assert_eq!(window.get_current_pane(), 4);
 
-            let support = find_about_element(&window, "Support development");
-            assert!(support.is_some(), "Support development button found");
+            let support = find_about_element(&window, "Send a tip");
+            assert!(support.is_some(), "Send a tip button found");
 
             let issues = find_about_element(&window, "Issue Tracker");
             assert!(issues.is_some(), "Issue Tracker button found");
@@ -3877,18 +3876,16 @@ mod tests {
     #[test]
     fn about_pane_card_hierarchy_and_divider_structure() {
         let source = include_str!("../ui/panes/about_pane.slint").replace("\r\n", "\n");
-        // Card 3 begins with Support development, Issue Tracker, and GitHub repository
+        // Card 3 begins with Send a tip, Issue Tracker, and GitHub repository
         assert!(
-            source.contains("Support development")
+            source.contains("Send a tip")
                 && source.contains("Issue Tracker")
                 && source.contains("GitHub repository"),
-            "Card 3 must contain support, issue tracker, and repo buttons"
+            "Card 3 must contain send a tip, issue tracker, and repo buttons"
         );
 
         // Followed by CardDivider
-        let support_pos = source
-            .find("Support development")
-            .expect("support development");
+        let support_pos = source.find("Send a tip").expect("send a tip");
         let divider_pos = source[support_pos..]
             .find("CardDivider {}")
             .expect("CardDivider");
@@ -3898,7 +3895,7 @@ mod tests {
 
         assert!(
             divider_pos > 0 && restore_pos > 0,
-            "Card 3 must place CardDivider between support actions and Restore all preferences to defaults"
+            "Card 3 must place CardDivider between action buttons and Restore all preferences to defaults"
         );
         assert!(
             !source.contains("Troubleshooting & Recovery"),
@@ -3907,25 +3904,122 @@ mod tests {
     }
 
     #[test]
-    fn about_pane_attribution_card_at_bottom() {
+    fn about_pane_contains_exact_approved_copy() {
         let source = include_str!("../ui/panes/about_pane.slint").replace("\r\n", "\n");
-        let attr_pos = source
-            .find("An open-source utility by ")
-            .expect("Attribution text found");
-        let restore_pos = source
-            .find("Restore all preferences to defaults")
-            .expect("Restore all preferences found");
+
+        // Approved Section C fixture strings:
+        let required_strings = [
+            "Wira Desk \" + root.version",
+            "Copyright (c) 2026 Wira Delta Indonesia",
+            "Same-app window cycling, one-key snapping, and mouse button mapping for Windows 11.",
+            "Free software under the GNU General Public License v3.0 only. Full terms: LICENSE.txt in the install folder.",
+            "Third-party components and their licenses: NOTICE.txt in the install folder.",
+            "Source: github.com/wiradeltaid/wira-desk",
+            "What it stores and sends: wiradelta.id/wira-desk/privacy/",
+            "Check for updates automatically",
+            "Once a day, and when you press Check for updates, Wira Desk asks wiradelta.id whether a newer",
+            "version exists. The request names Wira Desk, its version, your Windows version, and the processor",
+            "architecture. Nothing else is attached.",
+            "No account, no analytics, no crash reporting.",
+            "Questions: support@wiradelta.id",
+            "Security reports: GitHub Security Advisories on the repository",
+            "Send a tip",
+            "Issue Tracker",
+            "GitHub",
+        ];
+
+        let mut last_idx = 0;
+        for req in required_strings {
+            let found = source[last_idx..].find(req);
+            assert!(
+                found.is_some(),
+                "About pane must contain approved copy line in order: {req:?}"
+            );
+            last_idx += found.unwrap() + req.len();
+        }
+
+        // Prohibited promotional slop / outdated terms:
+        let prohibited_strings = [
+            "GitHub Releases",
+            "Support development",
+            "UX Honesty",
+            "accelerates",
+            "invisible, fast",
+            "Nothing about you is sent",
+            "licence",
+        ];
+
+        for bad in prohibited_strings {
+            assert!(
+                !source.contains(bad),
+                "About pane must NOT contain prohibited term: {bad:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn general_pane_has_no_slop_or_unapproved_dashes() {
+        let source = include_str!("../ui/panes/general_pane.slint").replace("\r\n", "\n");
 
         assert!(
-            attr_pos > restore_pos,
-            "Attribution Card 4 must follow Recovery Card 3"
+            source.contains("Show Unresponsive Windows"),
+            "General pane must contain clean 'Show Unresponsive Windows'"
         );
-
-        // Verify Card 4 is the final Card
-        let after_attr = &source[attr_pos..];
         assert!(
-            !after_attr.contains("Card {"),
-            "No Card declaration may follow Card 4 in AboutPane"
+            !source.contains("UX Honesty"),
+            "General pane must NOT contain 'UX Honesty'"
+        );
+        assert!(
+            source.contains("(100 to 500 ms)"),
+            "General pane must contain '(100 to 500 ms)' with ASCII 'to'"
+        );
+        assert!(
+            !source.contains("100–500 ms"),
+            "General pane must NOT contain en-dash in hold delay text"
+        );
+    }
+
+    #[test]
+    fn settings_tabs_and_legal_labels_locked() {
+        // Assert that all six critical legal labels and three tab titles are locked
+        let about_src = include_str!("../ui/panes/about_pane.slint");
+        let general_src = include_str!("../ui/panes/general_pane.slint");
+        let shortcuts_src = include_str!("../ui/panes/shortcuts_pane.slint");
+        let sidebar_src = include_str!("../ui/components/sidebar.slint");
+
+        // Tab titles in sidebar
+        for tab in ["About", "Mouse", "General"] {
+            assert!(
+                sidebar_src.contains(&format!("text: \"{tab}\";")),
+                "Settings sidebar must declare tab {tab:?}"
+            );
+        }
+
+        // Legal labels
+        assert!(
+            about_src.contains("Check for updates automatically"),
+            "Legal label 'Check for updates automatically' locked"
+        );
+        assert!(
+            about_src.contains("Check for updates"),
+            "Legal label 'Check for updates' locked"
+        );
+        assert!(
+            about_src.contains("Download and install"),
+            "Legal label 'Download and install' locked"
+        );
+        assert!(
+            about_src.contains("Reset all settings…"),
+            "Legal label 'Reset all settings…' locked"
+        );
+        assert!(
+            general_src.contains("Enable Visual Switcher Overlay"),
+            "Legal label 'Enable Visual Switcher Overlay' locked"
+        );
+        assert!(
+            shortcuts_src.contains("Enable Mouse Navigation")
+                || include_str!("../ui/panes/mouse_pane.slint").contains("Enable Mouse Navigation"),
+            "Legal label 'Enable Mouse Navigation' locked"
         );
     }
 

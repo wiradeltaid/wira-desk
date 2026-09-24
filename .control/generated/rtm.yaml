@@ -797,7 +797,7 @@ rtm:
   - settings::app::tests::about_pane_contains_exact_approved_copy
   - settings::app::tests::general_pane_has_no_slop_or_unapproved_dashes
   - settings::app::tests::settings_tabs_and_legal_labels_locked
-  status: ready-for-agent
+  status: closed
   exempt: false
   green: false
   broken_at: status

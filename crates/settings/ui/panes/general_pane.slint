@@ -124,7 +124,7 @@ export component GeneralPane inherits VerticalLayout {
                         color: Palette.text_primary;
                     }
                     Text {
-                        text: "Milliseconds to hold the chord before the visual overlay appears\n(100–500 ms).";
+                        text: "Milliseconds to hold the chord before the visual overlay appears\n(100 to 500 ms).";
                         font-family: Typography.font_family;
                         font-size: Typography.size_caption;
                         color: Palette.text_secondary;
@@ -251,7 +251,7 @@ export component GeneralPane inherits VerticalLayout {
             CardDivider {}
 
             SettingToggleRow {
-                title: "Show Unresponsive Windows (UX Honesty)";
+                title: "Show Unresponsive Windows";
                 description: "Ensures hanging windows are exposed cleanly to the user rather than hidden.";
                 checked: true;
                 enabled: false;

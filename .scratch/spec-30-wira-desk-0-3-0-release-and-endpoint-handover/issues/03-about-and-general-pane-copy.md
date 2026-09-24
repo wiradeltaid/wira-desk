@@ -3,7 +3,7 @@ id: SPEC-30-03
 component: settings
 satisfies: [UC-8]
 blocked_by: [SPEC-30-02]
-status: ready-for-agent
+status: closed
 touches:
   - crates/settings/ui/panes/about_pane.slint
   - crates/settings/ui/panes/general_pane.slint
@@ -22,7 +22,7 @@ tests:
 
 **Blocked by:** SPEC-30-02 (and requires approved upstream ops `about.md` Section C)
 
-**Status:** ready-for-agent
+**Status:** closed
 
 ## Implementation Details
 
@@ -54,10 +54,10 @@ tests:
 
 ## Acceptance Criteria
 
-- [ ] Every guard and test is observed red on today's codebase before implementation, then green.
-- [ ] Source scan over `crates/settings/ui/**/*.slint` confirms absence of "GitHub Releases", "Support development", "UX Honesty", "accelerates", "invisible, fast", "Nothing about you is sent", "licence", and Unicode dash characters U+2013 / U+2014.
-- [ ] Unit tests assert full text equality of About pane contents against the approved Section C fixture.
-- [ ] Unit tests assert that all six legal labels and all three tab names ("About", "Mouse", "General") are present verbatim.
-- [ ] Existing snapshot tests are updated and pass cleanly.
-- [ ] Light and dark mode screenshots of About and General panes captured and included in PR description.
-- [ ] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.
+- [x] Every guard and test is observed red on today's codebase before implementation, then green.
+- [x] Source scan over `crates/settings/ui/**/*.slint` confirms absence of "GitHub Releases", "Support development", "UX Honesty", "accelerates", "invisible, fast", "Nothing about you is sent", "licence", and Unicode dash characters U+2013 / U+2014.
+- [x] Unit tests assert full text equality of About pane contents against the approved Section C fixture.
+- [x] Unit tests assert that all six legal labels and all three tab names ("About", "Mouse", "General") are present verbatim.
+- [x] Existing snapshot tests are updated and pass cleanly.
+- [x] Light and dark mode screenshots of About and General panes captured and included in PR description.
+- [x] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.

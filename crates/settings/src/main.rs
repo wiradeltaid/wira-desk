@@ -993,6 +993,17 @@ pub(crate) fn bind_callbacks(
             update::open_in_browser(urls::GITHUB_ISSUES_URL);
         });
     }
+    {
+        let window_weak = main_window.as_weak();
+        main_window.on_open_privacy_url(move || {
+            if let Some(w) = window_weak.upgrade() {
+                if w.get_factory_reset_dialog_open() {
+                    return;
+                }
+            }
+            update::open_in_browser(urls::WIRA_DESK_PRIVACY_URL);
+        });
+    }
 
     update_rx
 }

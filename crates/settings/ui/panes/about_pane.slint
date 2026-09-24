@@ -57,6 +57,7 @@ export component AboutPane inherits VerticalLayout {
     callback open_source_url();
     callback open_support_url();
     callback open_issues_url();
+    callback open_privacy_url();
     callback reset_all_settings_clicked();
 
     spacing: 12px;
@@ -64,50 +65,31 @@ export component AboutPane inherits VerticalLayout {
 
     // Heading Section
     VerticalLayout {
-        spacing: 2px;
+        spacing: 4px;
         Text {
-            text: "Wira Desk";
+            text: "Wira Desk " + root.version;
             font-family: Typography.font_family;
             font-size: Typography.size_heading;
             font-weight: 700;
             color: Palette.text_primary;
         }
 
-        HorizontalLayout {
-            spacing: 8px;
-            alignment: start;
-
-            Text {
-                text: "Version " + root.version;
-                font-family: Typography.font_family;
-                font-size: Typography.size_caption;
-                font-weight: 700;
-                color: Palette.accent_primary;
-            }
-
-            Text {
-                text: "•";
-                font-size: Typography.size_caption;
-                color: Palette.text_tertiary;
-            }
-
-            Text {
-                text: "Typeface: " + root.typeface;
-                font-family: Typography.font_family;
-                font-size: Typography.size_caption;
-                color: Palette.text_secondary;
-            }
+        Text {
+            text: "Copyright (c) 2026 Wira Delta Indonesia";
+            font-family: Typography.font_family;
+            font-size: Typography.size_caption;
+            color: Palette.text_secondary;
         }
     }
 
-
+    // Card 1: Description, License, Source, Privacy (Section C Fixture)
     Card {
         VerticalLayout {
             padding: 16px;
             spacing: 8px;
 
             Text {
-                text: "Wira Desk accelerates desktop multitasking with smooth window switching, flexible edge snapping, and driverless mouse navigation.";
+                text: "Same-app window cycling, one-key snapping, and mouse button mapping for Windows 11.";
                 font-family: Typography.font_family;
                 font-size: Typography.size_body;
                 color: Palette.text_secondary;
@@ -115,19 +97,76 @@ export component AboutPane inherits VerticalLayout {
             }
 
             Text {
-                text: "Designed to be invisible, fast, and resource-efficient for all-day multitasking.";
+                text: "Free software under the GNU General Public License v3.0 only. Full terms: LICENSE.txt in the install folder.\nThird-party components and their licenses: NOTICE.txt in the install folder.";
                 font-family: Typography.font_family;
                 font-size: Typography.size_caption;
                 color: Palette.text_tertiary;
                 wrap: word-wrap;
             }
+
+            HorizontalLayout {
+                spacing: 8px;
+                alignment: start;
+
+                source_touch := TouchArea {
+                    accessible-role: button;
+                    accessible-label: "Source: github.com/wiradeltaid/wira-desk";
+                    accessible-action-default => { root.open_source_url(); }
+                    mouse-cursor: pointer;
+                    clicked => { root.open_source_url(); }
+
+                    HorizontalLayout {
+                        spacing: 4px;
+                        alignment: start;
+                        Text {
+                            text: "Source: github.com/wiradeltaid/wira-desk";
+                            font-family: Typography.font_family;
+                            font-size: Typography.size_caption;
+                            color: source_touch.has_hover ? Palette.accent_hover : Palette.accent_primary;
+                        }
+                        VerticalLayout {
+                            alignment: center;
+                            OpenLinkIcon {
+                                icon_color: source_touch.has_hover ? Palette.accent_hover : Palette.accent_primary;
+                            }
+                        }
+                    }
+                }
+            }
+
+            HorizontalLayout {
+                spacing: 8px;
+                alignment: start;
+
+                privacy_touch := TouchArea {
+                    accessible-role: button;
+                    accessible-label: "What it stores and sends: wiradelta.id/wira-desk/privacy/";
+                    accessible-action-default => { root.open_privacy_url(); }
+                    mouse-cursor: pointer;
+                    clicked => { root.open_privacy_url(); }
+
+                    HorizontalLayout {
+                        spacing: 4px;
+                        alignment: start;
+                        Text {
+                            text: "What it stores and sends: wiradelta.id/wira-desk/privacy/";
+                            font-family: Typography.font_family;
+                            font-size: Typography.size_caption;
+                            color: privacy_touch.has_hover ? Palette.accent_hover : Palette.accent_primary;
+                        }
+                        VerticalLayout {
+                            alignment: center;
+                            OpenLinkIcon {
+                                icon_color: privacy_touch.has_hover ? Palette.accent_hover : Palette.accent_primary;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
-    // Updates.
-    //
-    // In About rather than General because this is where a version number already lives, and
-    // "which version am I on" and "is there a newer one" are the same question asked twice.
+    // Card 2: Update Check and Privacy Disclosure (Section C Fixture)
     Card {
         VerticalLayout {
             padding: 0px;
@@ -135,7 +174,7 @@ export component AboutPane inherits VerticalLayout {
 
             SettingToggleRow {
                 title: "Check for updates automatically";
-                description: "The only time Wira Desk contacts the internet. Nothing about you is sent.";
+                description: "Once a day, and when you press Check for updates, Wira Desk asks wiradelta.id whether a newer\nversion exists. The request names Wira Desk, its version, your Windows version, and the processor\narchitecture. Nothing else is attached.\nNo account, no analytics, no crash reporting.";
                 checked <=> root.check_updates;
                 toggled(val) => { root.check_updates_toggled(val); }
             }
@@ -151,7 +190,6 @@ export component AboutPane inherits VerticalLayout {
                 alignment: start;
 
                 // Two buttons, never both. "Check" until something is found, then "Install".
-                // A single button that changes meaning is a button a user has to read twice.
                 if !root.update_ready : Rectangle {
                     width: 132px;
                     height: 32px;
@@ -255,7 +293,7 @@ export component AboutPane inherits VerticalLayout {
         }
     }
 
-    // 3. Support, Source Code, and Recovery Card (SPEC-25-02, SPEC-26-02, SPEC-27-02)
+    // Card 3: Support, Contacts, Actions & Recovery Section
     Card {
         accessible-role: text;
         accessible-label: "Support and recovery card";
@@ -264,17 +302,39 @@ export component AboutPane inherits VerticalLayout {
             padding: 0px;
             spacing: 0px;
 
-            // 1. GitHub Repository, Issue Tracker & Support Action Row (SPEC-25-02)
-            HorizontalLayout {
+            VerticalLayout {
                 padding-left: 16px;
                 padding-right: 16px;
                 padding-top: 14px;
+                padding-bottom: 8px;
+                spacing: 4px;
+
+                Text {
+                    text: "Questions: support@wiradelta.id";
+                    font-family: Typography.font_family;
+                    font-size: Typography.size_caption;
+                    color: Palette.text_secondary;
+                }
+
+                Text {
+                    text: "Security reports: GitHub Security Advisories on the repository";
+                    font-family: Typography.font_family;
+                    font-size: Typography.size_caption;
+                    color: Palette.text_secondary;
+                }
+            }
+
+            // Action Row: Send a tip, Issue Tracker, GitHub repository
+            HorizontalLayout {
+                padding-left: 16px;
+                padding-right: 16px;
+                padding-top: 4px;
                 padding-bottom: 14px;
                 spacing: 10px;
                 alignment: start;
 
                 Rectangle {
-                    width: 160px;
+                    width: 104px;
                     height: 32px;
                     border-radius: 6px;
                     background: support_touch.has_hover ? Palette.bg_card_hover : Palette.bg_subtle;
@@ -282,7 +342,7 @@ export component AboutPane inherits VerticalLayout {
                     border-color: Palette.stroke_card;
 
                     Text {
-                        text: "Support development";
+                        text: "Send a tip";
                         font-family: Typography.font_family;
                         font-size: 12.5px;
                         font-weight: 600;
@@ -293,7 +353,7 @@ export component AboutPane inherits VerticalLayout {
 
                     support_touch := TouchArea {
                         accessible-role: button;
-                        accessible-label: "Support development";
+                        accessible-label: "Send a tip";
                         accessible-action-default => { root.open_support_url(); }
                         mouse-cursor: pointer;
                         clicked => { root.open_support_url(); }
@@ -328,7 +388,7 @@ export component AboutPane inherits VerticalLayout {
                 }
 
                 Rectangle {
-                    width: 36px;
+                    width: 86px;
                     height: 32px;
                     border-radius: 6px;
                     background: repo_touch.has_hover ? Palette.bg_card_hover : Palette.bg_subtle;
@@ -337,11 +397,20 @@ export component AboutPane inherits VerticalLayout {
 
                     HorizontalLayout {
                         alignment: center;
+                        spacing: 6px;
                         VerticalLayout {
                             alignment: center;
                             GitHubIcon {
                                 icon_color: repo_touch.has_hover ? Palette.accent_hover : Palette.text_primary;
                             }
+                        }
+                        Text {
+                            text: "GitHub";
+                            font-family: Typography.font_family;
+                            font-size: 12.5px;
+                            font-weight: 600;
+                            color: Palette.text_primary;
+                            vertical-alignment: center;
                         }
                     }
 
@@ -357,7 +426,7 @@ export component AboutPane inherits VerticalLayout {
 
             CardDivider {}
 
-            // 2. Recovery Section (SPEC-26-02, SPEC-27-02)
+            // Recovery Section
             VerticalLayout {
                 padding-left: 16px;
                 padding-right: 16px;
@@ -413,88 +482,6 @@ export component AboutPane inherits VerticalLayout {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    // 4. Standalone Attribution, License & In-Process Disclosure Card (SPEC-26-02)
-    Card {
-        VerticalLayout {
-            padding: 16px;
-            spacing: 6px;
-
-            HorizontalLayout {
-                alignment: start;
-                spacing: 0px;
-
-                Text {
-                    text: "An open-source utility by ";
-                    font-family: Typography.font_family;
-                    font-size: Typography.size_caption;
-                    font-weight: 600;
-                    color: Palette.text_secondary;
-                    vertical-alignment: center;
-                }
-
-                inline_pub_touch := TouchArea {
-                    accessible-role: button;
-                    accessible-label: "Publisher website (wiradelta.id)";
-                    mouse-cursor: pointer;
-                    clicked => { root.open_publisher_url(); }
-
-                    HorizontalLayout {
-                        spacing: 4px;
-                        alignment: start;
-
-                        Text {
-                            text: "Wira Delta Indonesia";
-                            font-family: Typography.font_family;
-                            font-size: Typography.size_caption;
-                            font-weight: 600;
-                            color: inline_pub_touch.has_hover ? Palette.accent_hover : Palette.text_primary;
-                            vertical-alignment: center;
-                        }
-
-                        VerticalLayout {
-                            alignment: center;
-                            OpenLinkIcon {
-                                icon_color: inline_pub_touch.has_hover ? Palette.accent_hover : Palette.text_primary;
-                            }
-                        }
-                    }
-                }
-
-                Text {
-                    text: " • Licensed under GPL-3.0";
-                    font-family: Typography.font_family;
-                    font-size: Typography.size_caption;
-                    font-weight: 600;
-                    color: Palette.text_secondary;
-                    vertical-alignment: center;
-                }
-            }
-
-            Text {
-                text: "No telemetry, no account, no separate background service.\nUpdate checks run entirely in-process against GitHub Releases, which you can switch off.";
-                font-family: Typography.font_family;
-                font-size: Typography.size_caption;
-                color: Palette.text_tertiary;
-                wrap: word-wrap;
-            }
-
-            // Copyright line and third-party notice pointer.
-            //
-            // The notice pointer is a licence obligation rather than tidiness: most of the
-            // dependency licences listed in NOTICE require their notices to travel with the
-            // BINARY, and someone who installed from the setup executable never opens the
-            // repository. The installer places NOTICE.txt beside the executable, so name the
-            // file they actually have rather than a URL they would have to go and find.
-            Text {
-                text: "Copyright © 2026 Wira Delta Indonesia. Third-party components and their licences are listed in NOTICE.txt, in this application's install folder.";
-                font-family: Typography.font_family;
-                font-size: Typography.size_caption;
-                color: Palette.text_tertiary;
-                wrap: word-wrap;
             }
         }
     }

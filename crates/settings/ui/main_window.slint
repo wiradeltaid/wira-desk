@@ -143,6 +143,7 @@ export component MainWindow inherits Window {
     callback open_publisher_url();
     callback open_source_url();
     callback open_support_url();
+    callback open_privacy_url();
     in property <string> app_version: "0.1.0";
     in property <string> app_typeface: "Segoe UI Variable Text (System Loaded)";
 
@@ -434,6 +435,7 @@ export component MainWindow inherits Window {
                                 open_source_url => { root.open_source_url(); }
                                 open_support_url => { root.open_support_url(); }
                                 open_issues_url => { root.open_issues_url(); }
+                                open_privacy_url => { root.open_privacy_url(); }
                                 reset_all_settings_clicked => { root.factory_reset_dialog_open = true; }
                             }
                         }
