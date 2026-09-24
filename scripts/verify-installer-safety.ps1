@@ -122,8 +122,8 @@ foreach ($tc in $isppTestCases) {
         $modifiedContent = $realIssContent.Replace($targetVerLine, $replacement)
         [System.IO.File]::WriteAllText($customIss, $modifiedContent)
 
-        & $iscc /Q "/DSTAGE_DIR=$resolvedStage" "/DOUT_DIR=$testArtifactsDir" $customIss *>$null
-        $compiled = ($LASTEXITCODE -eq 0)
+        $proc = Start-Process -FilePath $iscc -ArgumentList @("/Q", "/DSTAGE_DIR=$resolvedStage", "/DOUT_DIR=$testArtifactsDir", "`"$customIss`"") -NoNewWindow -Wait -PassThru
+        $compiled = ($proc.ExitCode -eq 0)
 
         if ($compiled -ne $tc.ShouldPass) {
             Write-Fail "ISPP guard on production script failed for '$($tc.Ver)': expected pass=$($tc.ShouldPass), got pass=$compiled ($($tc.Reason))"
