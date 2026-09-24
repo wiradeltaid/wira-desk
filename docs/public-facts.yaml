@@ -33,6 +33,22 @@ facts:
       pattern: 'MAX_HOLD_DELAY_MS:\s*u32\s*=\s*(\d+)'
     appears_in: []
 
+  - id: snap_percent_default
+    value: 67
+    derived_from:
+      file: crates/shared/src/constants.rs
+      pattern: 'DEFAULT_SNAP_PERCENT:\s*u32\s*=\s*(\d+)'
+    appears_in:
+      - README.md
+
+  - id: snap_percent_top_default
+    value: 33
+    derived_from:
+      file: crates/shared/src/constants.rs
+      pattern: 'DEFAULT_SNAP_PERCENT_TOP:\s*u32\s*=\s*(\d+)'
+    appears_in:
+      - README.md
+
   - id: mouse_preset_count
     value: 20
     derived_from:
@@ -85,12 +101,43 @@ facts:
     appears_in: []
 
   - id: canonical_url
-    value: "https://wiradelta.id/wira-desk"
+    value: "https://wiradelta.id/wira-desk/"
     derived_from:
-      file: crates/settings/src/update.rs
-      pattern: '"(https://wiradelta\.id/wira-desk)"'
+      file: crates/settings/src/urls.rs
+      pattern: 'WIRA_DESK_PRODUCT_URL:\s*&str\s*=\s*"([^"]+)"'
     appears_in:
-      - crates/settings/src/update.rs
+      - README.md
+
+  - id: update_descriptor_url
+    value: "https://wiradelta.id/api/v1/update/wira-desk/"
+    derived_from:
+      file: crates/shared/src/update.rs
+      pattern: 'UPDATE_DESCRIPTOR_URL:\s*&str\s*=\s*"([^"]+)"'
+    appears_in:
+      - crates/shared/src/update.rs
+
+  - id: update_first_check_delay_s
+    value: 120
+    derived_from:
+      file: crates/daemon/src/updatecheck.rs
+      pattern: 'FIRST_CHECK_DELAY:\s*Duration\s*=\s*Duration::from_secs\((\d+)\)'
+    appears_in: []
+
+  - id: update_check_interval_h
+    value: 24
+    derived_from:
+      file: crates/daemon/src/updatecheck.rs
+      pattern: 'CHECK_INTERVAL:\s*Duration\s*=\s*Duration::from_secs\((\d+)\s*\*\s*60\s*\*\s*60\)'
+    appears_in: []
+
+  - id: autostart_onboarding_default
+    value: true
+    derived_from:
+      file: crates/settings/src/app.rs
+      pattern: 'onboarding_auto_start:\s*(true|false)'
+    appears_in: []
+    stale_patterns:
+      - 'Auto-start is opt-in'
 
   - id: license_identifier
     value: "GPL-3.0-only"
@@ -101,6 +148,7 @@ facts:
       - crates/daemon/Cargo.toml
       - crates/settings/Cargo.toml
       - crates/shared/Cargo.toml
+      - packaging/scoop-bucket/bucket/wiradesk.json
 
   - id: winget_available
     value: false
@@ -109,3 +157,4 @@ facts:
       0.1.4 is live in winget-pkgs, but it predates mouse navigation and the visual
       switcher, so no surface may advertise winget until a current version is accepted.
     appears_in: []
+

@@ -6,7 +6,7 @@ blocked_by:
   - SPEC-30-01
   - SPEC-30-02
   - SPEC-30-06
-status: ready-for-agent
+status: closed
 touches:
   - docs/public-facts.yaml
   - scripts/verify-public-facts.ps1
@@ -39,8 +39,8 @@ tests:
 
 ## Acceptance Criteria
 
-- [ ] Modifying any source constant temporarily turns `verify-public-facts.ps1` red, confirming test sensitivity.
-- [ ] `verify-public-facts.ps1` passes 100% green against current codebase values.
-- [ ] `docs/public-facts.yaml` explicitly sets `winget_available: false` for the 0.3.0 release tag.
-- [ ] Measured memory facts are recorded with valid `metric`, `measured_on`, and `measured_build` commit SHA fields after executing the 60-second idle measurement protocol.
-- [ ] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.
+- [x] Modifying any source constant temporarily turns `verify-public-facts.ps1` red, confirming test sensitivity.
+- [x] `verify-public-facts.ps1` passes 100% green against current codebase values.
+- [x] `docs/public-facts.yaml` explicitly sets `winget_available: false` for the 0.3.0 release tag.
+- [x] Measured memory facts are recorded with valid `metric`, `measured_on`, and `measured_build` commit SHA fields after executing the 60-second idle measurement protocol.
+- [x] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.
