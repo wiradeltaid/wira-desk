@@ -1212,6 +1212,33 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-044.md
 
+  - id: DEC-045
+    title: Autopilot mandate for SPEC-31 delivery
+    type: mandate
+    status: accepted
+    accepted_by: 'Wira, 2026-09-24'
+    file: decisions/DEC-045-autopilot-mandate-for-spec-31-delivery.md
+    created: '2026-09-24'
+    touches:
+      - .control/decisions/DEC-045-autopilot-mandate-for-spec-31-delivery.md
+      - .control/memlog/autopilot-DEC-045.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+      - .scratch/spec-31-about-tab-layout-and-error-message/SPEC.md
+      - .scratch/spec-31-about-tab-layout-and-error-message/issues/01-about-pane-layout-and-duplicate-link-removal.md
+      - .scratch/spec-31-about-tab-layout-and-error-message/issues/02-update-check-error-message-differentiation.md
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-10-01'
+      run_branch: autopilot/DEC-045
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-045.md
+
 
 
 
