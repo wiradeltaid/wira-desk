@@ -143,6 +143,12 @@ dag:
     - SPEC-30-05
   - parallel:
     - SPEC-30-10
+- spec: SPEC-31
+  order:
+  - parallel:
+    - SPEC-31-01
+  - parallel:
+    - SPEC-31-02
 - spec: SPEC-4
   order:
   - parallel:

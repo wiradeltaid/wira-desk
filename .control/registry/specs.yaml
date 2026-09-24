@@ -2113,3 +2113,39 @@ specs:
           - release::tests::changelog_section_extracted_successfully
           - release::tests::release_cutover_same_day_no_401
 
+  - id: SPEC-31
+    release: "0.3.0"
+    prd: [wira-desk]
+    size: S
+    status: open
+    depends_on: [SPEC-30]
+    spec_folder: .scratch/spec-31-about-tab-layout-and-error-message/
+    fr: [FR-24, FR-25]
+    spec_reviewed:
+      date: "2026-09-24"
+      sha: "2a46f55"
+      lenses: [structure, prose, edge-case-hunter, regression-guard, copy-fidelity]
+    tickets:
+      - id: SPEC-31-01
+        title: "About pane layout: word wrapping, non-breaking space, license lines, and GitHub button removal"
+        spec_folder: .scratch/spec-31-about-tab-layout-and-error-message/
+        component: settings
+        satisfies: [UC-8, FR-24]
+        blocked_by: []
+        tests:
+          - settings::app::tests::about_pane_contains_exact_approved_copy
+          - settings::app::tests::about_pane_has_no_duplicate_github_button
+          - settings::app::tests::about_pane_has_non_breaking_space_for_windows_11
+          - settings::app::tests::about_pane_license_block_has_three_distinct_lines
+          - settings::app::tests::about_pane_retains_source_code_link_and_action_buttons
+          - settings::app::tests::about_pane_card_hierarchy_and_divider_structure
+      - id: SPEC-31-02
+        title: "Update check error message: differentiate endpoint failure from download server"
+        spec_folder: .scratch/spec-31-about-tab-layout-and-error-message/
+        component: settings
+        satisfies: [UC-8, FR-25]
+        blocked_by: [SPEC-31-01]
+        tests:
+          - settings::update::tests::describe_http_status_uses_wiradelta_endpoint_for_checks
+          - settings::update::tests::describe_install_preserves_download_server_wording
+
