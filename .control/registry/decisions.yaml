@@ -1190,7 +1190,7 @@ decisions:
   - id: DEC-044
     title: Autopilot mandate for SPEC-30 delivery
     type: mandate
-    status: accepted
+    status: applied
     accepted_by: 'Wira, 2026-09-24'
     file: decisions/DEC-044-autopilot-mandate-for-spec-30-delivery.md
     created: '2026-09-24'
