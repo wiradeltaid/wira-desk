@@ -3,7 +3,7 @@ id: SPEC-30-04
 component: settings
 satisfies: [FR-24, FR-25]
 blocked_by: [SPEC-30-09]
-status: ready-for-agent
+status: closed
 touches:
   - PRIVACY.id.md
   - PRIVACY.md
@@ -20,7 +20,7 @@ tests:
 
 **Blocked by:** SPEC-30-09 (and requires upstream ops placeholders filled, effective date set to 0.3.0 release date, and GitHub private vulnerability reporting enabled)
 
-**Status:** ready-for-agent
+**Status:** closed
 
 ## Implementation Details
 
@@ -35,10 +35,10 @@ tests:
 
 ## Acceptance Criteria
 
-- [ ] Every guard and verification script is observed red on today's codebase before implementation, then green.
-- [ ] `PRIVACY.id.md`, `PRIVACY.md`, `SECURITY.id.md`, and `SECURITY.md` are present in repo root.
-- [ ] Each file carries the standardized copy stamp comment immediately below the top heading.
-- [ ] No unpopulated placeholders (`<UPDATE-ENDPOINT`, `<TANGGAL`, `<GO-LIVE`) remain.
-- [ ] `scripts/verify-legal-copies.ps1` passes cleanly in CI.
-- [ ] `scripts/verify-public-export.ps1` runs clean without findings.
-- [ ] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.
+- [x] Every guard and verification script is observed red on today's codebase before implementation, then green.
+- [x] `PRIVACY.id.md`, `PRIVACY.md`, `SECURITY.id.md`, and `SECURITY.md` are present in repo root.
+- [x] Each file carries the standardized copy stamp comment immediately below the top heading.
+- [x] No unpopulated placeholders (`<UPDATE-ENDPOINT`, `<TANGGAL`, `<GO-LIVE`) remain.
+- [x] `scripts/verify-legal-copies.ps1` passes cleanly in CI.
+- [x] `scripts/verify-public-export.ps1` runs clean without findings.
+- [x] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.

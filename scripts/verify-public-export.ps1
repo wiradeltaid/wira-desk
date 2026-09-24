@@ -422,6 +422,7 @@ if (Test-Path -LiteralPath $workspaceManifest) {
             $n = 0
             foreach ($line in (Get-Content -LiteralPath $f.FullName -ErrorAction SilentlyContinue)) {
                 $n++
+                if ($line -match '(?i)\b(?:Applies to|Berlaku untuk):') { continue }
                 foreach ($m in [regex]::Matches($line, '(?i)\b(?:WinTick|Wira\s+Desk)\s+v?([0-9]+\.[0-9]+\.[0-9]+)')) {
                     if ($m.Groups[1].Value -ne $crateVersion) { $drift += "${rel}:${n}: $($m.Value)" }
                 }

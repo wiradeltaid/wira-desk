@@ -13,7 +13,7 @@ Run branch: autopilot/DEC-044
 Stopped at: —
 Blocked: —
 Parked: —
-Next: SPEC-30-04 (Legal copies with stamp)
+Next: SPEC-30-05 (Threat model for 0.3.0)
 
 ## Decisions
 
@@ -31,3 +31,4 @@ Next: SPEC-30-04 (Legal copies with stamp)
 | Iteration 1 | SPEC-30-06 implementation | Synchronized 10 README translations, Scoop template, and WinGet generator with Section A, accurate auto-start, and portable zip | Citing unmeasured competitor RAM numbers and loose binary downloads | Brand copy drift and outdated installation instructions | README*.md, packaging/scoop-bucket/bucket/wiradesk.json, scripts/generate-winget-manifest.ps1 |
 | Iteration 1 | SPEC-30-08 implementation | Expanded canonical public facts to 20 verified facts with sensitivity proof | Leaving public website facts unanchored in code | Public claims drifting from code constants | docs/public-facts.yaml, scripts/verify-public-facts.ps1 |
 | Iteration 1 | SPEC-30-09 implementation | Reconciled BR-8, C4 L1, PRD §3.12/§7, UC-8, and requirements with wiradelta.id endpoint architecture | Leaving architecture corpus claiming direct GitHub descriptor checks | Architecture and specification drift from actual code | .what/business-rules.md, .how/_platform/c4-l1-system-context.md, .what/_prd/wira-desk/prd.md |
+| Iteration 1 | SPEC-30-04 implementation | Synchronized PRIVACY and SECURITY in English and Indonesian with official copy stamps and verify-legal-copies.ps1 | Unsynchronized legal documents and unpopulated placeholders | Legal non-compliance and out-of-date policy claims | PRIVACY.id.md, PRIVACY.md, SECURITY.id.md, SECURITY.md, scripts/verify-legal-copies.ps1 |
