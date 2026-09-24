@@ -21,21 +21,6 @@ component OpenLinkIcon inherits Rectangle {
     }
 }
 
-component GitHubIcon inherits Rectangle {
-    in property <color> icon_color: Palette.text_primary;
-    width: 16px;
-    height: 16px;
-
-    Path {
-        width: 16px;
-        height: 16px;
-        viewbox-width: 16;
-        viewbox-height: 16;
-        fill: root.icon_color;
-        commands: "M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z";
-    }
-}
-
 export component AboutPane inherits VerticalLayout {
     in property <string> version: "0.1.0";
     in property <string> typeface: "Segoe UI Variable Text (System Loaded)";
@@ -89,7 +74,7 @@ export component AboutPane inherits VerticalLayout {
             spacing: 8px;
 
             Text {
-                text: "Same-app window cycling, one-key snapping, and mouse button mapping for Windows 11.";
+                text: "Same-app window cycling, one-key snapping, and mouse button mapping for Windows\u{00A0}11.";
                 font-family: Typography.font_family;
                 font-size: Typography.size_body;
                 color: Palette.text_secondary;
@@ -97,7 +82,7 @@ export component AboutPane inherits VerticalLayout {
             }
 
             Text {
-                text: "Free software under the GNU General Public License v3.0 only. Full terms: LICENSE.txt in the install folder.\nThird-party components and their licenses: NOTICE.txt in the install folder.";
+                text: "Free software under the GNU General Public License v3.0 only.\nFull terms: LICENSE.txt in the install folder.\nThird-party components and their licenses: NOTICE.txt in the install folder.";
                 font-family: Typography.font_family;
                 font-size: Typography.size_caption;
                 color: Palette.text_tertiary;
@@ -174,7 +159,7 @@ export component AboutPane inherits VerticalLayout {
 
             SettingToggleRow {
                 title: "Check for updates automatically";
-                description: "Once a day, and when you press Check for updates, Wira Desk asks wiradelta.id whether a newer\nversion exists. The request names Wira Desk, its version, your Windows version, and the processor\narchitecture. Nothing else is attached.\nNo account, no analytics, no crash reporting.";
+                description: "Once a day, and when you press Check for updates, Wira Desk asks wiradelta.id whether a newer version exists. The request names Wira Desk, its version, your Windows version, and the processor architecture. Nothing else is attached.\nNo account, no analytics, no crash reporting.";
                 checked <=> root.check_updates;
                 toggled(val) => { root.check_updates_toggled(val); }
             }
@@ -324,7 +309,7 @@ export component AboutPane inherits VerticalLayout {
                 }
             }
 
-            // Action Row: Send a tip, Issue Tracker, GitHub repository
+            // Action Row: Send a tip, Issue Tracker
             HorizontalLayout {
                 padding-left: 16px;
                 padding-right: 16px;
@@ -384,42 +369,6 @@ export component AboutPane inherits VerticalLayout {
                         accessible-action-default => { root.open_issues_url(); }
                         mouse-cursor: pointer;
                         clicked => { root.open_issues_url(); }
-                    }
-                }
-
-                Rectangle {
-                    width: 86px;
-                    height: 32px;
-                    border-radius: 6px;
-                    background: repo_touch.has_hover ? Palette.bg_card_hover : Palette.bg_subtle;
-                    border-width: 1px;
-                    border-color: Palette.stroke_card;
-
-                    HorizontalLayout {
-                        alignment: center;
-                        spacing: 6px;
-                        VerticalLayout {
-                            alignment: center;
-                            GitHubIcon {
-                                icon_color: repo_touch.has_hover ? Palette.accent_hover : Palette.text_primary;
-                            }
-                        }
-                        Text {
-                            text: "GitHub";
-                            font-family: Typography.font_family;
-                            font-size: 12.5px;
-                            font-weight: 600;
-                            color: Palette.text_primary;
-                            vertical-alignment: center;
-                        }
-                    }
-
-                    repo_touch := TouchArea {
-                        accessible-role: button;
-                        accessible-label: "GitHub repository";
-                        accessible-action-default => { root.open_source_url(); }
-                        mouse-cursor: pointer;
-                        clicked => { root.open_source_url(); }
                     }
                 }
             }

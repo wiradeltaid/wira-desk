@@ -3,7 +3,7 @@ id: SPEC-31-02
 component: settings
 satisfies: [UC-8, FR-25]
 blocked_by: [SPEC-31-01]
-status: ready-for-dev
+status: closed
 touches:
   - crates/settings/src/update.rs
   - crates/settings/src/app.rs

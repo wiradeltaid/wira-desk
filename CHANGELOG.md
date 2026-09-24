@@ -18,6 +18,11 @@ owner decides.
 
 ## [Unreleased]
 
+### Changed
+
+- Settings About Pane Layout Polish: Natural word wrapping without awkward mid-sentence breaks for update toggle disclosure, non-breaking space for Windows 11, three-line license block sequence, and removal of duplicate GitHub button in Card 3 while preserving the Source code text link in Card 1.
+- Update Check Error Message Differentiation: Update check descriptor query failures explicitly cite `wiradelta.id answered with status {code}. You can try again.`, reserving download server error terminology strictly for installer binary downloads.
+
 ## [0.2.5] - 2026-09-24
 
 ### Added

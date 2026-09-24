@@ -816,10 +816,10 @@ rtm:
   - settings::app::tests::about_pane_license_block_has_three_distinct_lines
   - settings::app::tests::about_pane_retains_source_code_link_and_action_buttons
   - settings::app::tests::about_pane_card_hierarchy_and_divider_structure
-  status: ready-for-dev
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-13
   FR: FR-25
@@ -831,10 +831,10 @@ rtm:
   test:
   - settings::update::tests::describe_http_status_uses_wiradelta_endpoint_for_checks
   - settings::update::tests::describe_install_preserves_download_server_wording
-  status: ready-for-dev
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-3
   CAP: CAP-14
   FR: FR-26

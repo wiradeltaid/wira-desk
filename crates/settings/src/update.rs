@@ -98,6 +98,15 @@ fn describe_http(err: &HttpError) -> String {
     }
 }
 
+fn describe_check_http(err: &HttpError) -> String {
+    match err {
+        HttpError::Status(code) => {
+            format!("wiradelta.id answered with status {code}. You can try again.")
+        }
+        other => describe_http(other),
+    }
+}
+
 /// Words for a failure that stopped an install. HTTP failures defer to `describe_http`;
 /// a crypto failure gets its own sentence, because "the download failed" would be a lie
 /// about a working download and a broken provider.
@@ -116,7 +125,7 @@ pub fn spawn_check(running: String) -> Receiver<Progress> {
     let (tx, rx) = channel();
     std::thread::spawn(move || {
         let msg = match shared::https::get_text(&latest_json_url(), DESCRIPTOR_LIMIT) {
-            Err(e) => Progress::Failed(describe_http(&e)),
+            Err(e) => Progress::Failed(describe_check_http(&e)),
             Ok(body) => match decide(&running, &body) {
                 Decision::UpToDate => Progress::UpToDate,
                 Decision::Available(release) => Progress::Available(release),
@@ -504,5 +513,33 @@ mod tests {
         assert!(!is_allowed_browser_url(
             "https://wiradelta.id/wira-desk/privacy"
         ));
+    }
+
+    #[test]
+    fn describe_http_status_uses_wiradelta_endpoint_for_checks() {
+        let err = HttpError::Status(404);
+        let desc = describe_check_http(&err);
+        assert_eq!(
+            desc,
+            "wiradelta.id answered with status 404. You can try again."
+        );
+
+        let err500 = HttpError::Status(500);
+        let desc500 = describe_check_http(&err500);
+        assert_eq!(
+            desc500,
+            "wiradelta.id answered with status 500. You can try again."
+        );
+    }
+
+    #[test]
+    fn describe_install_preserves_download_server_wording() {
+        let err = InstallError::Http(HttpError::Status(404));
+        let desc = describe_install(&err);
+        assert_eq!(desc, "The download server answered with status 404.");
+
+        let err502 = InstallError::Http(HttpError::Status(502));
+        let desc502 = describe_install(&err502);
+        assert_eq!(desc502, "The download server answered with status 502.");
     }
 }
