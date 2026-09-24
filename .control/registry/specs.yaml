@@ -2000,3 +2000,178 @@ specs:
           - config::tests::percent_snap_fields_roundtrip_through_toml
           - persistence::tests::default_config_uses_frozen_shortcuts
 
+  - id: SPEC-30
+    release: "0.3.0"
+    prd: [wira-desk]
+    size: L
+    status: open
+    depends_on: []
+    spec_folder: .scratch/spec-30-wira-desk-0-3-0-release-and-endpoint-handover/
+    fr: [FR-24, FR-25]
+    spec_reviewed:
+      date: "2026-09-24"
+      sha: "a338591"
+      lenses: [structure, prose, edge-case-hunter]
+    tickets:
+      - id: SPEC-30-01
+        title: "Update check to the wiradelta.id endpoint"
+        spec_folder: .scratch/spec-30-wira-desk-0-3-0-release-and-endpoint-handover/
+        component: settings
+        satisfies: [UC-8, FR-24, FR-25]
+        blocked_by: []
+        touches:
+          - crates/shared/src/update.rs
+          - crates/shared/src/https.rs
+          - crates/daemon/src/updatecheck.rs
+          - crates/shared/Cargo.toml
+        tests:
+          - shared::update::tests::descriptor_url_is_wiradelta_endpoint
+          - shared::https::tests::user_agent_matches_platform_contract
+          - shared::https::tests::descriptor_fetch_disallows_redirects
+          - shared::https::tests::installer_and_descriptor_share_identical_user_agent
+          - shared::update::tests::ignored_live_debug_override_fails_on_redirect
+      - id: SPEC-30-02
+        title: "Embedded URL registry with trailing slash"
+        spec_folder: .scratch/spec-30-wira-desk-0-3-0-release-and-endpoint-handover/
+        component: settings
+        satisfies: [UC-8]
+        blocked_by: []
+        touches:
+          - crates/settings/src/urls.rs
+          - crates/settings/src/main.rs
+          - crates/settings/src/update.rs
+        tests:
+          - settings::urls::tests::all_wiradelta_urls_end_with_slash
+          - settings::update::tests::browser_allowlist_rejects_url_without_trailing_slash
+          - settings::update::tests::browser_allowlist_handles_approved_vectors
+      - id: SPEC-30-03
+        title: "About and General pane copy"
+        spec_folder: .scratch/spec-30-wira-desk-0-3-0-release-and-endpoint-handover/
+        component: settings
+        satisfies: [UC-8]
+        blocked_by: [SPEC-30-02]
+        touches:
+          - crates/settings/ui/panes/about_pane.slint
+          - crates/settings/ui/panes/general_pane.slint
+          - crates/settings/src/app.rs
+          - crates/settings/src/shortcut_row_slint_snapshot.rs
+          - crates/settings/src/main.rs
+        tests:
+          - settings::app::tests::about_pane_contains_exact_approved_copy
+          - settings::app::tests::general_pane_has_no_slop_or_unapproved_dashes
+          - settings::app::tests::settings_tabs_and_legal_labels_locked
+      - id: SPEC-30-04
+        title: "Legal copies with stamp"
+        spec_folder: .scratch/spec-30-wira-desk-0-3-0-release-and-endpoint-handover/
+        component: settings
+        satisfies: [FR-24, FR-25]
+        blocked_by: [SPEC-30-09]
+        touches:
+          - PRIVACY.id.md
+          - PRIVACY.md
+          - SECURITY.id.md
+          - SECURITY.md
+          - scripts/verify-legal-copies.ps1
+        tests:
+          - scripts::tests::verify_legal_copies_and_stamps
+      - id: SPEC-30-05
+        title: "Threat model for 0.3.0"
+        spec_folder: .scratch/spec-30-wira-desk-0-3-0-release-and-endpoint-handover/
+        component: settings
+        satisfies: [FR-24, FR-25]
+        blocked_by: [SPEC-30-04]
+        touches:
+          - docs/threat-model.md
+        tests:
+          - docs::tests::threat_model_matches_security_and_network_boundary
+      - id: SPEC-30-06
+        title: "README, Scoop template, and WinGet generator"
+        spec_folder: .scratch/spec-30-wira-desk-0-3-0-release-and-endpoint-handover/
+        component: settings
+        satisfies: [FR-24, FR-25]
+        blocked_by: [SPEC-30-07]
+        touches:
+          - README.md
+          - docs/README.id.md
+          - docs/README.zh-CN.md
+          - docs/README.ja.md
+          - docs/README.de.md
+          - docs/README.es.md
+          - docs/README.fr.md
+          - docs/README.ko.md
+          - docs/README.pt-BR.md
+          - docs/README.ru.md
+          - packaging/scoop-bucket/bucket/wiradesk.json
+          - scripts/generate-winget-manifest.ps1
+        tests:
+          - scripts::tests::verify_public_facts_readme_and_scoop_license
+          - scripts::tests::verify_all_readme_locales_cleaned
+      - id: SPEC-30-07
+        title: "Portable zip and release artifact guard"
+        spec_folder: .scratch/spec-30-wira-desk-0-3-0-release-and-endpoint-handover/
+        component: window-management
+        satisfies: [FR-24]
+        blocked_by: []
+        touches:
+          - .github/workflows/release.yml
+          - .github/workflows/ci.yml
+          - scripts/verify-release-artifacts.ps1
+        tests:
+          - scripts::tests::verify_release_artifacts_rejects_loose_binaries
+          - scripts::tests::verify_release_artifacts_validates_zip_contents
+      - id: SPEC-30-08
+        title: "Public facts the site reads"
+        spec_folder: .scratch/spec-30-wira-desk-0-3-0-release-and-endpoint-handover/
+        component: settings
+        satisfies: [FR-24, FR-25, FR-26]
+        blocked_by:
+          - SPEC-30-01
+          - SPEC-30-02
+          - SPEC-30-06
+        touches:
+          - docs/public-facts.yaml
+          - scripts/verify-public-facts.ps1
+        tests:
+          - scripts::tests::verify_public_facts_all_derived_facts_pass
+          - scripts::tests::verify_public_facts_memory_protocol_executed
+      - id: SPEC-30-09
+        title: "Corpus follows the update-check change"
+        spec_folder: .scratch/spec-30-wira-desk-0-3-0-release-and-endpoint-handover/
+        component: settings
+        satisfies: [FR-24, FR-25]
+        blocked_by:
+          - SPEC-30-03
+          - SPEC-30-08
+        touches:
+          - .what/business-rules.md
+          - .how/_platform/c4-l1-system-context.md
+          - .what/_prd/wira-desk/prd.md
+          - .what/settings/SRS-settings.md
+          - .what/window-management/SRS-window-management.md
+        tests:
+          - corpus::tests::validate_corpus_reconciles_cleanly
+      - id: SPEC-30-10
+        title: "Release 0.3.0: version and changelog"
+        spec_folder: .scratch/spec-30-wira-desk-0-3-0-release-and-endpoint-handover/
+        component: settings
+        satisfies: [FR-24, FR-25]
+        blocked_by:
+          - SPEC-30-05
+        touches:
+          - Cargo.toml
+          - Cargo.lock
+          - CHANGELOG.md
+          - docs/public-facts.yaml
+        tests:
+          - release::tests::release_workflow_tag_matches_crate_version
+          - release::tests::changelog_section_extracted_successfully
+          - release::tests::release_cutover_same_day_no_401
+        touches:
+          - Cargo.toml
+          - Cargo.lock
+          - CHANGELOG.md
+          - docs/public-facts.yaml
+        tests:
+          - release::tests::release_workflow_tag_matches_crate_version
+          - release::tests::changelog_section_extracted_successfully
+

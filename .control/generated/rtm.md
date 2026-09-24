@@ -756,6 +756,56 @@ rtm:
   exempt: false
   green: true
   broken_at: ''
+- BG: BG-2
+  CAP: CAP-13
+  FR: FR-25
+  DEC: []
+  UC: UC-8
+  ticket: SPEC-30-01
+  spec: SPEC-30
+  release: 0.3.0
+  test:
+  - shared::update::tests::descriptor_url_is_wiradelta_endpoint
+  - shared::https::tests::user_agent_matches_platform_contract
+  - shared::https::tests::descriptor_fetch_disallows_redirects
+  - shared::https::tests::installer_and_descriptor_share_identical_user_agent
+  - shared::update::tests::ignored_live_debug_override_fails_on_redirect
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-2
+  CAP: CAP-13
+  FR: FR-25
+  DEC: []
+  UC: UC-8
+  ticket: SPEC-30-02
+  spec: SPEC-30
+  release: 0.3.0
+  test:
+  - settings::urls::tests::all_wiradelta_urls_end_with_slash
+  - settings::update::tests::browser_allowlist_rejects_url_without_trailing_slash
+  - settings::update::tests::browser_allowlist_handles_approved_vectors
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-2
+  CAP: CAP-13
+  FR: FR-25
+  DEC: []
+  UC: UC-8
+  ticket: SPEC-30-03
+  spec: SPEC-30
+  release: 0.3.0
+  test:
+  - settings::app::tests::about_pane_contains_exact_approved_copy
+  - settings::app::tests::general_pane_has_no_slop_or_unapproved_dashes
+  - settings::app::tests::settings_tabs_and_legal_labels_locked
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
 - BG: BG-3
   CAP: CAP-14
   FR: FR-26
