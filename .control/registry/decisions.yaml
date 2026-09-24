@@ -1187,6 +1187,31 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-043.md
 
+  - id: DEC-044
+    title: Autopilot mandate for SPEC-30 delivery
+    type: mandate
+    status: accepted
+    accepted_by: 'Wira, 2026-09-24'
+    file: decisions/DEC-044-autopilot-mandate-for-spec-30-delivery.md
+    created: '2026-09-24'
+    touches:
+      - .control/decisions/DEC-044-autopilot-mandate-for-spec-30-delivery.md
+      - .control/memlog/autopilot-DEC-044.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+      - .scratch/spec-30-wira-desk-0-3-0-release-and-endpoint-handover/SPEC.md
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-10-01'
+      run_branch: autopilot/DEC-044
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-044.md
+
 
 
 
