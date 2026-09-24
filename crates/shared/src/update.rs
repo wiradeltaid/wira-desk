@@ -48,8 +48,11 @@ pub fn split_https(url: &str) -> Option<(&str, &str)> {
 #[cfg(debug_assertions)]
 const DEV_LATEST_JSON_URL_VAR: &str = "WIRADESK_DEV_LATEST_JSON_URL";
 
-/// Where the release descriptor lives. The filename never changes, so this URL is stable
-/// across every version -- no API, no rate limit, no HTML to parse.
+/// Canonical update descriptor endpoint for Wira Desk.
+pub const UPDATE_DESCRIPTOR_URL: &str = "https://wiradelta.id/api/v1/update/wira-desk/";
+
+/// Where the release descriptor lives. In release builds, this points to the canonical
+/// self-hosted endpoint `https://wiradelta.id/api/v1/update/wira-desk/`.
 ///
 /// **Debug builds only:** `WIRADESK_DEV_LATEST_JSON_URL`, when set, is returned instead of the
 /// real address. This is the seam that lets check → download → verify → launch be exercised
@@ -63,7 +66,7 @@ pub fn latest_json_url() -> String {
     if let Ok(url) = std::env::var(DEV_LATEST_JSON_URL_VAR) {
         return url;
     }
-    format!("{REPOSITORY}/releases/latest/download/latest.json")
+    UPDATE_DESCRIPTOR_URL.to_owned()
 }
 
 /// Ceiling for the descriptor. It is a few hundred bytes; anything approaching this is
@@ -424,6 +427,26 @@ mod tests {
         );
     }
 
+    #[test]
+    fn descriptor_url_is_wiradelta_endpoint() {
+        // Isolate test from ambient environment variables
+        let prev = std::env::var(DEV_LATEST_JSON_URL_VAR).ok();
+        std::env::remove_var(DEV_LATEST_JSON_URL_VAR);
+
+        assert_eq!(
+            latest_json_url(),
+            "https://wiradelta.id/api/v1/update/wira-desk/"
+        );
+        assert_eq!(
+            UPDATE_DESCRIPTOR_URL,
+            "https://wiradelta.id/api/v1/update/wira-desk/"
+        );
+
+        if let Some(val) = prev {
+            std::env::set_var(DEV_LATEST_JSON_URL_VAR, val);
+        }
+    }
+
     /// Live smoke test for the debug-only seam on `latest_json_url`. Ignored by default,
     /// because it touches the network and a real, clearly-labelled test descriptor rather than
     /// anything synthetic -- everything above this line needs neither. Meaningful only with
@@ -445,6 +468,23 @@ mod tests {
         match decide("0.0.1", &body) {
             Decision::Available(r) => println!("offered {} at {}", r.version, r.setup_url),
             other => panic!("expected Available against a stand-in newer version, got {other:?}"),
+        }
+    }
+
+    /// Live test confirming that descriptor fetches refuse redirects (e.g. 302 from GitHub latest download).
+    ///
+    /// `cargo test -p shared -- --ignored ignored_live_debug_override_fails_on_redirect`
+    #[test]
+    #[ignore]
+    fn ignored_live_debug_override_fails_on_redirect() {
+        let url = std::env::var("WIRADESK_DEV_LATEST_JSON_URL")
+            .unwrap_or_else(|_| format!("{REPOSITORY}/releases/latest/download/latest.json"));
+        let result = crate::https::get_text(&url, DESCRIPTOR_LIMIT);
+        match result {
+            Err(crate::https::HttpError::Status(code)) if (300..400).contains(&code) => {
+                println!("Confirmed redirect refused with status {code}");
+            }
+            other => panic!("expected 3xx refusal without following redirect, got {other:?}"),
         }
     }
 }

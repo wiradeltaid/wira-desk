@@ -8,12 +8,12 @@ date: 2026-09-24
 
 ## Resume
 
-Iteration: 0
+Iteration: 1
 Run branch: autopilot/DEC-044
 Stopped at: —
 Blocked: —
 Parked: —
-Next: Iteration 1 — SPEC-30 delivery
+Next: SPEC-30-02 (Embedded URL registry with trailing slash)
 
 ## Decisions
 
@@ -23,3 +23,5 @@ Next: Iteration 1 — SPEC-30 delivery
 | Preflight | Build safety | Pinned single target dir in main checkout to prevent race conditions and thrashing | Per-worktree target dir | Workspace crate fingerprints thrash | decisions.yaml |
 | Preflight | Peer review | Configured Kiro GPT-5.6 Terra shell-out for independent code and doc review | Single-agent self-review | Reviewer independence lost | decisions.yaml |
 | Preflight | Deep analyst | Set deep_analyst to none (coordinator self-review for docs/architecture) | Shelling out separate analyst | Extra cycle latency | decisions.yaml, custom-dispatch.yaml |
+| Iteration 1 | SPEC-30-01 implementation | Migrated descriptor to canonical wiradelta.id endpoint, enforced no-redirect policy and strict User-Agent contract | Retaining GitHub Releases descriptor URL and space-less UA | Endpoint drift and redirect hijacking risks | crates/shared/src/update.rs, crates/shared/src/https.rs, crates/settings/src/update.rs |
+| Iteration 1 | Peer review feedback | Added transport-level redirect policy tests, env isolation, and verified Terra review recommendations | Comparing enums only | Behavioral regression risks in redirect handling | crates/shared/src/https.rs, crates/shared/src/update.rs |

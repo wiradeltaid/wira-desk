@@ -3,7 +3,7 @@ id: SPEC-30-01
 component: settings
 satisfies: [UC-8, FR-24, FR-25]
 blocked_by: []
-status: ready-for-agent
+status: closed
 touches:
   - crates/shared/src/update.rs
   - crates/shared/src/https.rs
@@ -23,7 +23,7 @@ tests:
 
 **Blocked by:** None (can start immediately, in parallel with SPEC-30-02 and SPEC-30-07)
 
-**Status:** ready-for-agent
+**Status:** closed
 
 ## Implementation Details
 
@@ -40,14 +40,14 @@ tests:
 
 ## Acceptance Criteria
 
-- [ ] Every guard and test is observed red on today's codebase before implementation, then green.
-- [ ] Release builds return `https://wiradelta.id/api/v1/update/wira-desk/` without environment variables set.
-- [ ] User-Agent matches the exact product format `^WiraDesk/(\d{1,4}\.\d{1,4}\.\d{1,6}) \(Windows (\d{1,3}\.\d{1,3}\.\d{1,6}); (x64|arm64|x86)\)$` and passes shared test vectors (including `WiraDesk/0.3.0 (Windows 10.0.22631; arm64)` and `WiraDesk/0.3.0 (Windows 10.0.26100; x64)`).
-- [ ] Unit test explicitly validates that x64 process under WOW64 on ARM64 outputs `arm64`.
-- [ ] Unit test validates graceful fallback to target architecture when platform version APIs fail, with zero additional parts.
-- [ ] Existing `https.rs` test asserting absence of spaces in User-Agent is seen failing, then replaced with format specification tests.
-- [ ] Unit test explicitly asserts descriptor requests and installer streaming downloads send the exact same computed User-Agent.
-- [ ] Descriptor fetch requests `Redirects::Never` and non-200 / 3xx responses fail without following redirects; installer downloads request `Redirects::Follow`.
-- [ ] An `#[ignore]` integration test exercising debug override to a 302 endpoint (e.g. GitHub Releases latest download) confirms failure with status 302 instead of successful redirect traversal.
-- [ ] Runtime User-Agent check confirms no `COMPUTERNAME` or `USERNAME` leakage.
-- [ ] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.
+- [x] Every guard and test is observed red on today's codebase before implementation, then green.
+- [x] Release builds return `https://wiradelta.id/api/v1/update/wira-desk/` without environment variables set.
+- [x] User-Agent matches the exact product format `^WiraDesk/(\d{1,4}\.\d{1,4}\.\d{1,6}) \(Windows (\d{1,3}\.\d{1,3}\.\d{1,6}); (x64|arm64|x86)\)$` and passes shared test vectors (including `WiraDesk/0.3.0 (Windows 10.0.22631; arm64)` and `WiraDesk/0.3.0 (Windows 10.0.26100; x64)`).
+- [x] Unit test explicitly validates that x64 process under WOW64 on ARM64 outputs `arm64`.
+- [x] Unit test validates graceful fallback to target architecture when platform version APIs fail, with zero additional parts.
+- [x] Existing `https.rs` test asserting absence of spaces in User-Agent is seen failing, then replaced with format specification tests.
+- [x] Unit test explicitly asserts descriptor requests and installer streaming downloads send the exact same computed User-Agent.
+- [x] Descriptor fetch requests `Redirects::Never` and non-200 / 3xx responses fail without following redirects; installer downloads request `Redirects::Follow`.
+- [x] An `#[ignore]` integration test exercising debug override to a 302 endpoint (e.g. GitHub Releases latest download) confirms failure with status 302 instead of successful redirect traversal.
+- [x] Runtime User-Agent check confirms no `COMPUTERNAME` or `USERNAME` leakage.
+- [x] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.

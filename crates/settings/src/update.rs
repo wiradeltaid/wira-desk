@@ -380,11 +380,12 @@ fn download_to_file(
     let mut hasher = Sha256::new().map_err(InstallError::Hash)?;
     let mut file = std::fs::File::create(dest).map_err(|_| io_failure("File::create"))?;
 
-    let outcome = shared::https::get_streaming(url, limit, |chunk| {
-        hasher.update(chunk).map_err(InstallError::Hash)?;
-        file.write_all(chunk)
-            .map_err(|_| io_failure("File::write_all"))
-    });
+    let outcome =
+        shared::https::get_streaming(url, limit, shared::https::Redirects::Follow, |chunk| {
+            hasher.update(chunk).map_err(InstallError::Hash)?;
+            file.write_all(chunk)
+                .map_err(|_| io_failure("File::write_all"))
+        });
 
     let flushed = file.flush().is_ok();
     drop(file);

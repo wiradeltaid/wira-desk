@@ -32,15 +32,124 @@ use std::ptr;
 use windows_sys::Win32::Foundation::FALSE;
 use windows_sys::Win32::Networking::WinHttp::{
     WinHttpCloseHandle, WinHttpConnect, WinHttpOpen, WinHttpOpenRequest, WinHttpQueryHeaders,
-    WinHttpReadData, WinHttpReceiveResponse, WinHttpSendRequest, INTERNET_DEFAULT_HTTPS_PORT,
-    WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY, WINHTTP_FLAG_SECURE, WINHTTP_QUERY_FLAG_NUMBER,
-    WINHTTP_QUERY_STATUS_CODE,
+    WinHttpReadData, WinHttpReceiveResponse, WinHttpSendRequest, WinHttpSetOption,
+    INTERNET_DEFAULT_HTTPS_PORT, WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY, WINHTTP_FLAG_SECURE,
+    WINHTTP_OPTION_REDIRECT_POLICY, WINHTTP_OPTION_REDIRECT_POLICY_NEVER,
+    WINHTTP_QUERY_FLAG_NUMBER, WINHTTP_QUERY_STATUS_CODE,
 };
+use windows_sys::Win32::System::SystemInformation::{
+    IMAGE_FILE_MACHINE_AMD64, IMAGE_FILE_MACHINE_ARM64, IMAGE_FILE_MACHINE_I386, OSVERSIONINFOW,
+};
+use windows_sys::Win32::System::Threading::{GetCurrentProcess, IsWow64Process2};
 
-/// Sent as the user agent. Names the product and version so a maintainer reading a server
-/// log can tell what asked, which is the only thing this reveals beyond the request itself —
-/// and `PRIVACY.md` says so.
-const USER_AGENT: &str = concat!("WiraDesk/", env!("CARGO_PKG_VERSION"));
+#[link(name = "ntdll")]
+extern "system" {
+    fn RtlGetVersion(lpVersionInformation: *mut OSVERSIONINFOW) -> i32;
+}
+
+/// Policy for handling HTTP redirects.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Redirects {
+    /// Follow HTTP redirects (used for installer downloads).
+    Follow,
+    /// Refuse HTTP redirects (used for descriptor checking).
+    Never,
+}
+
+/// Pure function formatting the canonical 4-part User-Agent string:
+/// `WiraDesk/<version> (Windows <major>.<minor>.<build>; <arch>)`
+pub fn format_user_agent(
+    product: &str,
+    version: &str,
+    os_version: (u32, u32, u32),
+    arch: &str,
+) -> String {
+    format!(
+        "{product}/{version} (Windows {}.{}.{}; {arch})",
+        os_version.0, os_version.1, os_version.2
+    )
+}
+
+/// Map native processor machine constants to normalized lowercase architecture strings.
+pub fn detect_architecture_from_machines(native_machine: u16, fallback: &str) -> &'static str {
+    match native_machine {
+        IMAGE_FILE_MACHINE_ARM64 => "arm64",
+        IMAGE_FILE_MACHINE_AMD64 => "x64",
+        IMAGE_FILE_MACHINE_I386 => "x86",
+        _ => match fallback {
+            "x86_64" => "x64",
+            "aarch64" => "arm64",
+            "x86" => "x86",
+            other => {
+                if other.contains("x86_64") || other.contains("amd64") {
+                    "x64"
+                } else if other.contains("aarch64") || other.contains("arm64") {
+                    "arm64"
+                } else {
+                    "x64"
+                }
+            }
+        },
+    }
+}
+
+fn get_windows_version() -> (u32, u32, u32) {
+    // SAFETY: All-zero byte representation is a valid initial state for `OSVERSIONINFOW`.
+    let mut osvi: OSVERSIONINFOW = unsafe { std::mem::zeroed() };
+    osvi.dwOSVersionInfoSize = core::mem::size_of::<OSVERSIONINFOW>() as u32;
+
+    // SAFETY: `osvi` is zeroed with `dwOSVersionInfoSize` set to its byte size.
+    // `RtlGetVersion` fills in Windows kernel version numbers without application manifest interference.
+    let status = unsafe { RtlGetVersion(&mut osvi) };
+    if status == 0 {
+        (osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber)
+    } else {
+        (10, 0, 0)
+    }
+}
+
+fn get_processor_architecture() -> &'static str {
+    let mut process_machine: u16 = 0;
+    let mut native_machine: u16 = 0;
+
+    // SAFETY: `GetCurrentProcess()` returns a pseudo-handle representing the current process.
+    // Pointers point to stack-allocated locals for the duration of the call.
+    let ok = unsafe {
+        IsWow64Process2(
+            GetCurrentProcess(),
+            &mut process_machine,
+            &mut native_machine,
+        )
+    };
+
+    let fallback = std::env::consts::ARCH;
+    if ok != 0 && native_machine != 0 {
+        detect_architecture_from_machines(native_machine, fallback)
+    } else {
+        detect_architecture_from_machines(0, fallback)
+    }
+}
+
+/// Compute the canonical User-Agent string from the running system.
+pub fn compute_user_agent() -> String {
+    let (major, minor, build) = get_windows_version();
+    let arch = get_processor_architecture();
+    format_user_agent(
+        "WiraDesk",
+        env!("CARGO_PKG_VERSION"),
+        (major, minor, build),
+        arch,
+    )
+}
+
+/// Sent as the User-Agent header on all HTTP requests.
+///
+/// Formatted strictly as `WiraDesk/<version> (Windows <major>.<minor>.<build>; <arch>)`.
+/// Shared identically between descriptor fetches and installer streaming downloads.
+pub fn user_agent() -> &'static str {
+    static CACHED: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+    CACHED.get_or_init(compute_user_agent)
+}
 
 /// Read buffer. Large enough that a multi-megabyte installer is not read in thousands of
 /// round trips, small enough to be irrelevant to a tray application's footprint.
@@ -126,6 +235,29 @@ fn split_url(url: &str) -> Result<(String, String), HttpError> {
     Ok((host.to_owned(), path))
 }
 
+/// Configures WinHTTP request redirect policy on the request handle.
+///
+/// SAFETY: `request` must be a valid WinHttp request handle or null (which will return an error code from WinHttpSetOption).
+pub(crate) unsafe fn apply_redirect_policy(
+    request: *mut core::ffi::c_void,
+    redirects: Redirects,
+) -> Result<(), HttpError> {
+    if redirects == Redirects::Never {
+        let mut policy: u32 = WINHTTP_OPTION_REDIRECT_POLICY_NEVER;
+        // SAFETY: `policy` is a live local u32, with size passed correctly as 4 bytes.
+        let ok = WinHttpSetOption(
+            request,
+            WINHTTP_OPTION_REDIRECT_POLICY,
+            (&mut policy as *mut u32).cast(),
+            core::mem::size_of::<u32>() as u32,
+        );
+        if ok == FALSE {
+            return Err(last_error("WinHttpSetOption"));
+        }
+    }
+    Ok(())
+}
+
 /// One GET, streamed to `sink`, stopping if more than `limit` bytes arrive.
 ///
 /// Public because `settings` hashes an installer as it writes it, which needs the bytes
@@ -141,13 +273,18 @@ fn split_url(url: &str) -> Result<(String, String), HttpError> {
 /// sink. That is what lets the caller hash an installer as it is written rather than
 /// afterwards, and what keeps the ceiling meaningful — a limit enforced after the fact is
 /// not a limit.
-pub fn get_streaming<F, E>(url: &str, limit: u64, mut sink: F) -> Result<u64, E>
+pub fn get_streaming<F, E>(
+    url: &str,
+    limit: u64,
+    redirects: Redirects,
+    mut sink: F,
+) -> Result<u64, E>
 where
     F: FnMut(&[u8]) -> Result<(), E>,
     E: From<HttpError>,
 {
     let (host, path) = split_url(url).map_err(E::from)?;
-    let agent = wide(USER_AGENT);
+    let agent = wide(user_agent());
     let host_w = wide(&host);
     let path_w = wide(&path);
 
@@ -195,6 +332,9 @@ where
         )
     })
     .ok_or_else(|| E::from(last_error("WinHttpOpenRequest")))?;
+
+    // SAFETY: `request` is a live WinHttp request handle before SendRequest.
+    unsafe { apply_redirect_policy(request.raw(), redirects).map_err(E::from)? };
 
     // SAFETY: `request` is live. No additional headers, hence a null pointer with a zero
     // length; no request body, hence null optional data with zero lengths. A zero context is
@@ -275,7 +415,7 @@ where
 /// past that is either not our file or not worth reading.
 pub fn get_text(url: &str, limit: u64) -> Result<String, HttpError> {
     let mut body: Vec<u8> = Vec::new();
-    get_streaming::<_, HttpError>(url, limit, |chunk| {
+    get_streaming::<_, HttpError>(url, limit, Redirects::Never, |chunk| {
         body.extend_from_slice(chunk);
         Ok(())
     })?;
@@ -326,15 +466,134 @@ mod tests {
         }
     }
 
-    /// The user agent names the product and its version, which is the only thing a server
-    /// learns beyond the request itself. `PRIVACY.md` describes exactly this, so if the
-    /// string ever grows to carry more, that document has become wrong.
+    fn validate_user_agent_format(ua: &str) -> bool {
+        let Some(rest) = ua.strip_prefix("WiraDesk/") else {
+            return false;
+        };
+        let Some((version, rest)) = rest.split_once(" (Windows ") else {
+            return false;
+        };
+        let Some((os_ver, rest)) = rest.split_once("; ") else {
+            return false;
+        };
+        let Some(arch) = rest.strip_suffix(')') else {
+            return false;
+        };
+
+        let v_parts: Vec<&str> = version.split('.').collect();
+        if v_parts.is_empty()
+            || !v_parts
+                .iter()
+                .all(|p| !p.is_empty() && p.bytes().all(|b| b.is_ascii_digit()))
+        {
+            return false;
+        }
+
+        let os_parts: Vec<&str> = os_ver.split('.').collect();
+        if os_parts.len() != 3
+            || !os_parts
+                .iter()
+                .all(|p| !p.is_empty() && p.bytes().all(|b| b.is_ascii_digit()))
+        {
+            return false;
+        }
+
+        matches!(arch, "x64" | "arm64" | "x86")
+    }
+
     #[test]
-    fn the_user_agent_carries_only_product_and_version() {
+    fn user_agent_matches_platform_contract() {
+        let ua = user_agent();
+        assert!(validate_user_agent_format(ua), "invalid UA format: {ua}");
+
+        // Test vectors matching SPEC-30-01 specifications
         assert_eq!(
-            USER_AGENT,
-            format!("WiraDesk/{}", env!("CARGO_PKG_VERSION"))
+            format_user_agent("WiraDesk", "0.3.0", (10, 0, 22631), "arm64"),
+            "WiraDesk/0.3.0 (Windows 10.0.22631; arm64)"
         );
-        assert!(!USER_AGENT.contains(' '), "no room for anything else");
+        assert_eq!(
+            format_user_agent("WiraDesk", "0.3.0", (10, 0, 26100), "x64"),
+            "WiraDesk/0.3.0 (Windows 10.0.26100; x64)"
+        );
+
+        // Explicit validation: x64 under WOW64 on ARM64 outputs "arm64"
+        assert_eq!(
+            detect_architecture_from_machines(IMAGE_FILE_MACHINE_ARM64, "x86_64"),
+            "arm64"
+        );
+        assert_eq!(
+            detect_architecture_from_machines(IMAGE_FILE_MACHINE_AMD64, "x86_64"),
+            "x64"
+        );
+        assert_eq!(
+            detect_architecture_from_machines(IMAGE_FILE_MACHINE_I386, "x86_64"),
+            "x86"
+        );
+
+        // Fallbacks
+        assert_eq!(detect_architecture_from_machines(0, "x86_64"), "x64");
+        assert_eq!(detect_architecture_from_machines(0, "aarch64"), "arm64");
+        assert_eq!(detect_architecture_from_machines(0, "x86"), "x86");
+
+        // Privacy check: no username or computername leakage
+        if let Ok(user) = std::env::var("USERNAME") {
+            if !user.is_empty() {
+                assert!(!ua.contains(&user), "User-Agent must not leak USERNAME");
+            }
+        }
+        if let Ok(comp) = std::env::var("COMPUTERNAME") {
+            if !comp.is_empty() {
+                assert!(!ua.contains(&comp), "User-Agent must not leak COMPUTERNAME");
+            }
+        }
+    }
+
+    #[test]
+    fn installer_and_descriptor_share_identical_user_agent() {
+        let desc_ua = user_agent();
+        let inst_ua = user_agent();
+        assert_eq!(desc_ua, inst_ua);
+        assert!(!desc_ua.is_empty());
+
+        // Prove that compute_user_agent generates the identical 4-part contract string
+        let (major, minor, build) = get_windows_version();
+        let arch = get_processor_architecture();
+        let expected = format_user_agent(
+            "WiraDesk",
+            env!("CARGO_PKG_VERSION"),
+            (major, minor, build),
+            arch,
+        );
+        assert_eq!(desc_ua, expected);
+        assert_eq!(inst_ua, expected);
+    }
+
+    #[test]
+    fn descriptor_fetch_disallows_redirects() {
+        assert_eq!(Redirects::Never, Redirects::Never);
+        assert_ne!(Redirects::Never, Redirects::Follow);
+
+        // Under Redirects::Follow, apply_redirect_policy does not set WINHTTP_OPTION_REDIRECT_POLICY_NEVER.
+        // SAFETY: Testing null handle behavior for Redirects::Follow policy check.
+        let follow_res = unsafe { apply_redirect_policy(core::ptr::null_mut(), Redirects::Follow) };
+        assert!(
+            follow_res.is_ok(),
+            "Redirects::Follow must succeed without setting option"
+        );
+
+        // Under Redirects::Never, apply_redirect_policy invokes WinHttpSetOption with WINHTTP_OPTION_REDIRECT_POLICY_NEVER,
+        // which returns ERROR_WINHTTP_INCORRECT_HANDLE_TYPE (12018) or ERROR_INVALID_HANDLE (6) on null pointer.
+        // SAFETY: Testing null handle behavior for Redirects::Never policy check.
+        let never_res = unsafe { apply_redirect_policy(core::ptr::null_mut(), Redirects::Never) };
+        match never_res {
+            Err(HttpError::Win32 { call, code }) => {
+                assert_eq!(call, "WinHttpSetOption");
+                assert!(
+                    code == 12018 || code == 6,
+                    "expected WinHttp handle error code 12018 or 6, got {code}"
+                );
+            }
+            other => panic!("expected WinHttpSetOption failure with invalid handle, got {other:?}"),
+        }
     }
 }

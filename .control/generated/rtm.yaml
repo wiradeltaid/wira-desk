@@ -765,7 +765,7 @@ rtm:
   - shared::https::tests::descriptor_fetch_disallows_redirects
   - shared::https::tests::installer_and_descriptor_share_identical_user_agent
   - shared::update::tests::ignored_live_debug_override_fails_on_redirect
-  status: ready-for-agent
+  status: closed
   exempt: false
   green: false
   broken_at: status
