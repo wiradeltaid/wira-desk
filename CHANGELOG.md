@@ -18,6 +18,20 @@ owner decides.
 
 ## [Unreleased]
 
+### Added
+
+- Directional Custom-Percentage Top Snap: Configurable top-edge snapping default set to 33% (`Ctrl+Alt+Shift+Up`) while lateral and bottom edges remain at 67%, with full backward compatibility and persistent configuration.
+- Canonical Update Check Subsystem: Update descriptor checks migrate to the self-hosted endpoint `https://wiradelta.id/api/v1/update/wira-desk/` enforcing strict no-redirect policy (`Redirects::Never`), sharing identical 4-part User-Agent contract (`WiraDesk/<version> (Windows <major>.<minor>.<build>; <arch>)`) with installer downloads.
+- Portable Zip Distribution: Release workflows package executables, license, and notices into `WiraDesk-<version>-x64-portable.zip`, eliminating loose executable uploads, protected by an automated release artifact verifier in CI.
+- Settings Embedded URL Registry: Centralized registry for all studio links with trailing slashes (`/`), with hardened browser opening allowlist.
+- Formal Indonesian Legal Copies: Synchronized `PRIVACY.id.md` and `SECURITY.id.md` with official copy stamps and dual-language alignment.
+
+### Changed
+
+- Settings About and General Pane Copy: Word-for-word alignment with approved studio legal specifications, renaming "Support development" to "Send a tip", standardizing hold delay notation to `(100 to 500 ms)`, and locking all critical legal labels.
+- Threat Model Alignment: Documented dual outbound network paths, visual switcher window title inspection, and 1 MB log rotation.
+- Installer safety & downgrade prevention: Inno Setup installer enforces 64-bit HKLM registry checks, strict SemVer downgrade rejection, zero-bundling invariant, and fail-closed process shutdown.
+
 ## [0.2.4] - 2026-09-15
 
 ### Added

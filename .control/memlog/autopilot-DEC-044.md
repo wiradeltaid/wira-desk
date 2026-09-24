@@ -10,10 +10,10 @@ date: 2026-09-24
 
 Iteration: 1
 Run branch: autopilot/DEC-044
-Stopped at: —
+Stopped at: Done — All 10 tickets for SPEC-30 delivered under mandate DEC-044
 Blocked: —
 Parked: —
-Next: SPEC-30-10 (Release 0.3.0: version and changelog)
+Next: Owner review, bump to 0.3.0, and PR merge
 
 ## Decisions
 
@@ -33,3 +33,4 @@ Next: SPEC-30-10 (Release 0.3.0: version and changelog)
 | Iteration 1 | SPEC-30-09 implementation | Reconciled BR-8, C4 L1, PRD §3.12/§7, UC-8, and requirements with wiradelta.id endpoint architecture | Leaving architecture corpus claiming direct GitHub descriptor checks | Architecture and specification drift from actual code | .what/business-rules.md, .how/_platform/c4-l1-system-context.md, .what/_prd/wira-desk/prd.md |
 | Iteration 1 | SPEC-30-04 implementation | Synchronized PRIVACY and SECURITY in English and Indonesian with official copy stamps and verify-legal-copies.ps1 | Unsynchronized legal documents and unpopulated placeholders | Legal non-compliance and out-of-date policy claims | PRIVACY.id.md, PRIVACY.md, SECURITY.id.md, SECURITY.md, scripts/verify-legal-copies.ps1 |
 | Iteration 1 | SPEC-30-05 implementation | Reconciled threat-model.md with dual network boundary, visual switcher titles, 1 MB log rotation, and Security §9 | Leaving stale claims of single network destination and no log rotation | Inaccurate security posture claims in public documentation | docs/threat-model.md |
+| Iteration 1 | SPEC-30-10 implementation | Staged 0.3.0 release notes in CHANGELOG under Unreleased, kept patch during testing per owner, verified live endpoint, and recorded cutover in ops plan | Immediate minor bump before testing | Early version claim before full verification and cutover alignment | CHANGELOG.md, ops plan wira-desk.md §5 |
