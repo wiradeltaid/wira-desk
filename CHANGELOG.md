@@ -18,6 +18,8 @@ owner decides.
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-09-24
+
 ### Added
 
 - Directional Custom-Percentage Top Snap: Configurable top-edge snapping default set to 33% (`Ctrl+Alt+Shift+Up`) while lateral and bottom edges remain at 67%, with full backward compatibility and persistent configuration.
@@ -30,7 +32,6 @@ owner decides.
 
 - Settings About and General Pane Copy: Word-for-word alignment with approved studio legal specifications, renaming "Support development" to "Send a tip", standardizing hold delay notation to `(100 to 500 ms)`, and locking all critical legal labels.
 - Threat Model Alignment: Documented dual outbound network paths, visual switcher window title inspection, and 1 MB log rotation.
-- Installer safety & downgrade prevention: Inno Setup installer enforces 64-bit HKLM registry checks, strict SemVer downgrade rejection, zero-bundling invariant, and fail-closed process shutdown.
 
 ## [0.2.4] - 2026-09-15
 

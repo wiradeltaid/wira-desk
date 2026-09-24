@@ -3,7 +3,7 @@
 
 facts:
   - id: product_version
-    value: "0.2.4"
+    value: "0.2.5"
     derived_from:
       file: Cargo.toml
       pattern: 'version\s*=\s*"([^"]+)"'

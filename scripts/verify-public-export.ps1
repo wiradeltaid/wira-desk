@@ -416,13 +416,13 @@ if (Test-Path -LiteralPath $workspaceManifest) {
         $drift = @()
         foreach ($f in Get-TextFiles) {
             $rel = $f.FullName.Substring($root.Length).TrimStart('\', '/').Replace('\', '/')
-            # The planning archive is exempt: it records versions as they were at the time,
+            # The planning archive and scratch are exempt: they record versions as they were at the time,
             # and rewriting history to match the present would falsify it.
-            if ($rel -like '_bmad-output/*') { continue }
+            if ($rel -like '_bmad-output/*' -or $rel -like '.archive/*' -or $rel -like '.work/*') { continue }
             $n = 0
             foreach ($line in (Get-Content -LiteralPath $f.FullName -ErrorAction SilentlyContinue)) {
                 $n++
-                if ($line -match '(?i)\b(?:Applies to|Berlaku untuk):') { continue }
+                if ($line -match '(?i)\b(?:Applies to|Berlaku untuk|Versions before|Versi sebelum):?') { continue }
                 foreach ($m in [regex]::Matches($line, '(?i)\b(?:WinTick|Wira\s+Desk)\s+v?([0-9]+\.[0-9]+\.[0-9]+)')) {
                     if ($m.Groups[1].Value -ne $crateVersion) { $drift += "${rel}:${n}: $($m.Value)" }
                 }
