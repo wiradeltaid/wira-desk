@@ -786,7 +786,7 @@ rtm:
   - settings::urls::tests::all_wiradelta_urls_end_with_slash
   - settings::update::tests::browser_allowlist_rejects_url_without_trailing_slash
   - settings::update::tests::browser_allowlist_handles_approved_vectors
-  status: ready-for-agent
+  status: closed
   exempt: false
   green: false
   broken_at: status

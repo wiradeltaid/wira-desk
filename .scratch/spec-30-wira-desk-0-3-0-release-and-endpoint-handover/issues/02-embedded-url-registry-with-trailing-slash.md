@@ -3,7 +3,7 @@ id: SPEC-30-02
 component: settings
 satisfies: [UC-8]
 blocked_by: []
-status: ready-for-agent
+status: closed
 touches:
   - crates/settings/src/urls.rs
   - crates/settings/src/main.rs
@@ -20,7 +20,7 @@ tests:
 
 **Blocked by:** None (can start immediately, in parallel with SPEC-30-01 and SPEC-30-07)
 
-**Status:** ready-for-agent
+**Status:** closed
 
 ## Implementation Details
 
@@ -30,9 +30,9 @@ tests:
 
 ## Acceptance Criteria
 
-- [ ] Every guard and test is observed red on today's codebase before implementation, then green.
-- [ ] All embedded `wiradelta.id` URLs in the registry end with `/`.
-- [ ] Scanning non-test files in `crates/*/src` reveals zero literal `https://wiradelta.id` strings outside the registry and descriptor constants.
-- [ ] Browser allowlist rejects `https://wiradelta.id/wira-desk` (without trailing slash) and accepts `https://wiradelta.id/wira-desk/`.
-- [ ] Unit test tests approved vectors: accepts registry constants, `https://github.com/wiradeltaid/wira-desk/`, and `https://github.com/wiradeltaid/wira-desk/issues`; rejects non-allowlisted domains and non-approved subpaths.
-- [ ] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.
+- [x] Every guard and test is observed red on today's codebase before implementation, then green.
+- [x] All embedded `wiradelta.id` URLs in the registry end with `/`.
+- [x] Scanning non-test files in `crates/*/src` reveals zero literal `https://wiradelta.id` strings outside the registry and descriptor constants.
+- [x] Browser allowlist rejects `https://wiradelta.id/wira-desk` (without trailing slash) and accepts `https://wiradelta.id/wira-desk/`.
+- [x] Unit test tests approved vectors: accepts registry constants, `https://github.com/wiradeltaid/wira-desk/`, and `https://github.com/wiradeltaid/wira-desk/issues`; rejects non-allowlisted domains and non-approved subpaths.
+- [x] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.

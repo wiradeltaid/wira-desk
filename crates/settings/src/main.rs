@@ -7,6 +7,7 @@ mod persistence;
 mod sha256;
 mod theme;
 mod update;
+pub mod urls;
 
 #[cfg(test)]
 mod shortcut_row_slint_snapshot;
@@ -956,7 +957,7 @@ pub(crate) fn bind_callbacks(
                     return;
                 }
             }
-            update::open_in_browser("https://wiradelta.id");
+            update::open_in_browser(urls::WIRADELTA_HOME_URL);
         });
     }
     {
@@ -967,7 +968,7 @@ pub(crate) fn bind_callbacks(
                     return;
                 }
             }
-            update::open_in_browser("https://github.com/wiradeltaid/wira-desk/");
+            update::open_in_browser(urls::GITHUB_REPO_URL);
         });
     }
     {
@@ -978,7 +979,7 @@ pub(crate) fn bind_callbacks(
                     return;
                 }
             }
-            update::open_in_browser("https://wiradelta.id/wira-desk");
+            update::open_in_browser(urls::WIRA_DESK_PRODUCT_URL);
         });
     }
     {
@@ -989,7 +990,7 @@ pub(crate) fn bind_callbacks(
                     return;
                 }
             }
-            update::open_in_browser("https://github.com/wiradeltaid/wira-desk/issues");
+            update::open_in_browser(urls::GITHUB_ISSUES_URL);
         });
     }
 

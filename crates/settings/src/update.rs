@@ -277,30 +277,39 @@ fn launch_installer(path: &std::path::Path) -> Result<(), String> {
 
 /// Validate whether a URL is in the strict allowlist of browser navigation targets.
 ///
-/// Pinned targets allowed:
-/// - Exact `https://wiradelta.id` or `https://wiradelta.id/`
-/// - Exact `https://wiradelta.id/wira-desk` or `https://wiradelta.id/wira-desk/`
-/// - Pinned GitHub repository prefix `https://github.com/wiradeltaid/wira-desk` or subpaths
+/// Validate whether a URL is in the strict allowlist of browser navigation targets.
 ///
-/// All non-HTTPS schemes, dot-segments (`..`), userinfo (`@`), or unpinned hosts are rejected.
+/// Pinned targets allowed:
+/// - Exact registry constants: `https://wiradelta.id/`, `https://wiradelta.id/wira-desk/`, `https://wiradelta.id/wira-desk/privacy/`
+/// - Exact repository root: `https://github.com/wiradeltaid/wira-desk/`
+/// - Exact issues endpoint: `https://github.com/wiradeltaid/wira-desk/issues`
+/// - Releases endpoints for release notes: `https://github.com/wiradeltaid/wira-desk/releases` or subpaths starting with `https://github.com/wiradeltaid/wira-desk/releases/`
+///
+/// Non-trailing slash variants of `wiradelta.id` (such as `https://wiradelta.id` or `https://wiradelta.id/wira-desk`),
+/// non-HTTPS schemes, dot-segments (`..`), userinfo (`@`), or unpinned hosts are rejected.
 pub fn is_allowed_browser_url(url: &str) -> bool {
-    let url = url.trim();
     if !url.starts_with("https://") {
         return false;
     }
-    if url.contains("..") || url.contains('@') {
+    if url.contains("..") || url.contains('@') || url.contains(char::is_whitespace) {
         return false;
     }
-    if url == "https://wiradelta.id" || url == "https://wiradelta.id/" {
+
+    if url == crate::urls::WIRADELTA_HOME_URL
+        || url == crate::urls::WIRA_DESK_PRODUCT_URL
+        || url == crate::urls::WIRA_DESK_PRIVACY_URL
+    {
         return true;
     }
-    if url == "https://wiradelta.id/wira-desk" || url == "https://wiradelta.id/wira-desk/" {
+
+    if url == crate::urls::GITHUB_REPO_URL
+        || url == crate::urls::GITHUB_ISSUES_URL
+        || url == "https://github.com/wiradeltaid/wira-desk/releases"
+        || url.starts_with("https://github.com/wiradeltaid/wira-desk/releases/")
+    {
         return true;
     }
-    const REPO_BASE: &str = "https://github.com/wiradeltaid/wira-desk";
-    if url == REPO_BASE || url.starts_with("https://github.com/wiradeltaid/wira-desk/") {
-        return true;
-    }
+
     false
 }
 
@@ -437,38 +446,63 @@ mod tests {
     }
 
     #[test]
-    fn open_in_browser_accepts_publisher_and_repo_domains() {
-        assert!(is_allowed_browser_url("https://wiradelta.id"));
-        assert!(is_allowed_browser_url("https://wiradelta.id/"));
-        assert!(is_allowed_browser_url("https://wiradelta.id/wira-desk"));
-        assert!(is_allowed_browser_url("https://wiradelta.id/wira-desk/"));
-        assert!(is_allowed_browser_url(
-            "https://github.com/wiradeltaid/wira-desk"
-        ));
-        assert!(is_allowed_browser_url(
-            "https://github.com/wiradeltaid/wira-desk/"
-        ));
+    fn browser_allowlist_handles_approved_vectors() {
+        // Pinned registry constants with trailing slash
+        assert!(is_allowed_browser_url(crate::urls::WIRADELTA_HOME_URL));
+        assert!(is_allowed_browser_url(crate::urls::WIRA_DESK_PRODUCT_URL));
+        assert!(is_allowed_browser_url(crate::urls::WIRA_DESK_PRIVACY_URL));
+
+        // Approved GitHub endpoints
+        assert!(is_allowed_browser_url(crate::urls::GITHUB_REPO_URL));
+        assert!(is_allowed_browser_url(crate::urls::GITHUB_ISSUES_URL));
         assert!(is_allowed_browser_url(
             "https://github.com/wiradeltaid/wira-desk/releases"
         ));
         assert!(is_allowed_browser_url(
-            "https://github.com/wiradeltaid/wira-desk/issues"
+            "https://github.com/wiradeltaid/wira-desk/releases/tag/v0.3.0"
         ));
 
-        // Reject non-https
-        assert!(!is_allowed_browser_url("http://wiradelta.id"));
+        // Rejection of non-approved GitHub subpaths
+        assert!(!is_allowed_browser_url(
+            "https://github.com/wiradeltaid/wira-desk/pulls"
+        ));
+        assert!(!is_allowed_browser_url(
+            "https://github.com/wiradeltaid/wira-desk/actions"
+        ));
+        assert!(!is_allowed_browser_url(
+            "https://github.com/otheruser/wira-desk"
+        ));
+
+        // Rejection of non-https
+        assert!(!is_allowed_browser_url("http://wiradelta.id/"));
         assert!(!is_allowed_browser_url(
             "http://github.com/wiradeltaid/wira-desk/"
         ));
 
-        // Reject dot-segments and userinfo
+        // Rejection of dot-segments and userinfo
         assert!(!is_allowed_browser_url("https://wiradelta.id/../evil"));
-        assert!(!is_allowed_browser_url("https://user:pass@wiradelta.id"));
+        assert!(!is_allowed_browser_url("https://user:pass@wiradelta.id/"));
 
-        // Reject other domains
+        // Rejection of external domains
         assert!(!is_allowed_browser_url("https://evil.com"));
+        assert!(!is_allowed_browser_url("https://evil.wiradelta.id/"));
+
+        // Rejection of leading, trailing, or embedded whitespace
+        assert!(!is_allowed_browser_url(" https://wiradelta.id/"));
+        assert!(!is_allowed_browser_url("https://wiradelta.id/ "));
+        assert!(!is_allowed_browser_url("https://wiradelta.id/\n"));
+        assert!(!is_allowed_browser_url("https://wiradelta.id/ wira-desk/"));
         assert!(!is_allowed_browser_url(
-            "https://github.com/otheruser/wira-desk"
+            " https://github.com/wiradeltaid/wira-desk/ "
+        ));
+    }
+
+    #[test]
+    fn browser_allowlist_rejects_url_without_trailing_slash() {
+        assert!(!is_allowed_browser_url("https://wiradelta.id"));
+        assert!(!is_allowed_browser_url("https://wiradelta.id/wira-desk"));
+        assert!(!is_allowed_browser_url(
+            "https://wiradelta.id/wira-desk/privacy"
         ));
     }
 }
