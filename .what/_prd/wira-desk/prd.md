@@ -213,7 +213,7 @@ Windows already moves windows between monitors with `Win + Shift + Arrow`, and W
 
 **Capability:** CAP-13 — serves BG-2.
 
-**Description:** Tells the user when a newer release exists, without touching the network for anything else. The daemon checks on its own schedule and surfaces a found update in the tray menu; the settings application lets the user check on demand and, on confirmation, fetches and verifies the installer before offering to run it. Both paths share one property: nothing about how the product is used ever leaves the machine.
+**Description:** Tells the user when a newer release exists, without touching the network for anything else. The daemon checks on its own schedule (2 minutes after start, then every 24 hours) querying `https://wiradelta.id/api/v1/update/wira-desk/` without redirects, carrying strictly the 4-part User-Agent contract (`WiraDesk/<version> (Windows <major>.<minor>.<build>; <arch>)`), and surfaces a found update in the tray menu; the settings application lets the user check on demand and, on confirmation, streams the installer from GitHub Releases and verifies SHA-256 before running it elevated. Both paths share one property: nothing about how the product is used ever leaves the machine.
 
 **Realizes:** FR-24, FR-25
 
@@ -322,6 +322,6 @@ another action's, so the user is never left guessing which state they are lookin
 - **Delta Beyond Brief:** None beyond the Product Brief (`.what/_product-brief/brief.md`).
 - **Platform Constraint:** Strictly targets 64-bit Windows 10 (1809+) and Windows 11 desktop environments; no legacy Windows 7/8 or non-Windows platforms.
 - **Elevation Requirement:** Daemon requires Administrator privileges to ensure UIPI bypass across all target windows.
-- **Privacy & Telemetry:** Zero telemetry, remote analytics, or cloud syncing; all logs and configurations are strictly local to `%APPDATA%\WiraDesk`. The one exception is the update check (CAP-13): an optional, toggleable HTTPS request carrying no payload beyond the request itself and no identifying data. Nothing else in the product ever touches the network.
+- **Privacy & Telemetry:** No user account, remote analytics, or cloud syncing; all logs and configurations are strictly local to `%APPDATA%\WiraDesk`. The one exception is the update check (CAP-13): an optional, toggleable HTTPS descriptor check querying `https://wiradelta.id/api/v1/update/wira-desk/` without redirects, carrying only the 4-part User-Agent (`WiraDesk/<version> (Windows <major>.<minor>.<build>; <arch>)`) without personal or machine identifiers, followed on user confirmation by an installer download from GitHub Releases verified against its published SHA-256 checksum. Nothing else in the product ever touches the network.
 - **Architectural Separation:** Dual-binary model (`wiradesk.exe` headless tray daemon vs `wiradesk-settings.exe` on-demand UI) to guarantee UI rendering overhead never degrades input hook responsiveness.
 

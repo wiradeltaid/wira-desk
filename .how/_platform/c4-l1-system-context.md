@@ -20,8 +20,12 @@ graph TD
         AppData[("%APPDATA% / WiraDesk<br/>config.toml & wiradesk.log")]
     end
 
+    subgraph WiraDeltaAPI["Wira Delta Studio API<br/>[External System]"]
+        DescriptorFile["Update descriptor<br/>(static JSON, HTTPS, wiradelta.id)"]
+    end
+
     subgraph GitHubReleases["GitHub Releases<br/>[External System]"]
-        ReleaseFile["Release descriptor + installer<br/>(static, HTTPS)"]
+        ReleaseFile["Release installer payload<br/>(static, HTTPS, github.com)"]
     end
 
     User -- "Global shortcuts & mouse inputs<br/>(Win+`, Ctrl+Alt+Arrows, Thumb/Tilt)" --> WinHook
@@ -33,12 +37,13 @@ graph TD
     WD -- "Shell_NotifyIcon, TaskbarCreated listener" --> WinTray
     WD -- "schtasks /Create, /Query, /Delete" --> WinTS
     WD -- "Read / Write configuration & log diagnostics" --> AppData
-    WD -- "HTTPS GET, no payload beyond the request (BR-8)" --> GitHubReleases
+    WD -- "HTTPS GET descriptor without redirects (BR-8)" --> WiraDeltaAPI
+    WD -- "HTTPS GET installer payload on confirmation" --> GitHubReleases
 ```
 
 ### System Boundaries & Description
 
-- **Wira Desk**: Lightweight, local Windows utility that delivers instant macOS-style same-application window cycling and DPI-aware snapping.
+- **Wira Desk**: Lightweight, local Windows utility that delivers instant macOS-style same-application window cycling, DPI-aware snapping, and mouse navigation.
 - **External Systems**:
   - **Windows Low-Level Hooks**: Intercepts physical key combinations and auxiliary mouse inputs globally before target applications receive them.
   - **Windows Window Manager / DWM**: Live Z-order enumeration, active window focus transitions, DPI-aware bounds retrieval, and window positioning.
@@ -46,5 +51,6 @@ graph TD
   - **System Tray & Toast**: Native Win32 notification icon, context menu, and critical error toast notifications.
   - **Windows Task Scheduler**: Elevation-preserving logon trigger executing silently without repetitive UAC prompts.
   - **Local Filesystem**: Non-volatile storage for user configuration (`%APPDATA%\WiraDesk\config.toml`) and append-only diagnostic log (`%APPDATA%\WiraDesk\wiradesk.log`).
-  - **GitHub Releases**: Hosts the release descriptor the daemon polls and the installer settings can download on confirmation (CAP-13). The only external system Wira Desk ever talks to.
-- **Network Boundaries**: One outbound path — the update check (`BR-8`). An HTTPS `GET` to GitHub Releases, host- and path-pinned, carrying no payload beyond the request itself and no identifying data; toggleable from Settings. Nothing else in the product makes a network connection.
+  - **Wira Delta Studio API (`wiradelta.id`)**: Hosts the update check descriptor endpoint polled periodically by the daemon and manually by Settings without redirects (`BR-8`, CAP-13).
+  - **GitHub Releases (`github.com`)**: Hosts the release installer binaries and portable archives downloaded upon user confirmation.
+- **Network Boundaries**: Exactly two bounded outbound paths. Update descriptor checks query `https://wiradelta.id/api/v1/update/wira-desk/` under `Redirects::Never` carrying strictly the 4-part User-Agent contract (`WiraDesk/<version> (Windows <major>.<minor>.<build>; <arch>)`). Confirmed installer updates download the setup binary from GitHub Releases with SHA-256 validation. Nothing else in the product makes a network connection.

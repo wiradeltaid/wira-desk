@@ -5,13 +5,14 @@ satisfies: [FR-24, FR-25]
 blocked_by:
   - SPEC-30-03
   - SPEC-30-08
-status: ready-for-agent
+status: closed
 touches:
   - .what/business-rules.md
   - .how/_platform/c4-l1-system-context.md
   - .what/_prd/wira-desk/prd.md
   - .what/settings/SRS-settings.md
-  - .what/window-management/SRS-window-management.md
+  - .what/settings/04-usecases/UC-8-check-for-updates.md
+  - .control/registry/requirements-wira-desk.yaml
 tests:
   - corpus::tests::validate_corpus_reconciles_cleanly
 ---
@@ -22,7 +23,7 @@ tests:
 
 **Blocked by:** SPEC-30-03, SPEC-30-08
 
-**Status:** ready-for-agent
+**Status:** closed
 
 ## Implementation Details
 
@@ -33,8 +34,8 @@ tests:
 
 ## Acceptance Criteria
 
-- [ ] Every guard and corpus validator is observed red on drift before update, then green.
-- [ ] `validate.py` passes with zero findings across the corpus.
-- [ ] `wdi-reconcile` reports zero drift regarding update checks, network boundaries, and external endpoints.
-- [ ] No `DEC-` records violated or left unreconciled.
-- [ ] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.
+- [x] Every guard and corpus validator is observed red on drift before update, then green.
+- [x] `validate.py` passes with zero findings across the corpus.
+- [x] `wdi-reconcile` reports zero drift regarding update checks, network boundaries, and external endpoints.
+- [x] No `DEC-` records violated or left unreconciled.
+- [x] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.
