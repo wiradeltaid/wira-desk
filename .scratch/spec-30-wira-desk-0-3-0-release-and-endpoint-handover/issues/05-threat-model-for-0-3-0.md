@@ -3,7 +3,7 @@ id: SPEC-30-05
 component: settings
 satisfies: [FR-24, FR-25]
 blocked_by: [SPEC-30-04]
-status: ready-for-agent
+status: closed
 touches:
   - docs/threat-model.md
 tests:
@@ -16,7 +16,7 @@ tests:
 
 **Blocked by:** SPEC-30-04 (ensures `SECURITY.md` is finalized and synchronized before threat model verification)
 
-**Status:** ready-for-agent
+**Status:** closed
 
 ## Implementation Details
 
@@ -27,8 +27,8 @@ tests:
 
 ## Acceptance Criteria
 
-- [ ] Every guard and documentation check is observed red on today's codebase before implementation, then green.
-- [ ] Outdated claims regarding single network boundary, absent window title usage, and absent log rotation are completely removed.
-- [ ] Residual risks list matches `SECURITY.md` Section 9 verbatim in content and items.
-- [ ] PR description cites `file:line` references for every newly documented code behavior.
-- [ ] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.
+- [x] Every guard and documentation check is observed red on today's codebase before implementation, then green.
+- [x] Outdated claims regarding single network boundary, absent window title usage, and absent log rotation are completely removed.
+- [x] Residual risks list matches `SECURITY.md` Section 9 verbatim in content and items.
+- [x] PR description cites `file:line` references for every newly documented code behavior.
+- [x] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.

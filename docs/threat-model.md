@@ -83,17 +83,18 @@ bounded, and the bound is enforced by design rather than by review:
   modifier release leaves the focused application believing the key is still held, which is
   a worse bug than an occasional Start Menu.
 - Outbound network requests are strictly limited to the updater. No background socket or telemetry
-  exists in `crates/`. Outbound HTTPS is restricted to `github.com/wiradeltaid/wira-desk` for
-  version check (`latest.json`) and user-confirmed installer downloads.
+  exists in `crates/`. Outbound HTTPS is restricted to two bounded destinations:
+  `https://wiradelta.id/api/v1/update/wira-desk/` for descriptor checks without redirects, and
+  `github.com/wiradeltaid/wira-desk` for user-confirmed installer downloads.
 
 ## Trust boundaries and attack surface
 
 ### Outbound network boundary and updater trust model
 
-The application contains an updater module (`WinHttp` in `crates/daemon/src/updatecheck.rs` and `crates/settings/src/update.rs`). Its trust boundary is bounded and transparent:
+The application contains an updater module (`WinHttp` in `crates/daemon/src/updatecheck.rs`, `crates/shared/src/https.rs`, and `crates/settings/src/update.rs`). Its trust boundary is bounded and transparent across two distinct network paths:
 
-- **Strict host and path pinning:** Outbound HTTPS requests are hardcoded to `github.com/wiradeltaid/wira-desk`. Any URL outside this origin or using insecure protocols is rejected.
-- **Payload integrity:** Version descriptors (`latest.json`) are parsed under strict size caps (`DESCRIPTOR_LIMIT`). Binary setup installers are verified against published SHA-256 digests prior to launching.
+- **Canonical descriptor check endpoint:** The daemon (periodically every 24 hours, toggleable via `general.check_updates`) and Settings (on demand) query `https://wiradelta.id/api/v1/update/wira-desk/`. Requests enforce `WINHTTP_OPTION_REDIRECT_POLICY_NEVER` (`crates/shared/src/https.rs`), ensuring HTTP 3xx responses fail rather than following redirects. The request carries strictly the 4-part User-Agent contract `WiraDesk/<version> (Windows <major>.<minor>.<build>; <arch>)` backed by `RtlGetVersion` and `IsWow64Process2`, containing no user, machine, or configuration identifiers. The server keeps IP addresses and request logs for 30 days before reducing them to daily aggregate counts with no IP addresses.
+- **Payload integrity and installer downloads:** Version descriptors are parsed under strict size caps (`DESCRIPTOR_LIMIT`). The binary setup installer is downloaded exclusively from `github.com/wiradeltaid/wira-desk` under `Redirects::Follow` and verified against published SHA-256 digests prior to launching.
 - **User consent & elevation boundary:** The installer executable is downloaded only upon explicit user action ("Download and install" in Settings). Launching Setup triggers the standard Windows UAC prompt for elevation, ensuring administrative consent is never bypassed silently.
 - **Opt-out:** Automatic update checking can be toggled off completely in Settings.
 
@@ -211,7 +212,13 @@ global keyboard hooks fighting over the same shortcut.
 One `EnumWindows` sweep per accepted command, with no cache between commands. Only
 non-blocking metadata is read — visibility, cloak state, class name, executable basename —
 so a hung window answers as fast as a healthy one and cannot stall the daemon. Window
-titles are not used for switching decisions.
+titles are not used for non-visual switching decisions.
+
+When the visual switcher overlay is active, the overlay reads active window titles and
+icons (`crates/daemon/src/switcher/overlay.rs:39,636`) to render application preview cards,
+and requests DWM live thumbnails (`DwmRegisterThumbnail`). Titles, icons, and thumbnails
+exist in memory only while the visual switcher overlay is open, and are never logged, stored
+on disk, or transmitted over the network.
 
 ### Dependencies
 
@@ -226,8 +233,8 @@ gate is part of the release checklist rather than a one-off.
 Two separate paths, deliberately not merged:
 
 - `wiradesk.log` — user-facing Tier-2 warnings, one timestamped line each, opened and closed
-  per line so the file is never held. There is no log rotation in this version; the file
-  grows until deleted.
+  per line so the file is never held. Rotated automatically at 1 MB, with one prior generation
+  kept as `wiradesk.log.old` (bounded at ~2 MB total, `crates/daemon/src/log.rs:28`).
 - Debug trace — `#[cfg(debug_assertions)]` only, absent from release builds.
 
 Neither records keystroke content. Both live under `%APPDATA%` at medium integrity, so treat
@@ -246,26 +253,29 @@ on — not to restate what the function does.
 
 ## Residual risks
 
-Stated because a threat model that lists only what it solved is not usable.
+Stated because a threat model that lists only what it solved is not usable. Matches `SECURITY.md` Section 9:
 
-1. **Auto-start plus a user-writable install directory is an unprompted elevation path.**
-   Still not *fixable* in code — it depends on where the user installs the binary — but no
-   longer invisible: the daemon reads the location's permissions and raises a Tier-2 warning
-   when a non-administrator could replace the executable, and it re-points a stale task at
-   the running binary. The warning does not block, so a user who proceeds anyway keeps the
-   exposure. What changed is that they proceed knowing. See
-   [Auto-start is an elevation path](#auto-start-is-an-elevation-path).
-2. **A hostile `config.toml` write influences elevated behaviour.** Bounded to typed fields
-   with no path or command among them, but not nil.
-3. **Releases are unsigned.** See `SECURITY.md` for what can be verified today.
-4. **No log rotation.** `wiradesk.log` grows without bound until deleted.
-5. **The COM virtual-desktop path is minimally exercised.** `context/virtual_desktop.rs`
-   declares the `IVirtualDesktopManager` vtable by hand because no binding ships for it.
-   Slot order and both GUIDs are pinned by tests, and every failure returns "unknown" so the
-   caller fails closed, but the interface layout remains an assumption about an undocumented
+1. **Auto-start from a user-writable folder is an unprompted elevation path.**
+   Auto-start from a folder an ordinary user can write to remains an escalation route without a prompt if
+   you proceed past the warning in [Auto-start is an elevation path](#auto-start-is-an-elevation-path).
+2. **A hostile `config.toml` write influences elevated behavior.**
+   A deliberate write to `config.toml` by a malicious party can influence the behavior of the daemon,
+   which runs with Administrator rights, limited to typed fields with no path or command execution.
+3. **Releases are unsigned.**
+   See `SECURITY.md` for what can be verified today.
+4. **Temporary folder execution window before signature verification.**
+   Between the moment the installer's checksum is matched and the moment Windows starts it, another
+   program running as the same user could replace the file in the temp folder. The window is small, and
+   it closes properly only with a signature check once release files are signed. The risk is no worse
+   than downloading the installer yourself and running it.
+5. **The COM virtual-desktop path is minimally exercised.**
+   `context/virtual_desktop.rs` declares the `IVirtualDesktopManager` vtable by hand because no binding
+   ships for it. Slot order and both GUIDs are pinned by tests, and every failure returns "unknown" so
+   the caller fails closed, but the interface layout remains an assumption about an undocumented
    shell interface.
-6. **Denial of the shortcut is cheap.** Squatting the mutex name, or writing a bypass list
-   that matches everything, disables the feature. Neither grants privilege.
+6. **Denial of the shortcut is cheap.**
+   Shortcuts can be disabled through mutex squatting or abuse of the exception lists, with no gain in
+   rights. Neither grants privilege.
 
 Previously listed here and now closed: `WM_APP_CONFIG_SNAPSHOT` no longer carries a pointer,
 so the handler cannot be handed an address it did not create. See
