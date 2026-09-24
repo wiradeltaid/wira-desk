@@ -3,7 +3,7 @@
 > Alternância nativa e leve entre janelas do mesmo aplicativo, ajuste por zonas e navegação com mouse sem drivers para Windows 11 — escrito em Rust 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -30,11 +30,11 @@ Baixe o instalador (`WiraDesk-*-x64-setup.exe`) na [página de lançamentos](htt
 Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 ```
 
-Instala com privilégios elevados em `%ProgramFiles%\Wira Desk`. A inicialização automática é opcional e pode ser configurada nas Configurações ou pelo ícone da bandeja.
+Instala com privilégios elevados em `%ProgramFiles%\Wira Desk`. A inicialização automática é sugerida durante a integração inicial (onboarding) com uma opção pré-marcada, e pode ser configurada a qualquer momento nas Configurações ou pelo ícone da bandeja.
 
-### Binários Portáteis Avulsos (Portable)
+### Arquivo Portátil (Portable Archive)
 
-Baixe os executáveis avulsos `wiradesk.exe` e `wiradesk-settings.exe` em uma pasta com permissões de administrador e execute `wiradesk.exe` como Administrador.
+Baixe `WiraDesk-*-x64-portable.zip` na [página de lançamentos](https://github.com/wiradeltaid/wira-desk/releases) e extraia em uma pasta com permissões de administrador. Execute `wiradesk.exe` como Administrador.
 
 ---
 
@@ -65,7 +65,7 @@ Os botões do polegar alternam por padrão para a área de trabalho virtual ante
 
 ## Por que escolher o Wira Desk
 
-O Windows não tem um recurso nativo para alternar entre as janelas de um mesmo aplicativo. O PowerToys, um download separado da Microsoft, adicionou o Window Hopper na versão 0.101 (desativado por padrão), e as ferramentas dos fabricantes cuidam dos botões do mouse; juntos, eles rodam vários processos em segundo plano que usam de 150 a 500 MB de RAM. O Wira Desk roda como um único daemon nativo em segundo plano que usa cerca de 4.0 MB de memória privada (abaixo de um orçamento de 5 MB), sem telemetria.
+O Windows não tem um recurso nativo para alternar entre as janelas de um mesmo aplicativo. O PowerToys, um download separado da Microsoft, adicionou o Window Hopper na versão 0.101 (desativado por padrão), e as ferramentas dos fabricantes cuidam dos botões do mouse; juntos, eles rodam vários processos em segundo plano. O Wira Desk roda como um único daemon nativo em segundo plano que usa cerca de 4.0 MB de memória privada (abaixo de um orçamento de 5 MB). Sem necessidade de cadastro, sem análise de dados, sem envio de relatórios de falhas.
 
 ---
 
@@ -79,8 +79,8 @@ O Windows não tem um recurso nativo para alternar entre as janelas de um mesmo 
 
 ## Sobre e Termos Legais
 
-**Wira Delta Indonesia** é o estúdio de software responsável por este projeto. Desenvolvido e mantido por [@kodesh87](https://github.com/kodesh87).
+**Wira Delta Indonesia** é o estúdio de software responsável por este projeto.
 
 - **Licença:** [GPL-3.0-only](LICENSE). Os créditos a bibliotecas de terceiros estão listados em [NOTICE](NOTICE). Interface criada com [Slint](https://slint.dev).
-- **Privacidade e Segurança:** Zero telemetria, sem necessidade de cadastro, sem serviço de atualização em segundo plano. Consulte [PRIVACY.md](PRIVACY.md) e [SECURITY.md](SECURITY.md).
+- **Privacidade e Segurança:** Sem necessidade de cadastro, sem análise de dados, sem envio de relatórios de falhas. As verificações de atualização consultam wiradelta.id. Consulte [PRIVACY.md](PRIVACY.md) e [SECURITY.md](SECURITY.md).
 - **O Nome e o Ícone:** A licença GPL concede direitos sobre o código, não sobre nomes ou logotipos. Os nomes **Wira Desk** e **Wira Delta Indonesia**, bem como o ícone do produto, são propriedade da PT Wira Delta Indonesia.

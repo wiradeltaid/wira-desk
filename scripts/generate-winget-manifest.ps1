@@ -90,7 +90,7 @@ PackageIdentifier: $identifier
 PackageVersion: $Version
 PackageLocale: en-US
 Publisher: Wira Delta Indonesia
-PublisherUrl: https://wiradelta.id
+PublisherUrl: https://wiradelta.id/
 PublisherSupportUrl: https://github.com/$repo/issues
 PackageName: Wira Desk
 PackageUrl: https://github.com/$repo
@@ -98,16 +98,16 @@ License: GPL-3.0-only
 LicenseUrl: https://github.com/$repo/blob/main/LICENSE
 Copyright: Copyright (c) 2026 Wira Delta Indonesia
 PrivacyUrl: https://github.com/$repo/blob/main/PRIVACY.md
-ShortDescription: Lightweight desktop tools for Windows - same-app window switching and window arrangement via a tray daemon.
+ShortDescription: Same-app window cycling, one-key snapping, and mouse button mapping for Windows 11.
 Description: |-
   Wira Desk runs as an elevated system-tray daemon with global low-level keyboard and mouse
-  hooks for same-app window switching, window arrangement, and driver-free mouse button
+  hooks for same-app window cycling, window arrangement, and driver-free mouse button
   mapping, plus a Settings companion app for configuring shortcuts.
 
   The installer requires Administrator and installs to %ProgramFiles%, which is deliberate:
   auto-start runs the daemon elevated at every logon with no prompt, so a directory only
-  administrators can write is what protects it. Auto-start is not switched on by the
-  installer - that stays the user's choice from the tray menu or Settings.
+  administrators can write is what protects it. Auto-start is prompted during onboarding with
+  a pre-checked option, and can be changed anytime from the tray menu or Settings.
 Moniker: wiradesk
 Tags:
   - window-manager

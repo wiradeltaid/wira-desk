@@ -3,7 +3,7 @@
 > Windows 11向けの軽量・ネイティブな同一アプリ内ウィンドウ切り替え、ゾーンスナップ、ドライバ不要マウスナビゲーション — Rust 製 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -30,11 +30,11 @@ scoop install wiradesk
 Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 ```
 
-`%ProgramFiles%\Wira Desk` に管理者権限でインストールされます。スタートアップ登録は任意であり、「設定」またはトレイアイコンから変更可能です。
+`%ProgramFiles%\Wira Desk` に管理者権限でインストールされます。スタートアップ登録は初期設定（オンボーディング）時にチェック済みの選択肢として案内され、後から「設定」やトレイアイコンからいつでも変更可能です。
 
-### スタンドアロンバイナリ (Portable)
+### ポータブルアーカイブ (Portable)
 
-スタンドアロンの `wiradesk.exe` および `wiradesk-settings.exe` を管理者権限ディレクトリにダウンロードし、`wiradesk.exe` を管理者として実行してください。
+[Releases ページ](https://github.com/wiradeltaid/wira-desk/releases) から `WiraDesk-*-x64-portable.zip` をダウンロードし、管理者権限ディレクトリに展開して `wiradesk.exe` を管理者として実行してください。
 
 ---
 
@@ -65,7 +65,7 @@ Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 
 ## なぜ Wira Desk なのか
 
-Windows には、同じアプリのウィンドウだけを切り替える標準機能がありません。Microsoft が別途配布している PowerToys はバージョン 0.101 で Window Hopper を追加しましたが（既定では無効）、マウスボタンは周辺機器メーカーのツールが担います。これらを合わせると、複数のバックグラウンドプロセスで 150〜500 MB のメモリを使います。Wira Desk は単一のネイティブ常駐プロセスとして動作し、プライベートメモリは約 4.0 MB（予算 5 MB 以下）で、テレメトリはありません。
+Windows には、同じアプリのウィンドウだけを切り替える標準機能がありません。Microsoft が別途配布している PowerToys はバージョン 0.101 で Window Hopper を追加しましたが（既定では無効）、マウスボタンは周辺機器メーカーのツールが担います。これらを合わせると、複数のバックグラウンドプロセスが動作します。Wira Desk は単一のネイティブ常駐プロセスとして動作し、プライベートメモリは約 4.0 MB（予算 5 MB 以下）です。アカウント不要、アナリティクスなし、クラッシュレポート送信なし。
 
 ---
 
@@ -79,8 +79,8 @@ Windows には、同じアプリのウィンドウだけを切り替える標準
 
 ## 権利表記と法的事項
 
-**Wira Delta Indonesia** は本プロジェクトの開発元スタジオです。[@kodesh87](https://github.com/kodesh87) が開発・保守を行っています。
+**Wira Delta Indonesia** は本プロジェクトの開発元スタジオです。
 
 - **ライセンス:** [GPL-3.0-only](LICENSE)。サードパーティ製コンポーネントの権利表記は [NOTICE](NOTICE) に記載されています。UI は [Slint](https://slint.dev) を使用しています。
-- **プライバシーとセキュリティ:** テレメトリゼロ、アカウント不要、バックグラウンド自動アップデートサービスなし。[PRIVACY.md](PRIVACY.md) および [SECURITY.md](SECURITY.md) を参照してください。
+- **プライバシーとセキュリティ:** アカウント不要、アナリティクスなし、クラッシュレポート送信なし。更新確認は wiradelta.id へ問い合わせます。[PRIVACY.md](PRIVACY.md) および [SECURITY.md](SECURITY.md) を参照してください。
 - **名称とアイコンについて:** GPL ライセンスはコードの権利を許諾するものであり、名称や商標を許諾するものではありません。**Wira Desk** および **Wira Delta Indonesia** の名称、製品アイコンは PT Wira Delta Indonesia の権利物です。

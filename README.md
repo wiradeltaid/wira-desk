@@ -3,7 +3,7 @@
 > Lightweight, native same-app window cycling, zone snapping, and driverless mouse navigation for Windows 11 - written in Rust 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -28,11 +28,11 @@ Download the installer (`WiraDesk-*-x64-setup.exe`) from the [releases page](htt
 Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 ```
 
-Installs elevated to `%ProgramFiles%\Wira Desk`. Auto-start is opt-in and configurable from Settings or the tray icon.
+Installs elevated to `%ProgramFiles%\Wira Desk`. Auto-start is prompted during onboarding with a pre-checked option, and can be changed anytime from Settings or the tray icon.
 
-### Loose Binaries (Portable)
+### Portable Archive
 
-Download loose `wiradesk.exe` and `wiradesk-settings.exe` into an administrator-only directory and run `wiradesk.exe` as Administrator.
+Download `WiraDesk-*-x64-portable.zip` from the [releases page](https://github.com/wiradeltaid/wira-desk/releases) and extract into an administrator-only directory. Run `wiradesk.exe` as Administrator.
 
 ---
 
@@ -63,7 +63,7 @@ Thumb buttons default to previous/next virtual desktop; tilt wheel defaults to S
 
 ## Why
 
-Windows has no built-in same-app window cycling. PowerToys, a separate download from Microsoft, added Window Hopper in 0.101 (off by default), and vendor tools handle the mouse buttons; together they run several background processes using 150-500 MB of RAM. Wira Desk runs as a single native background daemon using about 4.0 MB of private memory (under a 5 MB budget), with zero telemetry.
+Windows has no built-in same-app window cycling. PowerToys, a separate download from Microsoft, added Window Hopper in 0.101 (off by default), and vendor tools handle the mouse buttons; together they run multiple background processes. Wira Desk runs as a single native background daemon using about 4.0 MB of private memory (under a 5 MB budget). No account, no analytics, no crash reporting.
 
 ---
 
@@ -80,5 +80,5 @@ Windows has no built-in same-app window cycling. PowerToys, a separate download 
 **Wira Delta Indonesia** is the studio behind this project. Built and maintained by [@kodesh87](https://github.com/kodesh87).
 
 - **License:** [GPL-3.0-only](LICENSE). Third-party acknowledgements are listed in [NOTICE](NOTICE). Built with [Slint](https://slint.dev).
-- **Privacy & Security:** Zero telemetry, no account, no background updater service. See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
+- **Privacy & Security:** No account, no analytics, no crash reporting. Update checks query wiradelta.id. See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
 - **The Name and the Icon:** The GPL grants rights over code, not names or logos. The names **Wira Desk** and **Wira Delta Indonesia**, and the product icon, remain property of Wira Delta Indonesia.

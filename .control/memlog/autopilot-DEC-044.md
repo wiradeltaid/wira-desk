@@ -13,7 +13,7 @@ Run branch: autopilot/DEC-044
 Stopped at: —
 Blocked: —
 Parked: —
-Next: SPEC-30-06 (README, Scoop template, and WinGet generator)
+Next: SPEC-30-08 (Public facts the site reads)
 
 ## Decisions
 
@@ -28,3 +28,4 @@ Next: SPEC-30-06 (README, Scoop template, and WinGet generator)
 | Iteration 1 | SPEC-30-02 implementation | Created Settings URL registry with trailing slashes and restricted browser allowlist | Inline ad-hoc URL strings and unpinned redirects | Subpath navigation vulnerabilities and redirect overhead | crates/settings/src/urls.rs, crates/settings/src/main.rs, crates/settings/src/update.rs |
 | Iteration 1 | SPEC-30-03 implementation | Synchronized About and General pane copy word-for-word with approved ops Section C fixture and removed all promotional slop | Retaining legacy marketing claims and British spellings | Drift from approved legal terms and brand SSOT | crates/settings/ui/panes/about_pane.slint, crates/settings/ui/panes/general_pane.slint, crates/settings/src/main.rs, crates/settings/src/app.rs |
 | Iteration 1 | SPEC-30-07 implementation | Packaged portable zip with 4 required files, eliminated loose binaries, added verify-release-artifacts.ps1 with strict allowlist, and updated CI | Uploading loose binaries and missing zip asset | Broken manual distribution and unvalidated release archives | .github/workflows/release.yml, .github/workflows/ci.yml, scripts/verify-release-artifacts.ps1 |
+| Iteration 1 | SPEC-30-06 implementation | Synchronized 10 README translations, Scoop template, and WinGet generator with Section A, accurate auto-start, and portable zip | Citing unmeasured competitor RAM numbers and loose binary downloads | Brand copy drift and outdated installation instructions | README*.md, packaging/scoop-bucket/bucket/wiradesk.json, scripts/generate-winget-manifest.ps1 |

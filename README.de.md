@@ -3,7 +3,7 @@
 > Schlanker, nativer Fensterwechsel für dieselbe App, Zonen-Snapping und treiberlose Mausnavigation für Windows 11 — geschrieben in Rust 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -30,11 +30,11 @@ Laden Sie das Installationsprogramm (`WiraDesk-*-x64-setup.exe`) von der [Releas
 Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 ```
 
-Die Installation erfolgt mit Administratorrechten unter `%ProgramFiles%\Wira Desk`. Der Autostart ist optional und kann in den Einstellungen oder über das Tray-Icon konfiguriert werden.
+Die Installation erfolgt mit Administratorrechten unter `%ProgramFiles%\Wira Desk`. Der Autostart wird während der Ersteinrichtung (Onboarding) vorausgewählt angeboten und kann in den Einstellungen oder über das Tray-Icon jederzeit geändert werden.
 
-### Standalone-Binärdateien (Portable)
+### Portables Archiv (Portable Archive)
 
-Laden Sie die eigenständigen Binärdateien `wiradesk.exe` und `wiradesk-settings.exe` in ein Verzeichnis mit Administratorrechten herunter und führen Sie `wiradesk.exe` als Administrator aus.
+Laden Sie `WiraDesk-*-x64-portable.zip` von der [Release-Seite](https://github.com/wiradeltaid/wira-desk/releases) herunter und entpacken Sie es in ein Verzeichnis mit Administratorrechten. Führen Sie `wiradesk.exe` als Administrator aus.
 
 ---
 
@@ -65,7 +65,7 @@ Daumentasten wechseln standardmäßig zum vorherigen/nächsten virtuellen Deskto
 
 ## Warum Wira Desk
 
-Windows bietet kein integriertes Wechseln zwischen den Fenstern derselben App. PowerToys, ein separater Download von Microsoft, hat in Version 0.101 Window Hopper ergänzt (standardmäßig deaktiviert), und Herstellertools übernehmen die Maustasten; zusammen laufen dafür mehrere Hintergrundprozesse mit 150–500 MB RAM. Wira Desk läuft als einzelner nativer Hintergrunddienst mit etwa 4.0 MB privatem Speicher (unter dem 5-MB-Budget) und ohne Telemetrie.
+Windows bietet kein integriertes Wechseln zwischen den Fenstern derselben App. PowerToys, ein separater Download von Microsoft, hat in Version 0.101 Window Hopper ergänzt (standardmäßig deaktiviert), und Herstellertools übernehmen die Maustasten; zusammen laufen dafür mehrere Hintergrundprozesse. Wira Desk läuft als einzelner nativer Hintergrunddienst mit etwa 4.0 MB privatem Speicher (unter dem 5-MB-Budget). Kein Benutzerkonto, keine Datenanalyse, keine Absturzberichte.
 
 ---
 
@@ -79,8 +79,8 @@ Windows bietet kein integriertes Wechseln zwischen den Fenstern derselben App. P
 
 ## Über das Projekt & Rechtliches
 
-**Wira Delta Indonesia** ist das verantwortliche Software-Studio. Entwickelt und gepflegt von [@kodesh87](https://github.com/kodesh87).
+**Wira Delta Indonesia** ist das verantwortliche Software-Studio.
 
 - **Lizenz:** [GPL-3.0-only](LICENSE). Danksagungen und Lizenzen Dritter sind in [NOTICE](NOTICE) aufgeführt. Erstellt mit [Slint](https://slint.dev).
-- **Datenschutz & Sicherheit:** Null Telemetrie, kein Benutzerkonto, kein stiller Update-Dienst. Siehe [PRIVACY.md](PRIVACY.md) und [SECURITY.md](SECURITY.md).
+- **Datenschutz & Sicherheit:** Kein Benutzerkonto, keine Datenanalyse, keine Absturzberichte. Update-Prüfungen kontaktieren wiradelta.id. Siehe [PRIVACY.md](PRIVACY.md) und [SECURITY.md](SECURITY.md).
 - **Name und Logo:** Die GPL gewährt Rechte am Code, nicht an Namen oder Markenzeichen. Die Namen **Wira Desk** und **Wira Delta Indonesia** sowie das Produkt-Icon verbleiben im Eigentum der PT Wira Delta Indonesia.

@@ -3,7 +3,7 @@
 > Легковесное, нативное переключение окон одного приложения, зонирование и навигация мышью без драйверов для Windows 11 — написано на Rust 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -30,11 +30,11 @@ scoop install wiradesk
 Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 ```
 
-Устанавливается с повышением прав в `%ProgramFiles%\Wira Desk`. Автозапуск при старте системы опционален и настраивается в параметрах или через значок в системном трее.
+Устанавливается с повышением прав в `%ProgramFiles%\Wira Desk`. Автозапуск при старте системы предлагается при начальной настройке (onboarding) с предустановленной галочкой и может быть изменен в любой момент в параметрах или через значок в системном трее.
 
-### Портативные бинарные файлы (Portable)
+### Портативный архив (Portable Archive)
 
-Загрузите отдельные бинарные файлы `wiradesk.exe` и `wiradesk-settings.exe` в директорию с правами администратора и запустите `wiradesk.exe` от имени администратора.
+Загрузите `WiraDesk-*-x64-portable.zip` со [страницы релизов](https://github.com/wiradeltaid/wira-desk/releases) и распакуйте в директорию с правами администратора. Запустите `wiradesk.exe` от имени администратора.
 
 ---
 
@@ -65,7 +65,7 @@ Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 
 ## Почему именно Wira Desk
 
-В Windows нет встроенного переключения между окнами одного приложения. PowerToys, отдельная загрузка от Microsoft, добавил Window Hopper в версии 0.101 (по умолчанию выключен), а кнопками мыши управляют фирменные утилиты производителей; вместе они держат несколько фоновых процессов, которые занимают 150–500 МБ оперативной памяти. Wira Desk работает как один нативный фоновый процесс, использующий около 4.0 МБ частной памяти (в пределах бюджета 5 МБ), без телеметрии.
+В Windows нет встроенного переключения между окнами одного приложения. PowerToys, отдельная загрузка от Microsoft, добавил Window Hopper в версии 0.101 (по умолчанию выключен), а кнопками мыши управляют фирменные утилиты производителей; вместе они держат несколько фоновых процессов. Wira Desk работает как один нативный фоновый процесс, использующий около 4.0 МБ частной памяти (в пределах бюджета 5 МБ). Без учетных записей, без аналитики, без отправки отчетов о сбоях.
 
 ---
 
@@ -79,8 +79,8 @@ Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 
 ## О проекте и юридическая информация
 
-**Wira Delta Indonesia** — студия-разработчик данного проекта. Создатель и мейнтейнер — [@kodesh87](https://github.com/kodesh87).
+**Wira Delta Indonesia** — студия-разработчик данного проекта.
 
 - **Лицензия:** [GPL-3.0-only](LICENSE). Благодарности сторонним библиотекам перечислены в [NOTICE](NOTICE). Интерфейс разработан с использованием [Slint](https://slint.dev).
-- **Конфиденциальность и безопасность:** Ноль телеметрии, без создания учетных записей, без скрытых фоновых служб обновления. См. [PRIVACY.md](PRIVACY.md) и [SECURITY.md](SECURITY.md).
+- **Конфиденциальность и безопасность:** Без учетных записей, без аналитики, без отправки отчетов о сбоях. Проверка обновлений обращается к wiradelta.id. См. [PRIVACY.md](PRIVACY.md) и [SECURITY.md](SECURITY.md).
 - **Наименование и товарные знаки:** Лицензия GPL распространяется на исходный код, но не на названия и логотипы. Наименования **Wira Desk** и **Wira Delta Indonesia**, а также значок продукта остаются собственностью PT Wira Delta Indonesia.

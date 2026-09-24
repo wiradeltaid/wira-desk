@@ -1,11 +1,11 @@
 {
     "version": "0.2.0",
-    "description": "Lightweight desktop tools for Windows: a system-tray daemon for same-app window switching and window arrangement, with a Settings companion app.",
-    "homepage": "https://wiradelta.id/wira-desk",
-    "license": "MIT",
+    "description": "Same-app window cycling, one-key snapping, and mouse button mapping for Windows 11.",
+    "homepage": "https://wiradelta.id/wira-desk/",
+    "license": "GPL-3.0-only",
     "notes": [
         "This installer requires Administrator and installs to %ProgramFiles%\\Wira Desk - it is NOT a portable app, unlike most Scoop packages. `scoop install` will trigger a UAC prompt.",
-        "Auto-start is NOT switched on by the installer. Enable it from the tray menu or the Settings app if you want it.",
+        "Auto-start is prompted during onboarding with a pre-checked option. Manage it from the tray menu or Settings app.",
         "`scoop uninstall` runs the same uninstaller Add/Remove Programs would. It leaves %APPDATA%\\WiraDesk untouched - see the project README for factory reset."
     ],
     "url": "https://github.com/wiradeltaid/wira-desk/releases/download/v0.2.0/WiraDesk-0.2.0-x64-setup.exe",

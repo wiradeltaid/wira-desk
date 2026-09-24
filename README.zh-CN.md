@@ -3,7 +3,7 @@
 > 轻量、原生的 Windows 11 同应用窗口轮转、分区吸附与免驱动鼠标导航工具 —— 基于 Rust 编写 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -30,11 +30,11 @@ scoop install wiradesk
 Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 ```
 
-安装至 `%ProgramFiles%\Wira Desk`（需要管理员权限）。开机自启为可选功能，可在“设置”界面或托盘图标中配置。
+安装至 `%ProgramFiles%\Wira Desk`（需要管理员权限）。开机自启在初次引导 (onboarding) 时提供预选勾选框，可随时在“设置”或托盘图标中修改。
 
-### 独立便携式二进制文件 (Portable)
+### 便携压缩包 (Portable Archive)
 
-下载独立的 `wiradesk.exe` 和 `wiradesk-settings.exe` 到管理员专用目录，以管理员身份运行 `wiradesk.exe` 即可。
+从 [GitHub Releases 页面](https://github.com/wiradeltaid/wira-desk/releases) 下载 `WiraDesk-*-x64-portable.zip` 并解压到管理员专用目录。以管理员身份运行 `wiradesk.exe` 即可。
 
 ---
 
@@ -65,7 +65,7 @@ Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 
 ## 为什么选择 Wira Desk
 
-Windows 没有内置的同一应用窗口切换功能。PowerToys 是 Microsoft 另行提供下载的工具，在 0.101 版加入了 Window Hopper（默认关闭），鼠标按键则由厂商外设工具负责；两者合计会运行多个后台进程，占用 150–500 MB 内存。Wira Desk 作为单个原生后台守护进程运行，私有内存约 4.0 MB（低于 5 MB 预算），且没有遥测。
+Windows 没有内置的同一应用窗口切换功能。PowerToys 是 Microsoft 另行提供下载的工具，在 0.101 版加入了 Window Hopper（默认关闭），鼠标按键则由厂商外设工具负责；两者合计会运行多个后台进程。Wira Desk 作为单个原生后台守护进程运行，私有内存约 4.0 MB（低于 5 MB 预算）。无账号体系，无数据分析，无崩溃报告。
 
 ---
 
@@ -79,8 +79,8 @@ Windows 没有内置的同一应用窗口切换功能。PowerToys 是 Microsoft 
 
 ## 关于与法律条款
 
-**Wira Delta Indonesia** 为本项目背后的软件工作室。由 [@kodesh87](https://github.com/kodesh87) 构建与维护。
+**Wira Delta Indonesia** 为本项目背后的软件工作室。
 
 - **开源许可：** 采用 [GPL-3.0-only](LICENSE) 许可证。第三方开源致谢详见 [NOTICE](NOTICE)。界面基于 [Slint](https://slint.dev) 构建。
-- **隐私与安全：** 零遥测、无账号要求、无静默后台更新常驻服务。详见 [PRIVACY.md](PRIVACY.md) 与 [SECURITY.md](SECURITY.md)。
+- **隐私与安全：** 无账号体系，无数据分析，无崩溃报告。更新检查请求 wiradelta.id。详见 [PRIVACY.md](PRIVACY.md) 与 [SECURITY.md](SECURITY.md)。
 - **名称与商标声明：** GPL 许可证仅授予代码相关权利，不授予产品名称与商标权。**Wira Desk** 和 **Wira Delta Indonesia** 名称以及产品图标均为 PT Wira Delta Indonesia 保留财产。

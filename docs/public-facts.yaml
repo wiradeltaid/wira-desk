@@ -7,8 +7,7 @@ facts:
     derived_from:
       file: Cargo.toml
       pattern: 'version\s*=\s*"([^"]+)"'
-    appears_in:
-      - README.md
+    appears_in: []
 
   - id: switcher_hold_delay_default_ms
     value: 300

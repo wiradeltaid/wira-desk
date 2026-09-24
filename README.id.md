@@ -3,7 +3,7 @@
 > Perpindahan jendela satu aplikasi yang ringan dan native, zone snapping, dan navigasi mouse tanpa driver untuk Windows 11 — ditulis dengan Rust 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -30,11 +30,11 @@ Unduh penginstal (`WiraDesk-*-x64-setup.exe`) dari [halaman rilis](https://githu
 Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 ```
 
-Terpasang dengan hak elevasi di `%ProgramFiles%\Wira Desk`. Auto-start bersifat opsional dan dapat diatur dari Pengaturan atau ikon tray.
+Terpasang dengan hak elevasi di `%ProgramFiles%\Wira Desk`. Pilihan auto-start ditawarkan saat orientasi (onboarding) dengan opsi tercentang, dan dapat diubah kapan saja dari Pengaturan atau ikon tray.
 
-### Biner Mandiri (Portable)
+### Arsip Portabel (Portable)
 
-Unduh berkas biner mandiri `wiradesk.exe` dan `wiradesk-settings.exe` ke direktori khusus administrator dan jalankan `wiradesk.exe` sebagai Administrator.
+Unduh `WiraDesk-*-x64-portable.zip` dari [halaman rilis](https://github.com/wiradeltaid/wira-desk/releases) dan ekstrak ke direktori khusus administrator. Jalankan `wiradesk.exe` sebagai Administrator.
 
 ---
 
@@ -65,7 +65,7 @@ Tombol jempol secara bawaan beralih ke desktop virtual sebelumnya/berikutnya; ti
 
 ## Mengapa Wira Desk
 
-Windows tidak punya fitur bawaan untuk berpindah antarjendela dari aplikasi yang sama. PowerToys, unduhan terpisah dari Microsoft, menambahkan Window Hopper di versi 0.101 (nonaktif secara default), sementara utilitas vendor mengatur tombol mouse; bersama-sama keduanya menjalankan beberapa proses latar belakang yang memakai 150–500 MB RAM. Wira Desk berjalan sebagai satu daemon latar belakang native yang memakai sekitar 4.0 MB memori privat (di bawah anggaran 5 MB), tanpa telemetri.
+Windows tidak punya fitur bawaan untuk berpindah antarjendela dari aplikasi yang sama. PowerToys, unduhan terpisah dari Microsoft, menambahkan Window Hopper di versi 0.101 (nonaktif secara default), sementara utilitas vendor mengatur tombol mouse; bersama-sama keduanya menjalankan beberapa proses latar belakang. Wira Desk berjalan sebagai satu daemon latar belakang native yang memakai sekitar 4.0 MB memori privat (di bawah anggaran 5 MB). Tanpa akun, tanpa analitik, tanpa pelaporan crash.
 
 ---
 
@@ -79,8 +79,8 @@ Windows tidak punya fitur bawaan untuk berpindah antarjendela dari aplikasi yang
 
 ## Tentang & Ketentuan Hukum
 
-**Wira Delta Indonesia** adalah studio di balik proyek ini. Dibangun dan dipelihara oleh [@kodesh87](https://github.com/kodesh87).
+**Wira Delta Indonesia** adalah studio di balik proyek ini.
 
 - **Lisensi:** [GPL-3.0-only](LICENSE). Atribusi pihak ketiga tercantum di [NOTICE](NOTICE). Dibangun menggunakan [Slint](https://slint.dev).
-- **Privasi & Keamanan:** Nol telemetri, tanpa pembuatan akun, tanpa layanan pembaruan latar belakang yang berjalan diam-diam. Lihat [PRIVACY.md](PRIVACY.md) dan [SECURITY.md](SECURITY.md).
+- **Privasi & Keamanan:** Tanpa akun, tanpa analitik, tanpa pelaporan crash. Pemeriksaan pembaruan menghubungi wiradelta.id. Lihat [PRIVACY.md](PRIVACY.md) dan [SECURITY.md](SECURITY.md).
 - **Nama dan Ikon:** Lisensi GPL memberikan hak atas kode, bukan atas nama atau logo. Nama **Wira Desk** dan **Wira Delta Indonesia**, serta ikon produk, tetap merupakan hak milik Wira Delta Indonesia.

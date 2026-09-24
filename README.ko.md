@@ -3,7 +3,7 @@
 > Windows 11을 위한 가볍고 네이티브한 동일 앱 창 전환, 영역 스냅, 드라이버 없는 마우스 탐색 도구 — Rust로 작성됨 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -30,11 +30,11 @@ scoop install wiradesk
 Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 ```
 
-관리자 권한으로 `%ProgramFiles%\Wira Desk`에 설치됩니다. 시작 프로그램 등록은 선택 사항이며 설정 화면이나 트레이 아이콘에서 조정할 수 있습니다.
+관리자 권한으로 `%ProgramFiles%\Wira Desk`에 설치됩니다. 시작 프로그램 등록은 초기 온보딩(onboarding) 과정에서 미리 체크된 옵션으로 안내되며, 언제든지 설정 화면이나 트레이 아이콘에서 변경할 수 있습니다.
 
-### 포터블 단독 실행 바이너리 (Portable)
+### 포터블 아카이브 (Portable Archive)
 
-단독 `wiradesk.exe` 및 `wiradesk-settings.exe`를 관리자 전용 폴더에 다운로드하고 관리자 권한으로 `wiradesk.exe`를 실행하십시오.
+[GitHub Releases 페이지](https://github.com/wiradeltaid/wira-desk/releases)에서 `WiraDesk-*-x64-portable.zip`을 다운로드하여 관리자 전용 폴더에 압축을 푼 뒤, 관리자 권한으로 `wiradesk.exe`를 실행하십시오.
 
 ---
 
@@ -65,7 +65,7 @@ Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 
 ## 왜 Wira Desk인가
 
-Windows에는 같은 앱의 창끼리만 전환하는 기본 기능이 없습니다. Microsoft가 별도로 배포하는 PowerToys는 0.101 버전에서 Window Hopper를 추가했고(기본값은 꺼짐), 마우스 버튼은 제조사 유틸리티가 맡습니다. 이들을 함께 쓰면 여러 백그라운드 프로세스가 150~500 MB의 RAM을 사용합니다. Wira Desk는 약 4.0 MB의 프라이빗 메모리(예산 5 MB 이하)를 쓰는 단일 네이티브 백그라운드 데몬으로 동작하며, 원격 측정이 없습니다.
+Windows에는 같은 앱의 창끼리만 전환하는 기본 기능이 없습니다. Microsoft가 별도로 배포하는 PowerToys는 0.101 버전에서 Window Hopper를 추가했고(기본값은 꺼짐), 마우스 버튼은 제조사 유틸리티가 맡습니다. 이들을 함께 쓰면 여러 백그라운드 프로세스가 동작합니다. Wira Desk는 약 4.0 MB의 프라이빗 메모리(예산 5 MB 이하)를 쓰는 단일 네이티브 백그라운드 데몬으로 동작합니다. 계정 생성 불필요, 데이터 분석 없음, 충돌 보고서 전송 없음.
 
 ---
 
@@ -79,8 +79,8 @@ Windows에는 같은 앱의 창끼리만 전환하는 기본 기능이 없습니
 
 ## 정보 및 법적 고지
 
-**Wira Delta Indonesia**는 본 프로젝트를 운영하는 소프트웨어 스튜디오입니다. [@kodesh87](https://github.com/kodesh87)이 개발 및 관리하고 있습니다.
+**Wira Delta Indonesia**는 본 프로젝트를 운영하는 소프트웨어 스튜디오입니다.
 
 - **라이선스:** [GPL-3.0-only](LICENSE). 타사 오픈소스 라이선스 고지는 [NOTICE](NOTICE)에 정리되어 있습니다. UI는 [Slint](https://slint.dev)로 구현되었습니다.
-- **개인정보 보호 및 보안:** 원격 측정 0, 계정 생성 불필요, 백그라운드 자동 업데이트 서비스 없음. [PRIVACY.md](PRIVACY.md) 및 [SECURITY.md](SECURITY.md)를 참조하십시오.
+- **개인정보 보호 및 보안:** 계정 생성 불필요, 데이터 분석 없음, 충돌 보고서 전송 없음. 업데이트 확인은 wiradelta.id로 요청합니다. [PRIVACY.md](PRIVACY.md) 및 [SECURITY.md](SECURITY.md)를 참조하십시오.
 - **명칭 및 상표권 고지:** GPL 라이선스는 소스 코드에 대한 권리를 부여하며 제품명이나 로고 상표권을 부여하지 않습니다. **Wira Desk** 및 **Wira Delta Indonesia** 명칭과 제품 아이콘은 PT Wira Delta Indonesia의 자산입니다.

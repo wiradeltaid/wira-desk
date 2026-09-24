@@ -3,18 +3,18 @@ id: SPEC-30-06
 component: settings
 satisfies: [FR-24, FR-25]
 blocked_by: [SPEC-30-07]
-status: ready-for-agent
+status: closed
 touches:
   - README.md
-  - docs/README.id.md
-  - docs/README.zh-CN.md
-  - docs/README.ja.md
-  - docs/README.de.md
-  - docs/README.es.md
-  - docs/README.fr.md
-  - docs/README.ko.md
-  - docs/README.pt-BR.md
-  - docs/README.ru.md
+  - README.id.md
+  - README.zh-CN.md
+  - README.ja.md
+  - README.de.md
+  - README.es.md
+  - README.fr.md
+  - README.ko.md
+  - README.pt-BR.md
+  - README.ru.md
   - packaging/scoop-bucket/bucket/wiradesk.json
   - scripts/generate-winget-manifest.ps1
 tests:
@@ -28,7 +28,7 @@ tests:
 
 **Blocked by:** SPEC-30-07 (and requires approved ops `about.md` Section A)
 
-**Status:** ready-for-agent
+**Status:** closed
 
 ## Implementation Details
 
@@ -45,10 +45,10 @@ tests:
 
 ## Acceptance Criteria
 
-- [ ] Every guard and documentation check is observed red on today's codebase before implementation, then green.
-- [ ] `verify-public-facts.ps1` confirms `autostart_onboarding_default` is satisfied and stale "Auto-start is opt-in" phrasing is eliminated.
-- [ ] Automated scan over `README.md` and all 9 localized `docs/README.*.md` files proves complete absence of competitor RAM figures ("150-500", "150–500"), loose exe instructions, and unapproved telemetry claims.
-- [ ] Scoop bucket template specifies `"license": "GPL-3.0-only"` and description matches `about.md` §A verbatim.
-- [ ] Executing `scripts/generate-winget-manifest.ps1 -Version 0.3.0` generates a valid manifest containing `License: GPL-3.0-only` and `ShortDescription` matching `about.md` §A.
-- [ ] `verify-public-export.ps1` passes cleanly with no unapproved product claims.
-- [ ] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.
+- [x] Every guard and documentation check is observed red on today's codebase before implementation, then green.
+- [x] `verify-public-facts.ps1` confirms `autostart_onboarding_default` is satisfied and stale "Auto-start is opt-in" phrasing is eliminated.
+- [x] Automated scan over `README.md` and all 9 localized `docs/README.*.md` files proves complete absence of competitor RAM figures ("150-500", "150–500"), loose exe instructions, and unapproved telemetry claims.
+- [x] Scoop bucket template specifies `"license": "GPL-3.0-only"` and description matches `about.md` §A verbatim.
+- [x] Executing `scripts/generate-winget-manifest.ps1 -Version 0.3.0` generates a valid manifest containing `License: GPL-3.0-only` and `ShortDescription` matching `about.md` §A.
+- [x] `verify-public-export.ps1` passes cleanly with no unapproved product claims.
+- [x] Workspace verification succeeds: `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings`, and `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace --no-fail-fast`.

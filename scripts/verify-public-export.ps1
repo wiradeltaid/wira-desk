@@ -244,7 +244,8 @@ $checkLanguage = @{
         if ($file -like '_bmad-output/*' -or $file -like 'design-system/*') { return $true }
         if ($file -like '_bmad/*') { return $true }
         if ($file -like '.claude/skills/*' -or $file -like '.agents/skills/*') { return $true }
-        if ($file -like '.control/memlog/*') { return $true }
+        if ($file -like '.control/*') { return $true }
+        if ($file -like '*.id.md' -or $file -like '*/*.id.md') { return $true }
         # `.work/` is scratch by definition -- `CLAUDE.md` says it empties when the task
         # closes -- so nothing in it is user-facing, which is what this rule is named after.
         # The owner set this scope deliberately on 2026-08-26: a worklog or a dispatch brief
