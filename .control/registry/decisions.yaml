@@ -1215,7 +1215,7 @@ decisions:
   - id: DEC-045
     title: Autopilot mandate for SPEC-31 delivery
     type: mandate
-    status: accepted
+    status: applied
     accepted_by: 'Wira, 2026-09-24'
     file: decisions/DEC-045-autopilot-mandate-for-spec-31-delivery.md
     created: '2026-09-24'

@@ -10,10 +10,10 @@ date: 2026-09-24
 
 Iteration: 1
 Run branch: autopilot/DEC-045
-Stopped at: Done — All tickets for SPEC-31 delivered under mandate DEC-045
+Stopped at: Done — All tickets (SPEC-31-01, SPEC-31-02) delivered and verified green under mandate DEC-045
 Blocked: —
 Parked: —
-Next: § Finish (Smoke test, validator verification, PR preparation)
+Next: Owner review and PR merge into main
 
 ## Decisions
 
