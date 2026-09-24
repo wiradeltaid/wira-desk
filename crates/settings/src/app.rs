@@ -3138,7 +3138,7 @@ mod tests {
 
             let desc = find_about_element(
                 &window,
-                "Same-app window cycling, one-key snapping, and mouse button mapping for Windows 11.",
+                "Same-app window cycling, one-key snapping, and mouse button mapping for Windows\u{00A0}11.",
             );
             assert!(
                 desc.is_some(),
@@ -3183,8 +3183,15 @@ mod tests {
 
             let repo_btn = find_about_element(&window, "GitHub repository");
             assert!(
-                repo_btn.is_some(),
-                "GitHub repository button found in About pane"
+                repo_btn.is_none(),
+                "GitHub repository button must be removed from Card 3 (SPEC-31-01)"
+            );
+
+            let source_link =
+                find_about_element(&window, "Source: github.com/wiradeltaid/wira-desk");
+            assert!(
+                source_link.is_some(),
+                "Source code text link must be retained in Card 1"
             );
 
             let issues_btn = find_about_element(&window, "Issue Tracker");
@@ -3694,7 +3701,7 @@ mod tests {
     }
 
     #[test]
-    fn about_pane_renders_three_independent_action_buttons() {
+    fn about_pane_renders_action_buttons_and_retains_source_link() {
         crate::shortcut_row_slint_snapshot::tests::run_on_ui_thread(|| {
             let (window, model, save_path) =
                 crate::shortcut_row_slint_snapshot::tests::setup_shortcuts_window();
@@ -3711,9 +3718,15 @@ mod tests {
             assert!(issues.is_some(), "Issue Tracker button found");
 
             let repo = find_about_element(&window, "GitHub repository");
-            assert!(repo.is_some(), "GitHub repository button found");
+            assert!(
+                repo.is_none(),
+                "GitHub repository button must be removed from Card 3 (SPEC-31-01)"
+            );
 
-            // Verify all three callbacks can be invoked
+            let source = find_about_element(&window, "Source: github.com/wiradeltaid/wira-desk");
+            assert!(source.is_some(), "Source code link found in Card 1");
+
+            // Verify callbacks can be invoked
             window.invoke_open_support_url();
             window.invoke_open_issues_url();
             window.invoke_open_source_url();
@@ -3876,12 +3889,18 @@ mod tests {
     #[test]
     fn about_pane_card_hierarchy_and_divider_structure() {
         let source = include_str!("../ui/panes/about_pane.slint").replace("\r\n", "\n");
-        // Card 3 begins with Send a tip, Issue Tracker, and GitHub repository
+        // Card 3 begins with Send a tip and Issue Tracker (GitHub repository button removed per SPEC-31-01)
         assert!(
-            source.contains("Send a tip")
-                && source.contains("Issue Tracker")
-                && source.contains("GitHub repository"),
-            "Card 3 must contain send a tip, issue tracker, and repo buttons"
+            source.contains("Send a tip") && source.contains("Issue Tracker"),
+            "Card 3 must contain send a tip and issue tracker buttons"
+        );
+        assert!(
+            !source.contains("GitHub repository"),
+            "Card 3 must NOT contain duplicate GitHub repository button (SPEC-31-01)"
+        );
+        assert!(
+            source.contains("Source: github.com/wiradeltaid/wira-desk"),
+            "Card 1 must retain source code text link"
         );
 
         // Followed by CardDivider
@@ -3907,25 +3926,20 @@ mod tests {
     fn about_pane_contains_exact_approved_copy() {
         let source = include_str!("../ui/panes/about_pane.slint").replace("\r\n", "\n");
 
-        // Approved Section C fixture strings:
+        // Approved Section C fixture strings (SPEC-31-01 refined):
         let required_strings = [
             "Wira Desk \" + root.version",
             "Copyright (c) 2026 Wira Delta Indonesia",
-            "Same-app window cycling, one-key snapping, and mouse button mapping for Windows 11.",
-            "Free software under the GNU General Public License v3.0 only. Full terms: LICENSE.txt in the install folder.",
-            "Third-party components and their licenses: NOTICE.txt in the install folder.",
+            "Same-app window cycling, one-key snapping, and mouse button mapping for Windows\\u{00A0}11.",
+            "Free software under the GNU General Public License v3.0 only.\\nFull terms: LICENSE.txt in the install folder.\\nThird-party components and their licenses: NOTICE.txt in the install folder.",
             "Source: github.com/wiradeltaid/wira-desk",
             "What it stores and sends: wiradelta.id/wira-desk/privacy/",
             "Check for updates automatically",
-            "Once a day, and when you press Check for updates, Wira Desk asks wiradelta.id whether a newer",
-            "version exists. The request names Wira Desk, its version, your Windows version, and the processor",
-            "architecture. Nothing else is attached.",
-            "No account, no analytics, no crash reporting.",
+            "Once a day, and when you press Check for updates, Wira Desk asks wiradelta.id whether a newer version exists. The request names Wira Desk, its version, your Windows version, and the processor architecture. Nothing else is attached.\\nNo account, no analytics, no crash reporting.",
             "Questions: support@wiradelta.id",
             "Security reports: GitHub Security Advisories on the repository",
             "Send a tip",
             "Issue Tracker",
-            "GitHub",
         ];
 
         let mut last_idx = 0;
@@ -3938,7 +3952,7 @@ mod tests {
             last_idx += found.unwrap() + req.len();
         }
 
-        // Prohibited promotional slop / outdated terms:
+        // Prohibited promotional slop / outdated terms / removed duplicates:
         let prohibited_strings = [
             "GitHub Releases",
             "Support development",
@@ -3947,6 +3961,8 @@ mod tests {
             "invisible, fast",
             "Nothing about you is sent",
             "licence",
+            "GitHub repository",
+            "Windows 11.",
         ];
 
         for bad in prohibited_strings {
@@ -3955,6 +3971,63 @@ mod tests {
                 "About pane must NOT contain prohibited term: {bad:?}"
             );
         }
+    }
+
+    #[test]
+    fn about_pane_has_no_duplicate_github_button() {
+        let source = include_str!("../ui/panes/about_pane.slint").replace("\r\n", "\n");
+        assert!(
+            !source.contains("GitHub repository"),
+            "About pane Card 3 must not contain duplicate GitHub repository button (A4)"
+        );
+        assert!(
+            !source.contains("repo_touch :="),
+            "About pane Card 3 must not contain repo_touch TouchArea (A4)"
+        );
+        assert!(
+            !source.contains("component GitHubIcon"),
+            "About pane must not contain unused GitHubIcon component (A4)"
+        );
+    }
+
+    #[test]
+    fn about_pane_has_non_breaking_space_for_windows_11() {
+        let source = include_str!("../ui/panes/about_pane.slint").replace("\r\n", "\n");
+        assert!(
+            source.contains("Windows\\u{00A0}11"),
+            "About pane description must join Windows and 11 with non-breaking space U+00A0 (A2)"
+        );
+        assert!(
+            !source.contains("Windows 11."),
+            "About pane must not contain regular space in 'Windows 11.'"
+        );
+    }
+
+    #[test]
+    fn about_pane_license_block_has_three_distinct_lines() {
+        let source = include_str!("../ui/panes/about_pane.slint").replace("\r\n", "\n");
+        let expected = "Free software under the GNU General Public License v3.0 only.\\nFull terms: LICENSE.txt in the install folder.\\nThird-party components and their licenses: NOTICE.txt in the install folder.";
+        assert!(
+            source.contains(expected),
+            "License block must have 3 distinct lines separated by newlines (A3)"
+        );
+    }
+
+    #[test]
+    fn about_pane_retains_source_code_link_and_action_buttons() {
+        let source = include_str!("../ui/panes/about_pane.slint").replace("\r\n", "\n");
+        assert!(
+            source.contains("Source: github.com/wiradeltaid/wira-desk"),
+            "Source code link must be preserved in Card 1"
+        );
+        assert!(
+            source.contains("source_touch :="),
+            "source_touch TouchArea must be preserved in Card 1"
+        );
+        assert!(
+            source.contains("Send a tip") && source.contains("Issue Tracker"),
+            "Action buttons Send a tip and Issue Tracker must be preserved in Card 3"
+        );
     }
 
     #[test]

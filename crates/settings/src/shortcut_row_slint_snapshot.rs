@@ -2879,7 +2879,10 @@ pub(crate) mod tests {
             assert!(issues.is_some(), "Issue Tracker button found");
 
             let repo = find_element_scrolling(&window, "GitHub repository");
-            assert!(repo.is_some(), "GitHub repository button found");
+            assert!(
+                repo.is_none(),
+                "GitHub repository button must be removed from Card 3 (SPEC-31-01)"
+            );
 
             let reset_btn = find_element_scrolling(&window, "Reset all settings to defaults");
             assert!(reset_btn.is_some(), "Reset all settings button found");

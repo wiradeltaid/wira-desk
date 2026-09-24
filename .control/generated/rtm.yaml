@@ -816,7 +816,7 @@ rtm:
   - settings::app::tests::about_pane_license_block_has_three_distinct_lines
   - settings::app::tests::about_pane_retains_source_code_link_and_action_buttons
   - settings::app::tests::about_pane_card_hierarchy_and_divider_structure
-  status: ready-for-dev
+  status: closed
   exempt: false
   green: false
   broken_at: status

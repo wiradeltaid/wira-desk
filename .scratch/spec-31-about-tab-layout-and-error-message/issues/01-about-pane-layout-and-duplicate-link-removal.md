@@ -3,7 +3,7 @@ id: SPEC-31-01
 component: settings
 satisfies: [UC-8, FR-24]
 blocked_by: []
-status: ready-for-dev
+status: closed
 touches:
   - crates/settings/ui/panes/about_pane.slint
   - crates/settings/src/app.rs
