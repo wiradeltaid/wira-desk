@@ -3,7 +3,7 @@
 > Легковесное, нативное переключение окон одного приложения, зонирование и навигация мышью без драйверов для Windows 11 — написано на Rust 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.com/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -82,5 +82,5 @@ Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 **Wira Delta Indonesia** — студия-разработчик данного проекта.
 
 - **Лицензия:** [GPL-3.0-only](LICENSE). Благодарности сторонним библиотекам перечислены в [NOTICE](NOTICE). Интерфейс разработан с использованием [Slint](https://slint.dev).
-- **Конфиденциальность и безопасность:** Без учетных записей, без аналитики, без отправки отчетов о сбоях. Проверка обновлений обращается к wiradelta.id. См. [PRIVACY.md](PRIVACY.md) и [SECURITY.md](SECURITY.md).
+- **Конфиденциальность и безопасность:** Без учетных записей, без аналитики, без отправки отчетов о сбоях. Проверка обновлений обращается к wiradelta.com. См. [PRIVACY.md](PRIVACY.md) и [SECURITY.md](SECURITY.md).
 - **Наименование и товарные знаки:** Лицензия GPL распространяется на исходный код, но не на названия и логотипы. Наименования **Wira Desk** и **Wira Delta Indonesia**, а также значок продукта остаются собственностью PT Wira Delta Indonesia.

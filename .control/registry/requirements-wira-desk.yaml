@@ -318,7 +318,7 @@ functional:
     proof: >-
       With the check enabled and a newer release published, the tray context menu shows an
       "Update to <version>..." item within one check interval, and the request queries
-      https://wiradelta.id/api/v1/update/wira-desk/ without redirects, carrying strictly the
+      https://wiradelta.com/api/v1/update/wira-desk/ without redirects, carrying strictly the
       4-part User-Agent contract.
   - id: FR-25
     capability: CAP-13

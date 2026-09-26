@@ -44,10 +44,10 @@ deciding whether this software can be trusted.
   and then discards it.
 - **No analytics, no account, and no separate updater service.** The update check runs inside the daemon
   process. Wira Desk makes two kinds of outbound HTTPS request:
-  1. The update check to `https://wiradelta.id/api/v1/update/wira-desk/`, automatically once a day or when you ask for
+  1. The update check to `https://wiradelta.com/api/v1/update/wira-desk/`, automatically once a day or when you ask for
      it. Its User-Agent header names the product, the Wira Desk version, the Windows version, and the
      processor architecture, with no other computer, user, or configuration data. This endpoint runs on
-     the same server as the `wiradelta.id` site, behind Cloudflare, and answers itself without
+     the same server as the `wiradelta.com` site, behind Cloudflare, and answers itself without
      redirecting to GitHub. Our server records the IP address, the User-Agent, and the time. After 30
      days, the raw records are deleted; what remains is only daily aggregate counts (app version,
      Windows version, architecture) and an estimated number of devices, with no IP address. The automatic
@@ -111,7 +111,7 @@ repository's releases page as untrusted.
 ## 5. The Updater, and What Verifies It
 
 - The release descriptor (a small file naming the latest version, the installer address, and its
-  checksum) is fetched from `https://wiradelta.id/api/v1/update/wira-desk/` over HTTPS only. Our server serves that
+  checksum) is fetched from `https://wiradelta.com/api/v1/update/wira-desk/` over HTTPS only. Our server serves that
   descriptor itself, with no redirect to GitHub. No code path can fetch it over plain HTTP, and a
   descriptor larger than 64 KB is refused.
 - The installer address inside the descriptor must be HTTPS and must sit exactly on the host and
@@ -217,8 +217,8 @@ The full analysis, including the trust boundaries and the reason for each privil
 ## 10. Changes to This Document
 
 This document is published with the same content in `SECURITY.md` in the Wira Desk repository and at
-`wiradelta.id/wira-desk/security/`. The Indonesian original is in `SECURITY.id.md` and at
-`wiradelta.id/id/wira-desk/security/`. When the behavior described here changes, this document is
+`wiradelta.com/wira-desk/security/`. The Indonesian original is in `SECURITY.id.md` and at
+`wiradelta.com/id/wira-desk/security/`. When the behavior described here changes, this document is
 changed and the date at the top is updated.
 
 ## 11. Language

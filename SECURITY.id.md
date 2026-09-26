@@ -39,10 +39,10 @@ sedang menilai apakah software (perangkat lunak) ini layak dipercaya.
   di atas overlay itu, untuk mengetahui kartu mana yang ditunjuk, lalu membuangnya.
 - **Tidak ada analitik, akun, atau layanan updater terpisah.** Cek update berjalan di dalam proses
   daemon. Wira Desk membuat dua jenis permintaan HTTPS keluar:
-  1. Cek update ke `https://wiradelta.id/api/v1/update/wira-desk/`, otomatis sekali sehari atau saat Anda memintanya.
+  1. Cek update ke `https://wiradelta.com/api/v1/update/wira-desk/`, otomatis sekali sehari atau saat Anda memintanya.
      Header User-Agent-nya menyebut nama produk, versi Wira Desk, versi Windows, dan arsitektur
      prosesor, tanpa data lain tentang komputer, pengguna, atau konfigurasi. Endpoint ini berjalan di
-     server yang sama dengan situs `wiradelta.id`, di belakang Cloudflare, dan menjawab sendiri tanpa
+     server yang sama dengan situs `wiradelta.com`, di belakang Cloudflare, dan menjawab sendiri tanpa
      mengalihkan ke GitHub. Server kami mencatat alamat IP, User-Agent, dan waktu. Sesudah 30 hari,
      catatan mentah dihapus; yang tersisa hanya hitungan harian agregat (versi aplikasi, versi
      Windows, arsitektur) dan perkiraan jumlah perangkat, tanpa alamat IP. Cek otomatis aktif
@@ -108,7 +108,7 @@ halaman rilis repo ini tidak tepercaya.
 ## 5. Updater dan Apa yang Memverifikasinya
 
 - Deskriptor rilis (file kecil yang menyebut versi terbaru, alamat installer, dan checksum-nya) diambil
-  dari `https://wiradelta.id/api/v1/update/wira-desk/` lewat HTTPS saja. Server kami menyajikan deskriptor itu sendiri,
+  dari `https://wiradelta.com/api/v1/update/wira-desk/` lewat HTTPS saja. Server kami menyajikan deskriptor itu sendiri,
   tanpa pengalihan ke GitHub. Tidak ada jalur kode yang bisa mengambilnya lewat HTTP biasa, dan
   deskriptor yang lebih besar dari 64 KB ditolak.
 - Alamat installer di dalam deskriptor harus HTTPS dan harus berada tepat di host dan repo
@@ -219,8 +219,8 @@ Analisis lengkapnya, termasuk batas kepercayaan dan alasan setiap hak akses, ada
 ## 10. Perubahan Naskah
 
 Naskah ini diterbitkan dengan isi yang sama di `SECURITY.id.md` di repo Wira Desk dan di
-`wiradelta.id/id/wira-desk/security/`. Terjemahan bahasa Inggrisnya ada di `SECURITY.md` dan di
-`wiradelta.id/wira-desk/security/`. Bila perilaku yang disebut di sini berubah, naskah ini diubah dan
+`wiradelta.com/id/wira-desk/security/`. Terjemahan bahasa Inggrisnya ada di `SECURITY.md` dan di
+`wiradelta.com/wira-desk/security/`. Bila perilaku yang disebut di sini berubah, naskah ini diubah dan
 tanggal di bagian atas diperbarui.
 
 ## 11. Bahasa

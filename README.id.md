@@ -3,7 +3,7 @@
 > Perpindahan jendela satu aplikasi yang ringan dan native, zone snapping, dan navigasi mouse tanpa driver untuk Windows 11 — ditulis dengan Rust 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.com/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -82,5 +82,5 @@ Windows tidak punya fitur bawaan untuk berpindah antarjendela dari aplikasi yang
 **Wira Delta Indonesia** adalah studio di balik proyek ini.
 
 - **Lisensi:** [GPL-3.0-only](LICENSE). Atribusi pihak ketiga tercantum di [NOTICE](NOTICE). Dibangun menggunakan [Slint](https://slint.dev).
-- **Privasi & Keamanan:** Tanpa akun, tanpa analitik, tanpa pelaporan crash. Pemeriksaan pembaruan menghubungi wiradelta.id. Lihat [PRIVACY.md](PRIVACY.md) dan [SECURITY.md](SECURITY.md).
+- **Privasi & Keamanan:** Tanpa akun, tanpa analitik, tanpa pelaporan crash. Pemeriksaan pembaruan menghubungi wiradelta.com. Lihat [PRIVACY.md](PRIVACY.md) dan [SECURITY.md](SECURITY.md).
 - **Nama dan Ikon:** Lisensi GPL memberikan hak atas kode, bukan atas nama atau logo. Nama **Wira Desk** dan **Wira Delta Indonesia**, serta ikon produk, tetap merupakan hak milik Wira Delta Indonesia.

@@ -49,10 +49,10 @@ pub fn split_https(url: &str) -> Option<(&str, &str)> {
 const DEV_LATEST_JSON_URL_VAR: &str = "WIRADESK_DEV_LATEST_JSON_URL";
 
 /// Canonical update descriptor endpoint for Wira Desk.
-pub const UPDATE_DESCRIPTOR_URL: &str = "https://wiradelta.id/api/v1/update/wira-desk/";
+pub const UPDATE_DESCRIPTOR_URL: &str = "https://wiradelta.com/api/v1/update/wira-desk/";
 
 /// Where the release descriptor lives. In release builds, this points to the canonical
-/// self-hosted endpoint `https://wiradelta.id/api/v1/update/wira-desk/`.
+/// self-hosted endpoint `https://wiradelta.com/api/v1/update/wira-desk/`.
 ///
 /// **Debug builds only:** `WIRADESK_DEV_LATEST_JSON_URL`, when set, is returned instead of the
 /// real address. This is the seam that lets check → download → verify → launch be exercised
@@ -435,11 +435,11 @@ mod tests {
 
         assert_eq!(
             latest_json_url(),
-            "https://wiradelta.id/api/v1/update/wira-desk/"
+            "https://wiradelta.com/api/v1/update/wira-desk/"
         );
         assert_eq!(
             UPDATE_DESCRIPTOR_URL,
-            "https://wiradelta.id/api/v1/update/wira-desk/"
+            "https://wiradelta.com/api/v1/update/wira-desk/"
         );
 
         if let Some(val) = prev {

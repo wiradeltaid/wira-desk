@@ -1,18 +1,18 @@
 //! Canonical embedded URLs for Settings.
 //!
-//! All `wiradelta.id` endpoints terminate with a trailing slash (`/`) to avoid
+//! All `wiradelta.com` endpoints terminate with a trailing slash (`/`) to avoid
 //! unnecessary HTTP redirect hops. GitHub URLs are exempt from trailing slashes
 //! where GitHub's routing standard does not require them (e.g. `/issues`), while
 //! the repository root uses a trailing slash (`https://github.com/wiradeltaid/wira-desk/`).
 
 /// Studio home page.
-pub const WIRADELTA_HOME_URL: &str = "https://wiradelta.id/";
+pub const WIRADELTA_HOME_URL: &str = "https://wiradelta.com/";
 
 /// Product home page on the studio site.
-pub const WIRA_DESK_PRODUCT_URL: &str = "https://wiradelta.id/wira-desk/";
+pub const WIRA_DESK_PRODUCT_URL: &str = "https://wiradelta.com/wira-desk/";
 
 /// Product privacy disclosure page.
-pub const WIRA_DESK_PRIVACY_URL: &str = "https://wiradelta.id/wira-desk/privacy/";
+pub const WIRA_DESK_PRIVACY_URL: &str = "https://wiradelta.com/wira-desk/privacy/";
 
 /// Open source repository root on GitHub.
 pub const GITHUB_REPO_URL: &str = "https://github.com/wiradeltaid/wira-desk/";
@@ -33,8 +33,8 @@ pub(crate) mod tests {
         ];
         for url in urls {
             assert!(
-                url.starts_with("https://wiradelta.id/"),
-                "{url} must start with https://wiradelta.id/"
+                url.starts_with("https://wiradelta.com/"),
+                "{url} must start with https://wiradelta.com/"
             );
             assert!(
                 url.ends_with('/'),

@@ -3,7 +3,7 @@
 > Schlanker, nativer Fensterwechsel für dieselbe App, Zonen-Snapping und treiberlose Mausnavigation für Windows 11 — geschrieben in Rust 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.com/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -82,5 +82,5 @@ Windows bietet kein integriertes Wechseln zwischen den Fenstern derselben App. P
 **Wira Delta Indonesia** ist das verantwortliche Software-Studio.
 
 - **Lizenz:** [GPL-3.0-only](LICENSE). Danksagungen und Lizenzen Dritter sind in [NOTICE](NOTICE) aufgeführt. Erstellt mit [Slint](https://slint.dev).
-- **Datenschutz & Sicherheit:** Kein Benutzerkonto, keine Datenanalyse, keine Absturzberichte. Update-Prüfungen kontaktieren wiradelta.id. Siehe [PRIVACY.md](PRIVACY.md) und [SECURITY.md](SECURITY.md).
+- **Datenschutz & Sicherheit:** Kein Benutzerkonto, keine Datenanalyse, keine Absturzberichte. Update-Prüfungen kontaktieren wiradelta.com. Siehe [PRIVACY.md](PRIVACY.md) und [SECURITY.md](SECURITY.md).
 - **Name und Logo:** Die GPL gewährt Rechte am Code, nicht an Namen oder Markenzeichen. Die Namen **Wira Desk** und **Wira Delta Indonesia** sowie das Produkt-Icon verbleiben im Eigentum der PT Wira Delta Indonesia.

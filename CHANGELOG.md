@@ -21,14 +21,15 @@ owner decides.
 ### Changed
 
 - Settings About Pane Layout Polish: Natural word wrapping without awkward mid-sentence breaks for update toggle disclosure, non-breaking space for Windows 11, three-line license block sequence, and removal of duplicate GitHub button in Card 3 while preserving the Source code text link in Card 1.
-- Update Check Error Message Differentiation: Update check descriptor query failures explicitly cite `wiradelta.id answered with status {code}. You can try again.`, reserving download server error terminology strictly for installer binary downloads.
+- Update Check Error Message Differentiation: Update check descriptor query failures explicitly cite `wiradelta.com answered with status {code}. You can try again.`, reserving download server error terminology strictly for installer binary downloads.
+- Canonical Domain Move to `wiradelta.com`: Update descriptor endpoint, studio links, browser allowlist, About pane text, and support address all move to `wiradelta.com` (ODR-011).
 
 ## [0.2.5] - 2026-09-24
 
 ### Added
 
 - Directional Custom-Percentage Top Snap: Configurable top-edge snapping default set to 33% (`Ctrl+Alt+Shift+Up`) while lateral and bottom edges remain at 67%, with full backward compatibility and persistent configuration.
-- Canonical Update Check Subsystem: Update descriptor checks migrate to the self-hosted endpoint `https://wiradelta.id/api/v1/update/wira-desk/` enforcing strict no-redirect policy (`Redirects::Never`), sharing identical 4-part User-Agent contract (`WiraDesk/<version> (Windows <major>.<minor>.<build>; <arch>)`) with installer downloads.
+- Canonical Update Check Subsystem: Update descriptor checks migrate to the self-hosted endpoint `https://wiradelta.com/api/v1/update/wira-desk/` enforcing strict no-redirect policy (`Redirects::Never`), sharing identical 4-part User-Agent contract (`WiraDesk/<version> (Windows <major>.<minor>.<build>; <arch>)`) with installer downloads.
 - Portable Zip Distribution: Release workflows package executables, license, and notices into `WiraDesk-<version>-x64-portable.zip`, eliminating loose executable uploads, protected by an automated release artifact verifier in CI.
 - Settings Embedded URL Registry: Centralized registry for all studio links with trailing slashes (`/`), with hardened browser opening allowlist.
 - Formal Indonesian Legal Copies: Synchronized `PRIVACY.id.md` and `SECURITY.id.md` with official copy stamps and dual-language alignment.

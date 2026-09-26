@@ -3,7 +3,7 @@
 > Windows 11을 위한 가볍고 네이티브한 동일 앱 창 전환, 영역 스냅, 드라이버 없는 마우스 탐색 도구 — Rust로 작성됨 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.com/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -82,5 +82,5 @@ Windows에는 같은 앱의 창끼리만 전환하는 기본 기능이 없습니
 **Wira Delta Indonesia**는 본 프로젝트를 운영하는 소프트웨어 스튜디오입니다.
 
 - **라이선스:** [GPL-3.0-only](LICENSE). 타사 오픈소스 라이선스 고지는 [NOTICE](NOTICE)에 정리되어 있습니다. UI는 [Slint](https://slint.dev)로 구현되었습니다.
-- **개인정보 보호 및 보안:** 계정 생성 불필요, 데이터 분석 없음, 충돌 보고서 전송 없음. 업데이트 확인은 wiradelta.id로 요청합니다. [PRIVACY.md](PRIVACY.md) 및 [SECURITY.md](SECURITY.md)를 참조하십시오.
+- **개인정보 보호 및 보안:** 계정 생성 불필요, 데이터 분석 없음, 충돌 보고서 전송 없음. 업데이트 확인은 wiradelta.com로 요청합니다. [PRIVACY.md](PRIVACY.md) 및 [SECURITY.md](SECURITY.md)를 참조하십시오.
 - **명칭 및 상표권 고지:** GPL 라이선스는 소스 코드에 대한 권리를 부여하며 제품명이나 로고 상표권을 부여하지 않습니다. **Wira Desk** 및 **Wira Delta Indonesia** 명칭과 제품 아이콘은 PT Wira Delta Indonesia의 자산입니다.
