@@ -28,8 +28,8 @@ komputer Anda.
 ## 2. Cek Update
 
 Wira Desk bisa memeriksa apakah ada versi yang lebih baru. Sejak versi 0.3.0 permintaan ini dikirim
-ke server kami di `wiradelta.id`, supaya kami bisa menghitung berapa salinan tiap versi yang masih
-dipakai. Server itu sama dengan server situs `wiradelta.id`, dan menjawab permintaan ini sendiri tanpa
+ke server kami di `wiradelta.com`, supaya kami bisa menghitung berapa salinan tiap versi yang masih
+dipakai. Server itu sama dengan server situs `wiradelta.com`, dan menjawab permintaan ini sendiri tanpa
 meneruskannya ke GitHub atau pihak lain.
 
 **Kapan dikirim.** Daemon mengirim cek update pertama sekitar dua menit sesudah mulai berjalan, lalu
@@ -37,7 +37,7 @@ sekali setiap 24 jam selama ia berjalan. Tombol "Check for updates" di Settings 
 yang sama satu kali setiap Anda menekannya. Cek otomatis aktif secara default. Pilihan ini disengaja,
 sebagai ganti bertanya sekali saat pertama kali Wira Desk dijalankan.
 
-**Apa yang dikirim.** Satu permintaan HTTPS `GET` ke `https://wiradelta.id/api/v1/update/wira-desk/`. Header
+**Apa yang dikirim.** Satu permintaan HTTPS `GET` ke `https://wiradelta.com/api/v1/update/wira-desk/`. Header
 User-Agent-nya berisi empat hal: nama produk, versi Wira Desk, versi Windows, dan arsitektur prosesor
 (misalnya x64 atau ARM64). Selain keempat hal itu tidak ada yang dilampirkan: tidak ada nama komputer,
 nama pengguna, konfigurasi, ID perangkat, atau penghitung.
@@ -45,7 +45,7 @@ nama pengguna, konfigurasi, ID perangkat, atau penghitung.
 **Apa yang tetap terungkap walaupun tidak dikirim.** Server kami menerima alamat IP asal permintaan dan
 waktu permintaan, karena setiap permintaan di internet membawa keduanya. Alamat IP menunjukkan
 perkiraan lokasi, dan bagi pengelola jaringan yang Anda pakai, perangkat tertentu. Lalu lintas ke
-`wiradelta.id` melewati Cloudflare, yang melihat permintaan yang sama saat meneruskannya, menurut
+`wiradelta.com` melewati Cloudflare, yang melihat permintaan yang sama saat meneruskannya, menurut
 kebijakan privasi Cloudflare sendiri.
 
 **Yang kami simpan, dan berapa lama.** Server kami mencatat setiap cek update dengan tiga hal: alamat
@@ -99,9 +99,9 @@ sendiri dari halaman rilis.
 ## 4. Tautan yang Dibuka di Browser
 
 Beberapa tombol di Settings (catatan rilis, situs, kode sumber, laporan bug, dan bantuan) membuka
-halaman di browser default Anda. Wira Desk hanya mengizinkan alamat di `wiradelta.id` dan
+halaman di browser default Anda. Wira Desk hanya mengizinkan alamat di `wiradelta.com` dan
 `github.com/wiradeltaid/wira-desk`. Kunjungan itu dilakukan browser Anda, bukan Wira Desk, dan diatur
-kebijakan privasi situs yang dibuka. Untuk `wiradelta.id`, itu Kebijakan Privasi situs kami.
+kebijakan privasi situs yang dibuka. Untuk `wiradelta.com`, itu Kebijakan Privasi situs kami.
 
 ## 5. Ketikan Keyboard
 
@@ -206,13 +206,13 @@ tercantum di `NOTICE` di repo dan di `NOTICE.txt` di folder instalasi.
 ## 12. Perubahan Naskah
 
 Naskah ini diterbitkan dengan isi yang sama di `PRIVACY.id.md` di repo Wira Desk dan di
-`wiradelta.id/id/wira-desk/privacy/`. Terjemahan bahasa Inggrisnya ada di `PRIVACY.md` dan di
-`wiradelta.id/wira-desk/privacy/`. Bila perilaku Wira Desk yang disebut di sini berubah, naskah ini
+`wiradelta.com/id/wira-desk/privacy/`. Terjemahan bahasa Inggrisnya ada di `PRIVACY.md` dan di
+`wiradelta.com/wira-desk/privacy/`. Bila perilaku Wira Desk yang disebut di sini berubah, naskah ini
 diubah dan tanggal di bagian atas diperbarui. Perubahan perilakunya dicatat di `CHANGELOG.md`.
 
 ## 13. Pertanyaan
 
-Pertanyaan tentang naskah ini atau tentang data Anda: `support@wiradelta.id`. Untuk apa pun yang
+Pertanyaan tentang naskah ini atau tentang data Anda: `support@wiradelta.com`. Untuk apa pun yang
 tampak seperti masalah keamanan, pakai jalur di Kebijakan Keamanan Wira Desk, karena jalur itu
 tertutup sampai ada perbaikan.
 

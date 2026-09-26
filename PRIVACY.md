@@ -31,8 +31,8 @@ summarized. Everything else stays on your computer.
 ## 2. Update Check
 
 Wira Desk can check whether a newer version exists. Since version 0.3.0 this request goes to our server
-at `wiradelta.id`, so that we can count how many copies of each version are still in use. That server
-is the same one that runs the `wiradelta.id` site, and it answers this request itself, without passing
+at `wiradelta.com`, so that we can count how many copies of each version are still in use. That server
+is the same one that runs the `wiradelta.com` site, and it answers this request itself, without passing
 it on to GitHub or anyone else.
 
 **When it is sent.** The daemon sends the first update check about two minutes after it starts, then
@@ -40,7 +40,7 @@ once every 24 hours while it runs. The "Check for updates" button in Settings se
 once each time you press it. The automatic check is on by default. That is deliberate, in place of
 asking once the first time Wira Desk runs.
 
-**What is sent.** One HTTPS `GET` request to `https://wiradelta.id/api/v1/update/wira-desk/`. Its User-Agent header
+**What is sent.** One HTTPS `GET` request to `https://wiradelta.com/api/v1/update/wira-desk/`. Its User-Agent header
 contains four things: the product name, the Wira Desk version, the Windows version, and the processor
 architecture (for example x64 or ARM64). Apart from those four things, nothing is attached: no computer
 name, no user name, no configuration, no device ID, and no counter.
@@ -48,7 +48,7 @@ name, no user name, no configuration, no device ID, and no counter.
 **What is revealed anyway, even though it is not sent.** Our server receives the IP address the request
 came from and the time of the request, because every request on the internet carries both. An IP
 address indicates an approximate location and, to whoever runs the network you are on, a particular
-device. Traffic to `wiradelta.id` passes through Cloudflare, which sees the same request as it forwards
+device. Traffic to `wiradelta.com` passes through Cloudflare, which sees the same request as it forwards
 it, under Cloudflare's own privacy policy.
 
 **What we keep, and for how long.** Our server records each update check with three things: the IP
@@ -100,9 +100,9 @@ yourself from the releases page.
 ## 4. Links Opened in the Browser
 
 Some buttons in Settings (release notes, website, source code, bug reports, and help) open a page in
-your default browser. Wira Desk allows only addresses on `wiradelta.id` and
+your default browser. Wira Desk allows only addresses on `wiradelta.com` and
 `github.com/wiradeltaid/wira-desk`. Those visits are made by your browser, not by Wira Desk, and are
-governed by the privacy policy of the site being opened. For `wiradelta.id`, that is our site's Privacy
+governed by the privacy policy of the site being opened. For `wiradelta.com`, that is our site's Privacy
 Policy.
 
 ## 5. Keystrokes
@@ -210,13 +210,13 @@ licenses, are listed in `NOTICE` in the repository and in `NOTICE.txt` in the in
 ## 12. Changes to This Document
 
 This document is published with the same content in `PRIVACY.md` in the Wira Desk repository and at
-`wiradelta.id/wira-desk/privacy/`. The Indonesian original is in `PRIVACY.id.md` and at
-`wiradelta.id/id/wira-desk/privacy/`. When the Wira Desk behavior described here changes, this document
+`wiradelta.com/wira-desk/privacy/`. The Indonesian original is in `PRIVACY.id.md` and at
+`wiradelta.com/id/wira-desk/privacy/`. When the Wira Desk behavior described here changes, this document
 is changed and the date at the top is updated. The change in behavior is recorded in `CHANGELOG.md`.
 
 ## 13. Questions
 
-Questions about this document or about your data: `support@wiradelta.id`. For anything that looks like
+Questions about this document or about your data: `support@wiradelta.com`. For anything that looks like
 a security problem, use the channel in the Wira Desk Security Policy, because that channel stays
 private until a fix exists.
 
