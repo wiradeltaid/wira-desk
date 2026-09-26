@@ -1,7 +1,7 @@
 {
     "version": "0.2.0",
     "description": "Same-app window cycling, one-key snapping, and mouse button mapping for Windows 11.",
-    "homepage": "https://wiradelta.id/wira-desk/",
+    "homepage": "https://wiradelta.com/wira-desk/",
     "license": "GPL-3.0-only",
     "notes": [
         "This installer requires Administrator and installs to %ProgramFiles%\\Wira Desk - it is NOT a portable app, unlike most Scoop packages. `scoop install` will trigger a UAC prompt.",

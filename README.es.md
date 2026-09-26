@@ -3,7 +3,7 @@
 > Alternancia nativa y ligera entre ventanas de una misma aplicación, ajuste por zonas y navegación con ratón sin controladores para Windows 11 — escrito en Rust 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.com/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -82,5 +82,5 @@ Windows no incluye una forma nativa de alternar entre las ventanas de una misma 
 **Wira Delta Indonesia** es el estudio de software responsable de este proyecto.
 
 - **Licencia:** [GPL-3.0-only](LICENSE). Los reconocimientos a componentes de terceros se listan en [NOTICE](NOTICE). Construido con [Slint](https://slint.dev).
-- **Privacidad y Seguridad:** Sin cuentas de usuario, sin analítica de datos, sin informes de fallos. Las comprobaciones de actualización consultan wiradelta.id. Consulte [PRIVACY.md](PRIVACY.md) y [SECURITY.md](SECURITY.md).
+- **Privacidad y Seguridad:** Sin cuentas de usuario, sin analítica de datos, sin informes de fallos. Las comprobaciones de actualización consultan wiradelta.com. Consulte [PRIVACY.md](PRIVACY.md) y [SECURITY.md](SECURITY.md).
 - **El Nombre y el Icono:** La licencia GPL otorga derechos sobre el código, no sobre nombres ni logotipos. Los nombres **Wira Desk** y **Wira Delta Indonesia**, así como el icono del producto, son propiedad de PT Wira Delta Indonesia.

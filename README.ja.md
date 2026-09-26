@@ -3,7 +3,7 @@
 > Windows 11向けの軽量・ネイティブな同一アプリ内ウィンドウ切り替え、ゾーンスナップ、ドライバ不要マウスナビゲーション — Rust 製 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.com/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -82,5 +82,5 @@ Windows には、同じアプリのウィンドウだけを切り替える標準
 **Wira Delta Indonesia** は本プロジェクトの開発元スタジオです。
 
 - **ライセンス:** [GPL-3.0-only](LICENSE)。サードパーティ製コンポーネントの権利表記は [NOTICE](NOTICE) に記載されています。UI は [Slint](https://slint.dev) を使用しています。
-- **プライバシーとセキュリティ:** アカウント不要、アナリティクスなし、クラッシュレポート送信なし。更新確認は wiradelta.id へ問い合わせます。[PRIVACY.md](PRIVACY.md) および [SECURITY.md](SECURITY.md) を参照してください。
+- **プライバシーとセキュリティ:** アカウント不要、アナリティクスなし、クラッシュレポート送信なし。更新確認は wiradelta.com へ問い合わせます。[PRIVACY.md](PRIVACY.md) および [SECURITY.md](SECURITY.md) を参照してください。
 - **名称とアイコンについて:** GPL ライセンスはコードの権利を許諾するものであり、名称や商標を許諾するものではありません。**Wira Desk** および **Wira Delta Indonesia** の名称、製品アイコンは PT Wira Delta Indonesia の権利物です。

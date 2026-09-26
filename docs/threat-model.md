@@ -84,7 +84,7 @@ bounded, and the bound is enforced by design rather than by review:
   a worse bug than an occasional Start Menu.
 - Outbound network requests are strictly limited to the updater. No background socket or telemetry
   exists in `crates/`. Outbound HTTPS is restricted to two bounded destinations:
-  `https://wiradelta.id/api/v1/update/wira-desk/` for descriptor checks without redirects, and
+  `https://wiradelta.com/api/v1/update/wira-desk/` for descriptor checks without redirects, and
   `github.com/wiradeltaid/wira-desk` for user-confirmed installer downloads.
 
 ## Trust boundaries and attack surface
@@ -93,7 +93,7 @@ bounded, and the bound is enforced by design rather than by review:
 
 The application contains an updater module (`WinHttp` in `crates/daemon/src/updatecheck.rs`, `crates/shared/src/https.rs`, and `crates/settings/src/update.rs`). Its trust boundary is bounded and transparent across two distinct network paths:
 
-- **Canonical descriptor check endpoint:** The daemon (periodically every 24 hours, toggleable via `general.check_updates`) and Settings (on demand) query `https://wiradelta.id/api/v1/update/wira-desk/`. Requests enforce `WINHTTP_OPTION_REDIRECT_POLICY_NEVER` (`crates/shared/src/https.rs`), ensuring HTTP 3xx responses fail rather than following redirects. The request carries strictly the 4-part User-Agent contract `WiraDesk/<version> (Windows <major>.<minor>.<build>; <arch>)` backed by `RtlGetVersion` and `IsWow64Process2`, containing no user, machine, or configuration identifiers. The server keeps IP addresses and request logs for 30 days before reducing them to daily aggregate counts with no IP addresses.
+- **Canonical descriptor check endpoint:** The daemon (periodically every 24 hours, toggleable via `general.check_updates`) and Settings (on demand) query `https://wiradelta.com/api/v1/update/wira-desk/`. Requests enforce `WINHTTP_OPTION_REDIRECT_POLICY_NEVER` (`crates/shared/src/https.rs`), ensuring HTTP 3xx responses fail rather than following redirects. The request carries strictly the 4-part User-Agent contract `WiraDesk/<version> (Windows <major>.<minor>.<build>; <arch>)` backed by `RtlGetVersion` and `IsWow64Process2`, containing no user, machine, or configuration identifiers. The server keeps IP addresses and request logs for 30 days before reducing them to daily aggregate counts with no IP addresses.
 - **Payload integrity and installer downloads:** Version descriptors are parsed under strict size caps (`DESCRIPTOR_LIMIT`). The binary setup installer is downloaded exclusively from `github.com/wiradeltaid/wira-desk` under `Redirects::Follow` and verified against published SHA-256 digests prior to launching.
 - **User consent & elevation boundary:** The installer executable is downloaded only upon explicit user action ("Download and install" in Settings). Launching Setup triggers the standard Windows UAC prompt for elevation, ensuring administrative consent is never bypassed silently.
 - **Opt-out:** Automatic update checking can be toggled off completely in Settings.

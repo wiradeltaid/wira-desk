@@ -3,7 +3,7 @@
 > Basculement léger et natif entre fenêtres d'une même application, ancrage par zones et navigation à la souris sans pilote pour Windows 11 — écrit en Rust 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.com/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -82,5 +82,5 @@ Windows n'offre pas de moyen intégré pour passer d'une fenêtre à l'autre d'u
 **Wira Delta Indonesia** est le studio de développement à l'origine de ce projet.
 
 - **Licence :** [GPL-3.0-only](LICENSE). Les attributions tierces sont listées dans [NOTICE](NOTICE). Interface développée avec [Slint](https://slint.dev).
-- **Confidentialité & Sécurité :** Aucun compte requis, aucune analyse de données, aucun rapport d'incident. Les vérifications de mise à jour contactent wiradelta.id. Consultez [PRIVACY.md](PRIVACY.md) et [SECURITY.md](SECURITY.md).
+- **Confidentialité & Sécurité :** Aucun compte requis, aucune analyse de données, aucun rapport d'incident. Les vérifications de mise à jour contactent wiradelta.com. Consultez [PRIVACY.md](PRIVACY.md) et [SECURITY.md](SECURITY.md).
 - **Nom et Marque :** La licence GPL accorde des droits sur le code, pas sur les noms ou logos. Les noms **Wira Desk** et **Wira Delta Indonesia**, ainsi que l'icône du produit, demeurent la propriété de PT Wira Delta Indonesia.

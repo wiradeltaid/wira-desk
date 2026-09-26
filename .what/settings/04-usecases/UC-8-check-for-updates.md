@@ -21,7 +21,7 @@ User clicks "Check for updates" in the About pane.
 ## Main Flow
 
 1. User opens the About pane and clicks "Check for updates". The button shows "Checking…" and disables itself.
-2. System requests the release descriptor from `https://wiradelta.id/api/v1/update/wira-desk/` over HTTPS without redirects, carrying only the 4-part User-Agent contract (BR-8).
+2. System requests the release descriptor from `https://wiradelta.com/api/v1/update/wira-desk/` over HTTPS without redirects, carrying only the 4-part User-Agent contract (BR-8).
 3. System compares the descriptor's version against the running version and validates the descriptor (checksum shape, release URL pinned to this product's own channel).
 4. A newer, valid release exists: the About pane shows the new version and an "Install" action.
 5. User clicks "Install" ("Download and install"). System streams the installer from GitHub Releases to a fresh, unpredictable temporary directory with the identical User-Agent.

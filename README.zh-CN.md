@@ -3,7 +3,7 @@
 > 轻量、原生的 Windows 11 同应用窗口轮转、分区吸附与免驱动鼠标导航工具 —— 基于 Rust 编写 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.com/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -82,5 +82,5 @@ Windows 没有内置的同一应用窗口切换功能。PowerToys 是 Microsoft 
 **Wira Delta Indonesia** 为本项目背后的软件工作室。
 
 - **开源许可：** 采用 [GPL-3.0-only](LICENSE) 许可证。第三方开源致谢详见 [NOTICE](NOTICE)。界面基于 [Slint](https://slint.dev) 构建。
-- **隐私与安全：** 无账号体系，无数据分析，无崩溃报告。更新检查请求 wiradelta.id。详见 [PRIVACY.md](PRIVACY.md) 与 [SECURITY.md](SECURITY.md)。
+- **隐私与安全：** 无账号体系，无数据分析，无崩溃报告。更新检查请求 wiradelta.com。详见 [PRIVACY.md](PRIVACY.md) 与 [SECURITY.md](SECURITY.md)。
 - **名称与商标声明：** GPL 许可证仅授予代码相关权利，不授予产品名称与商标权。**Wira Desk** 和 **Wira Delta Indonesia** 名称以及产品图标均为 PT Wira Delta Indonesia 保留财产。

@@ -90,7 +90,7 @@ PackageIdentifier: $identifier
 PackageVersion: $Version
 PackageLocale: en-US
 Publisher: Wira Delta Indonesia
-PublisherUrl: https://wiradelta.id/
+PublisherUrl: https://wiradelta.com/
 PublisherSupportUrl: https://github.com/$repo/issues
 PackageName: Wira Desk
 PackageUrl: https://github.com/$repo

@@ -3,7 +3,7 @@
 > Lightweight, native same-app window cycling, zone snapping, and driverless mouse navigation for Windows 11 - written in Rust 🦀
 
 [English](README.md) | [Bahasa Indonesia](README.id.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Português (Brasil)](README.pt-BR.md) | [Русский](README.ru.md)  
-[Website](https://wiradelta.id/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
+[Website](https://wiradelta.com/wira-desk/) | [Download](https://github.com/wiradeltaid/wira-desk/releases) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md) | [License](LICENSE) | [Security](SECURITY.md) | [Privacy](PRIVACY.md)
 
 ---
 
@@ -80,5 +80,5 @@ Windows has no built-in same-app window cycling. PowerToys, a separate download 
 **Wira Delta Indonesia** is the studio behind this project. Built and maintained by [@kodesh87](https://github.com/kodesh87).
 
 - **License:** [GPL-3.0-only](LICENSE). Third-party acknowledgements are listed in [NOTICE](NOTICE). Built with [Slint](https://slint.dev).
-- **Privacy & Security:** No account, no analytics, no crash reporting. Update checks query wiradelta.id. See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
+- **Privacy & Security:** No account, no analytics, no crash reporting. Update checks query wiradelta.com. See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
 - **The Name and the Icon:** The GPL grants rights over code, not names or logos. The names **Wira Desk** and **Wira Delta Indonesia**, and the product icon, remain property of Wira Delta Indonesia.
