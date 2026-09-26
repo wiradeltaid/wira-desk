@@ -3215,7 +3215,7 @@ mod tests {
 
             let privacy_link = find_about_element(
                 &window,
-                "What it stores and sends: wiradelta.id/wira-desk/privacy/",
+                "What it stores and sends: wiradelta.com/wira-desk/privacy/",
             );
             assert!(
                 privacy_link.is_some(),
@@ -3244,7 +3244,7 @@ mod tests {
 
             let privacy_link = find_about_element(
                 &window,
-                "What it stores and sends: wiradelta.id/wira-desk/privacy/",
+                "What it stores and sends: wiradelta.com/wira-desk/privacy/",
             );
             assert!(privacy_link.is_some(), "Privacy link found in About pane");
             let source_link =
@@ -3294,8 +3294,8 @@ mod tests {
 
             let source = include_str!("../ui/panes/about_pane.slint");
             assert!(
-                !source.contains("text: \"Publisher website (wiradelta.id)\";"),
-                "Standalone 'Publisher website (wiradelta.id)' Text element must be removed from Card 3"
+                !source.contains("text: \"Publisher website (wiradelta.com)\";"),
+                "Standalone 'Publisher website (wiradelta.com)' Text element must be removed from Card 3"
             );
 
             let _ = std::fs::remove_file(&save_path);
@@ -3333,7 +3333,7 @@ mod tests {
 
             let link_el = find_about_element(
                 &window,
-                "What it stores and sends: wiradelta.id/wira-desk/privacy/",
+                "What it stores and sends: wiradelta.com/wira-desk/privacy/",
             )
             .expect("Privacy link must be instantiated in accessible tree");
             let link_right = link_el.absolute_position().x + link_el.size().width;
@@ -3933,10 +3933,10 @@ mod tests {
             "Same-app window cycling, one-key snapping, and mouse button mapping for Windows\\u{00A0}11.",
             "Free software under the GNU General Public License v3.0 only.\\nFull terms: LICENSE.txt in the install folder.\\nThird-party components and their licenses: NOTICE.txt in the install folder.",
             "Source: github.com/wiradeltaid/wira-desk",
-            "What it stores and sends: wiradelta.id/wira-desk/privacy/",
+            "What it stores and sends: wiradelta.com/wira-desk/privacy/",
             "Check for updates automatically",
-            "Once a day, and when you press Check for updates, Wira Desk asks wiradelta.id whether a newer version exists. The request names Wira Desk, its version, your Windows version, and the processor architecture. Nothing else is attached.\\nNo account, no analytics, no crash reporting.",
-            "Questions: support@wiradelta.id",
+            "Once a day, and when you press Check for updates, Wira Desk asks wiradelta.com whether a newer version exists. The request names Wira Desk, its version, your Windows version, and the processor architecture. Nothing else is attached.\\nNo account, no analytics, no crash reporting.",
+            "Questions: support@wiradelta.com",
             "Security reports: GitHub Security Advisories on the repository",
             "Send a tip",
             "Issue Tracker",

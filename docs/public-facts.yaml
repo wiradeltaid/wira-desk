@@ -96,12 +96,12 @@ facts:
     appears_in: []
 
   - id: support_email
-    value: "support@wiradelta.id"
+    value: "support@wiradelta.com"
     source: .control/project-non-technical-log.md
     appears_in: []
 
   - id: canonical_url
-    value: "https://wiradelta.id/wira-desk/"
+    value: "https://wiradelta.com/wira-desk/"
     derived_from:
       file: crates/settings/src/urls.rs
       pattern: 'WIRA_DESK_PRODUCT_URL:\s*&str\s*=\s*"([^"]+)"'
@@ -109,7 +109,7 @@ facts:
       - README.md
 
   - id: update_descriptor_url
-    value: "https://wiradelta.id/api/v1/update/wira-desk/"
+    value: "https://wiradelta.com/api/v1/update/wira-desk/"
     derived_from:
       file: crates/shared/src/update.rs
       pattern: 'UPDATE_DESCRIPTOR_URL:\s*&str\s*=\s*"([^"]+)"'

@@ -101,7 +101,7 @@ fn describe_http(err: &HttpError) -> String {
 fn describe_check_http(err: &HttpError) -> String {
     match err {
         HttpError::Status(code) => {
-            format!("wiradelta.id answered with status {code}. You can try again.")
+            format!("wiradelta.com answered with status {code}. You can try again.")
         }
         other => describe_http(other),
     }
@@ -289,13 +289,15 @@ fn launch_installer(path: &std::path::Path) -> Result<(), String> {
 /// Validate whether a URL is in the strict allowlist of browser navigation targets.
 ///
 /// Pinned targets allowed:
-/// - Exact registry constants: `https://wiradelta.id/`, `https://wiradelta.id/wira-desk/`, `https://wiradelta.id/wira-desk/privacy/`
+/// - Exact registry constants: `https://wiradelta.com/`, `https://wiradelta.com/wira-desk/`, `https://wiradelta.com/wira-desk/privacy/`
 /// - Exact repository root: `https://github.com/wiradeltaid/wira-desk/`
 /// - Exact issues endpoint: `https://github.com/wiradeltaid/wira-desk/issues`
 /// - Releases endpoints for release notes: `https://github.com/wiradeltaid/wira-desk/releases` or subpaths starting with `https://github.com/wiradeltaid/wira-desk/releases/`
 ///
-/// Non-trailing slash variants of `wiradelta.id` (such as `https://wiradelta.id` or `https://wiradelta.id/wira-desk`),
-/// non-HTTPS schemes, dot-segments (`..`), userinfo (`@`), or unpinned hosts are rejected.
+/// Non-trailing slash variants of `wiradelta.com` (such as `https://wiradelta.com` or `https://wiradelta.com/wira-desk`),
+/// non-HTTPS schemes, dot-segments (`..`), userinfo (`@`), or unpinned hosts are rejected. This
+/// includes the former canonical host `wiradelta.id`: release `v0.2.0` shipped before this
+/// allowlist existed, so there is no client-side back-compatibility to preserve for it.
 pub fn is_allowed_browser_url(url: &str) -> bool {
     if !url.starts_with("https://") {
         return false;
@@ -483,35 +485,40 @@ mod tests {
         ));
 
         // Rejection of non-https
-        assert!(!is_allowed_browser_url("http://wiradelta.id/"));
+        assert!(!is_allowed_browser_url("http://wiradelta.com/"));
         assert!(!is_allowed_browser_url(
             "http://github.com/wiradeltaid/wira-desk/"
         ));
 
         // Rejection of dot-segments and userinfo
-        assert!(!is_allowed_browser_url("https://wiradelta.id/../evil"));
-        assert!(!is_allowed_browser_url("https://user:pass@wiradelta.id/"));
+        assert!(!is_allowed_browser_url("https://wiradelta.com/../evil"));
+        assert!(!is_allowed_browser_url("https://user:pass@wiradelta.com/"));
 
         // Rejection of external domains
         assert!(!is_allowed_browser_url("https://evil.com"));
-        assert!(!is_allowed_browser_url("https://evil.wiradelta.id/"));
+        assert!(!is_allowed_browser_url("https://evil.wiradelta.com/"));
 
         // Rejection of leading, trailing, or embedded whitespace
-        assert!(!is_allowed_browser_url(" https://wiradelta.id/"));
-        assert!(!is_allowed_browser_url("https://wiradelta.id/ "));
-        assert!(!is_allowed_browser_url("https://wiradelta.id/\n"));
-        assert!(!is_allowed_browser_url("https://wiradelta.id/ wira-desk/"));
+        assert!(!is_allowed_browser_url(" https://wiradelta.com/"));
+        assert!(!is_allowed_browser_url("https://wiradelta.com/ "));
+        assert!(!is_allowed_browser_url("https://wiradelta.com/\n"));
+        assert!(!is_allowed_browser_url("https://wiradelta.com/ wira-desk/"));
         assert!(!is_allowed_browser_url(
             " https://github.com/wiradeltaid/wira-desk/ "
         ));
+
+        // Rejection of the former canonical host: v0.2.0 shipped before this allowlist
+        // existed, so there is no client-side back-compatibility to preserve for `.id`.
+        assert!(!is_allowed_browser_url("https://wiradelta.id/"));
+        assert!(!is_allowed_browser_url("https://wiradelta.id/wira-desk/"));
     }
 
     #[test]
     fn browser_allowlist_rejects_url_without_trailing_slash() {
-        assert!(!is_allowed_browser_url("https://wiradelta.id"));
-        assert!(!is_allowed_browser_url("https://wiradelta.id/wira-desk"));
+        assert!(!is_allowed_browser_url("https://wiradelta.com"));
+        assert!(!is_allowed_browser_url("https://wiradelta.com/wira-desk"));
         assert!(!is_allowed_browser_url(
-            "https://wiradelta.id/wira-desk/privacy"
+            "https://wiradelta.com/wira-desk/privacy"
         ));
     }
 
@@ -521,14 +528,14 @@ mod tests {
         let desc = describe_check_http(&err);
         assert_eq!(
             desc,
-            "wiradelta.id answered with status 404. You can try again."
+            "wiradelta.com answered with status 404. You can try again."
         );
 
         let err500 = HttpError::Status(500);
         let desc500 = describe_check_http(&err500);
         assert_eq!(
             desc500,
-            "wiradelta.id answered with status 500. You can try again."
+            "wiradelta.com answered with status 500. You can try again."
         );
     }
 

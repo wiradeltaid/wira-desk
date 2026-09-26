@@ -125,7 +125,7 @@ export component AboutPane inherits VerticalLayout {
 
                 privacy_touch := TouchArea {
                     accessible-role: button;
-                    accessible-label: "What it stores and sends: wiradelta.id/wira-desk/privacy/";
+                    accessible-label: "What it stores and sends: wiradelta.com/wira-desk/privacy/";
                     accessible-action-default => { root.open_privacy_url(); }
                     mouse-cursor: pointer;
                     clicked => { root.open_privacy_url(); }
@@ -134,7 +134,7 @@ export component AboutPane inherits VerticalLayout {
                         spacing: 4px;
                         alignment: start;
                         Text {
-                            text: "What it stores and sends: wiradelta.id/wira-desk/privacy/";
+                            text: "What it stores and sends: wiradelta.com/wira-desk/privacy/";
                             font-family: Typography.font_family;
                             font-size: Typography.size_caption;
                             color: privacy_touch.has_hover ? Palette.accent_hover : Palette.accent_primary;
@@ -159,7 +159,7 @@ export component AboutPane inherits VerticalLayout {
 
             SettingToggleRow {
                 title: "Check for updates automatically";
-                description: "Once a day, and when you press Check for updates, Wira Desk asks wiradelta.id whether a newer version exists. The request names Wira Desk, its version, your Windows version, and the processor architecture. Nothing else is attached.\nNo account, no analytics, no crash reporting.";
+                description: "Once a day, and when you press Check for updates, Wira Desk asks wiradelta.com whether a newer version exists. The request names Wira Desk, its version, your Windows version, and the processor architecture. Nothing else is attached.\nNo account, no analytics, no crash reporting.";
                 checked <=> root.check_updates;
                 toggled(val) => { root.check_updates_toggled(val); }
             }
@@ -295,7 +295,7 @@ export component AboutPane inherits VerticalLayout {
                 spacing: 4px;
 
                 Text {
-                    text: "Questions: support@wiradelta.id";
+                    text: "Questions: support@wiradelta.com";
                     font-family: Typography.font_family;
                     font-size: Typography.size_caption;
                     color: Palette.text_secondary;

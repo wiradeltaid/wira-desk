@@ -2890,7 +2890,7 @@ pub(crate) mod tests {
             // Card 1 elements
             let privacy = find_element_scrolling(
                 &window,
-                "What it stores and sends: wiradelta.id/wira-desk/privacy/",
+                "What it stores and sends: wiradelta.com/wira-desk/privacy/",
             );
             assert!(privacy.is_some(), "Privacy link found in Card 1");
 
