@@ -203,6 +203,9 @@ SetupIconFile={#STAGE_DIR}\wiradesk.ico
 UninstallDisplayIcon={app}\{#DaemonExe}
 UninstallDisplayName={#AppName}
 WizardStyle=modern
+; Side image on the Welcome and Finished pages. Four DPI sizes (100/150/200/250%) of the
+; modern-style 202x386; Inno picks the closest. Built in ops brand-identity/sampul/src/installer.py.
+WizardImageFile={#STAGE_DIR}\installer-wizard.png,{#STAGE_DIR}\installer-wizard-150.png,{#STAGE_DIR}\installer-wizard-200.png,{#STAGE_DIR}\installer-wizard-250.png
 WizardSmallImageFile={#STAGE_DIR}\installer-logo.png
 Compression=lzma2/max
 SolidCompression=yes
