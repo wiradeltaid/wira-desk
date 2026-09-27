@@ -3,7 +3,7 @@
 
 facts:
   - id: product_version
-    value: "0.2.5"
+    value: "0.3.0"
     derived_from:
       file: Cargo.toml
       pattern: 'version\s*=\s*"([^"]+)"'
@@ -88,11 +88,11 @@ facts:
     appears_in: []
 
   - id: installer_size_mb
-    value: 6.8
+    value: 6.6
     metric: megabytes
-    measured_on: "2026-09-15"
-    measured_build: "0eae449"
-    source: dist/WiraDesk-0.2.4-x64-setup.exe
+    measured_on: "2026-09-27"
+    measured_build: "v0.3.0"
+    source: https://github.com/wiradeltaid/wira-desk/releases/download/v0.3.0/WiraDesk-0.3.0-x64-setup.exe
     appears_in: []
 
   - id: support_email
