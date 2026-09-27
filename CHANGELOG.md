@@ -18,13 +18,7 @@ owner decides.
 
 ## [Unreleased]
 
-### Changed
-
-- Settings About Pane Layout Polish: Natural word wrapping without awkward mid-sentence breaks for update toggle disclosure, non-breaking space for Windows 11, three-line license block sequence, and removal of duplicate GitHub button in Card 3 while preserving the Source code text link in Card 1.
-- Update Check Error Message Differentiation: Update check descriptor query failures explicitly cite `wiradelta.com answered with status {code}. You can try again.`, reserving download server error terminology strictly for installer binary downloads.
-- Canonical Domain Move to `wiradelta.com`: Update descriptor endpoint, studio links, browser allowlist, About pane text, and support address all move to `wiradelta.com` (ODR-011).
-
-## [0.2.5] - 2026-09-24
+## [0.3.0] - 2026-09-27
 
 ### Added
 
@@ -33,16 +27,6 @@ owner decides.
 - Portable Zip Distribution: Release workflows package executables, license, and notices into `WiraDesk-<version>-x64-portable.zip`, eliminating loose executable uploads, protected by an automated release artifact verifier in CI.
 - Settings Embedded URL Registry: Centralized registry for all studio links with trailing slashes (`/`), with hardened browser opening allowlist.
 - Formal Indonesian Legal Copies: Synchronized `PRIVACY.id.md` and `SECURITY.id.md` with official copy stamps and dual-language alignment.
-
-### Changed
-
-- Settings About and General Pane Copy: Word-for-word alignment with approved studio legal specifications, renaming "Support development" to "Send a tip", standardizing hold delay notation to `(100 to 500 ms)`, and locking all critical legal labels.
-- Threat Model Alignment: Documented dual outbound network paths, visual switcher window title inspection, and 1 MB log rotation.
-
-## [0.2.4] - 2026-09-15
-
-### Added
-
 - Visual Window Switcher: Same-app visual switcher overlay displaying live window tiles and thumbnails with adaptive layout, keyboard navigation (including Shift-held backward cycling), and mouse selection.
 - Driverless Mouse Desktop Navigation: Native mouse hook support mapping thumb back/forward buttons and horizontal tilt wheel left/right to desktop switching, snapping, and arrangement presets without manufacturer drivers.
 - Header Defaults Buttons: Pane-level `↺ Defaults` buttons in Shortcuts, General, and Mouse headers with conditional visibility appearing only when active draft differs from defaults.
@@ -50,6 +34,11 @@ owner decides.
 
 ### Changed
 
+- Settings About Pane Layout Polish: Natural word wrapping without awkward mid-sentence breaks for update toggle disclosure, non-breaking space for Windows 11, three-line license block sequence, and removal of duplicate GitHub button in Card 3 while preserving the Source code text link in Card 1.
+- Update Check Error Message Differentiation: Update check descriptor query failures explicitly cite `wiradelta.com answered with status {code}. You can try again.`, reserving download server error terminology strictly for installer binary downloads.
+- Canonical Domain Move to `wiradelta.com`: Update descriptor endpoint, studio links, browser allowlist, About pane text, and support address all move to `wiradelta.com` (ODR-011).
+- Settings About and General Pane Copy: Word-for-word alignment with approved studio legal specifications, renaming "Support development" to "Send a tip", standardizing hold delay notation to `(100 to 500 ms)`, and locking all critical legal labels.
+- Threat Model Alignment: Documented dual outbound network paths, visual switcher window title inspection, and 1 MB log rotation.
 - Edge-snap default percentage updated from 50% to 67% (`Ctrl+Alt+Shift+Left/Right/Up/Down`).
 - General Defaults isolation: Restoring General settings to defaults now preserves the Windows auto-start preference.
 - Settings window & modal polish: Compact 560px window height, polished About pane card layout cleanly enclosing the Reset button, and redesigned modal confirmation dialog matching Onboarding aesthetics without blue focus outlines.
