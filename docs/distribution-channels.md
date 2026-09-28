@@ -28,7 +28,7 @@ See `packaging/winget/README.md` for the full history, including a real `wingetc
 version gotcha hit while submitting. Short version: the 0.1.4 manifest was submitted
 2026-08-30 as [microsoft/winget-pkgs#426321](https://github.com/microsoft/winget-pkgs/pull/426321).
 `wingetcreate` forked `microsoft/winget-pkgs` under whichever GitHub account owned the
-submitting token, not necessarily `wiradigitalid` — the PR itself names which. The `WINGET_TOKEN`
+submitting token, not necessarily the studio's main GitHub account — the PR itself names which. The `WINGET_TOKEN`
 repo secret is already set; once the PR merges, `release.yml`'s existing `winget` job carries
 every release after with no further action.
 
