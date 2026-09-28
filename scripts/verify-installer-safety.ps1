@@ -5,6 +5,8 @@
 .DESCRIPTION
     Verification harness for SPEC-21 / DEF-23.
     Directly exercises packaging\wiradesk.iss and compiled installer binaries without code duplication:
+      0. Confirms the installer is bilingual: [Languages] declares both en and id, packaging\languages\
+         Indonesian.isl exists, and every en.* [CustomMessages] key has a matching id.* counterpart.
       1. Compiles packaging\wiradesk.iss with candidate versions to verify ISPP compile-time version guard:
          - Accepts strictly decimal major.minor.patch (e.g. 0.2.0, 0.10.0, 1.0.42).
          - Rejects 4-component versions, empty components, leading 'v', and prerelease/build metadata.
@@ -78,6 +80,14 @@ $testArtifactsDir = Join-Path $tempRoot "test_artifacts"
 if (-not (Test-Path $testArtifactsDir)) { New-Item -ItemType Directory -Path $testArtifactsDir | Out-Null }
 
 $realIssContent = Get-Content "packaging\wiradesk.iss" -Raw
+
+# Every generated test copy of the .iss below is written directly into $tempRoot rather than
+# packaging\, but [Languages] resolves "languages\Indonesian.isl" relative to the compiled
+# script's own directory. Mirror packaging\languages\ next to those copies so the bilingual
+# [Languages] entry still compiles for every test .iss generated further down.
+$tempLanguagesDir = Join-Path $tempRoot "languages"
+if (-not (Test-Path $tempLanguagesDir)) { New-Item -ItemType Directory -Path $tempLanguagesDir | Out-Null }
+Copy-Item "packaging\languages\*" $tempLanguagesDir -Recurse -Force
 
 # ----------------------------------------------------------------------------
 # 2. Stage minimal release binaries for compilation
@@ -189,6 +199,51 @@ if ($filesSection -match 'config\.toml' -or $filesSection -match 'wiradesk\.log'
 }
 Write-Pass "packaging\wiradesk.iss [Files] section zero-bundling invariant confirmed (no config.toml or wiradesk.log)."
 Write-Pass "packaging\wiradesk.iss contains all required safety directives and joined dialog formatting."
+
+# ----------------------------------------------------------------------------
+# 4b. Bilingual Installer Coverage (EN/ID)
+# ----------------------------------------------------------------------------
+Write-Step "Checking packaging\wiradesk.iss for bilingual [Languages] and [CustomMessages] coverage..."
+
+if (-not (Test-Path "packaging\languages\Indonesian.isl")) {
+    Write-Fail "packaging\languages\Indonesian.isl is missing."
+    exit 1
+}
+
+if ($realIssContent -notmatch 'Name:\s*"en";\s*MessagesFile:\s*"compiler:Default\.isl"') {
+    Write-Fail "packaging\wiradesk.iss [Languages] section is missing the English (en) entry."
+    exit 1
+}
+if ($realIssContent -notmatch 'Name:\s*"id";\s*MessagesFile:\s*"languages\\Indonesian\.isl"') {
+    Write-Fail "packaging\wiradesk.iss [Languages] section is missing the Indonesian (id) entry."
+    exit 1
+}
+
+# Every en.<key> defined in [CustomMessages] must have a matching id.<key>, and vice versa,
+# so the installer never silently falls back to English mid-dialog on the id language.
+$customMessagesMatch = [regex]::Match($realIssContent, '(?ms)\[CustomMessages\]\s*(.*?)(?=\r?\n\[[A-Za-z]+\]|\z)')
+if (-not $customMessagesMatch.Success) {
+    Write-Fail "packaging\wiradesk.iss is missing [CustomMessages] section."
+    exit 1
+}
+$customMessagesSection = $customMessagesMatch.Groups[1].Value
+$enKeys = [regex]::Matches($customMessagesSection, '(?m)^en\.([A-Za-z0-9_]+)=') | ForEach-Object { $_.Groups[1].Value }
+$idKeys = [regex]::Matches($customMessagesSection, '(?m)^id\.([A-Za-z0-9_]+)=') | ForEach-Object { $_.Groups[1].Value }
+if ($enKeys.Count -eq 0) {
+    Write-Fail "packaging\wiradesk.iss [CustomMessages] section defines no en.* keys."
+    exit 1
+}
+$missingId = $enKeys | Where-Object { $idKeys -notcontains $_ }
+$missingEn = $idKeys | Where-Object { $enKeys -notcontains $_ }
+if ($missingId.Count -gt 0) {
+    Write-Fail "packaging\wiradesk.iss [CustomMessages] is missing id.* counterparts for: $($missingId -join ', ')"
+    exit 1
+}
+if ($missingEn.Count -gt 0) {
+    Write-Fail "packaging\wiradesk.iss [CustomMessages] has id.* keys with no en.* counterpart: $($missingEn -join ', ')"
+    exit 1
+}
+Write-Pass "packaging\wiradesk.iss declares both en and id languages; every en.* CustomMessages key has a matching id.* counterpart ($($enKeys.Count) keys)."
 
 # ----------------------------------------------------------------------------
 # 5. Real Installer Compilation and 64-bit HKLM Registry Decision Table Tests

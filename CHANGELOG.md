@@ -18,6 +18,10 @@ owner decides.
 
 ## [Unreleased]
 
+### Added
+
+- Bilingual Windows Installer: `packaging/wiradesk.iss` now ships an English/Indonesian language picker, following the Windows display language (`ShowLanguageDialog=auto`, `LanguageDetectionMethod=uilanguage`), matching Snapdown's installer. The GPL-3.0 licence text shown during setup stays in its official English wording for both languages; every other installer string (version guard dialogs, the Ready to Install summary, process-shutdown errors, and uninstall prompts) is translated.
+
 ## [0.3.0] - 2026-09-27
 
 ### Added

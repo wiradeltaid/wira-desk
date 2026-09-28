@@ -209,6 +209,10 @@ WizardImageFile={#STAGE_DIR}\installer-wizard.png,{#STAGE_DIR}\installer-wizard-
 WizardSmallImageFile={#STAGE_DIR}\installer-logo.png
 Compression=lzma2/max
 SolidCompression=yes
+; Shows the language picker only when more than one language is registered below, and
+; preselects the entry matching the Windows display language rather than always English.
+ShowLanguageDialog=auto
+LanguageDetectionMethod=uilanguage
 OutputDir={#OUT_DIR}
 ; The `-x64-setup` ending is load-bearing: `release.yml` hands winget an
 ; `installers-regex` of `-x64-setup\.exe$` so that the loose binaries published
@@ -239,6 +243,14 @@ CloseApplications=no
 ; NSIS's `!uninstfinalize` has no such artefact.
 ;   SignTool=mysigntool
 ;   SignedUninstaller=yes
+
+; Both entries point at the same LicenseFile above (unset here on purpose): the GPL-3.0
+; licence text is the official English text and is not translated (ops
+; legal/bahasa-naskah-legal.md §6), so Inno falls back to the [Setup] LicenseFile for
+; both languages instead of pairing English with a translated licence body.
+[Languages]
+Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "id"; MessagesFile: "languages\Indonesian.isl"
 
 [Files]
 Source: "{#STAGE_DIR}\{#DaemonExe}";   DestDir: "{app}"; Flags: ignoreversion
@@ -291,7 +303,7 @@ Name: "{group}\{#AppName}"; Filename: "{app}\{#DaemonExe}"
 ; also work by routing through ShellExecuteEx, but it would put a SECOND UAC prompt in
 ; front of a user who just consented to Setup's. Inheriting the token Setup already holds
 ; costs no prompt at all.
-Filename: "{app}\{#DaemonExe}"; Description: "Start {#AppName} now"; Flags: postinstall nowait skipifsilent runascurrentuser
+Filename: "{app}\{#DaemonExe}"; Description: "{cm:StartAppNow}"; Flags: postinstall nowait skipifsilent runascurrentuser
 Filename: "{app}\{#DaemonExe}"; Flags: nowait runascurrentuser; Check: RunningSilently
 
 [UninstallRun]
@@ -324,6 +336,58 @@ Filename: "{sys}\schtasks.exe"; Parameters: "/Delete /TN ""{#TaskName}"" /F"; Fl
 ; it removes nothing if anything remains, so a file this installer did not put there still
 ; blocks the deletion, which is the behaviour to want.
 Type: dirifempty; Name: "{app}"
+
+[CustomMessages]
+en.StartAppNow=Start {#AppName} now
+id.StartAppNow=Mulai {#AppName} sekarang
+
+en.InvalidVersionInfo=An existing {#AppName} installation was found, but its version information%nis missing or invalid (%1).%n%nSetup cannot verify version compatibility. Please uninstall the current version before continuing.
+id.InvalidVersionInfo=Instalasi {#AppName} yang sudah ada ditemukan, tetapi informasi versinya%nhilang atau tidak valid (%1).%n%nSetup tidak dapat memverifikasi kompatibilitas versi. Silakan hapus instalan versi saat ini terlebih dahulu sebelum melanjutkan.
+
+en.DowngradeRejected=A newer version of {#AppName} (%1) is already installed.%nDowngrading to version %2 is not permitted.%n%nIf you wish to install an older version, please uninstall the current version first.
+id.DowngradeRejected=Versi {#AppName} yang lebih baru (%1) sudah terpasang.%nMenurunkan ke versi %2 tidak diizinkan.%n%nJika Anda ingin memasang versi yang lebih lama, silakan hapus instalan versi saat ini terlebih dahulu.
+
+en.ReadyMemoDestination=Destination location:
+id.ReadyMemoDestination=Lokasi tujuan:
+
+en.ReadyMemoConfigLogs=Configuration and logs:
+id.ReadyMemoConfigLogs=Konfigurasi dan log:
+
+en.ReadyMemoPreserved=Preserved across updates; clean installs start fresh.
+id.ReadyMemoPreserved=Dipertahankan saat pembaruan; pemasangan bersih dimulai dari awal.
+
+en.ReadyMemoAutoStartTask=Auto-start task:
+id.ReadyMemoAutoStartTask=Tugas mulai otomatis:
+
+en.ReadyMemoAutoStartTaskName={#TaskName} (optional elevated logon task)
+id.ReadyMemoAutoStartTaskName={#TaskName} (tugas logon dengan hak elevasi, bersifat opsional)
+
+en.ReadyMemoAutoStartNoCreate=Setup does not create or enable auto-start.
+id.ReadyMemoAutoStartNoCreate=Setup tidak membuat atau mengaktifkan mulai otomatis.
+
+en.ReadyMemoAutoStartEnableLater=Auto-start can be enabled later from Settings or the tray icon.
+id.ReadyMemoAutoStartEnableLater=Mulai otomatis dapat diaktifkan nanti melalui Settings atau ikon tray.
+
+en.ProcessProbeFailed=Failed to probe {#AppName} process state during shutdown. Aborting for safety.
+id.ProcessProbeFailed=Gagal memeriksa status proses {#AppName} saat penutupan. Dibatalkan demi keamanan.
+
+en.ProcessVerifyFailed=Failed to verify {#AppName} daemon process exit. Aborting for safety.
+id.ProcessVerifyFailed=Gagal memverifikasi proses daemon {#AppName} telah berhenti. Dibatalkan demi keamanan.
+
+en.DaemonStillRunning=The {#AppName} background process (%1) is still running and could not be stopped. Please close it and retry Setup.
+id.DaemonStillRunning=Proses latar belakang {#AppName} (%1) masih berjalan dan tidak dapat dihentikan. Silakan tutup proses tersebut dan coba lagi Setup.
+
+en.SettingsProbeFailed=Failed to probe Settings process state during shutdown. Aborting for safety.
+id.SettingsProbeFailed=Gagal memeriksa status proses Settings saat penutupan. Dibatalkan demi keamanan.
+
+en.SettingsStillRunning={#AppName} Settings (%1) is still running. Please save your changes, close Settings, and retry Setup.
+id.SettingsStillRunning=Settings {#AppName} (%1) masih berjalan. Silakan simpan perubahan Anda, tutup Settings, lalu coba lagi Setup.
+
+en.RemovedNotice={#AppName} has been removed.
+id.RemovedNotice={#AppName} telah dihapus.
+
+en.DeletePrompt={#AppName} has been removed.%n%nAlso delete your settings and log?%n%n%1%n%nChoose No to keep them, which is what you want if you plan to reinstall.
+id.DeletePrompt={#AppName} telah dihapus.%n%nHapus juga pengaturan dan log Anda?%n%n%1%n%nPilih Tidak untuk mempertahankannya, yang tepat jika Anda berencana memasang ulang.
 
 [Code]
 const
@@ -459,9 +523,7 @@ begin
     if not RunningSilently then
     begin
       MsgBox(
-        'An existing {#AppName} installation was found, but its version information' + #13#10 +
-        'is missing or invalid (' + InstalledVer + ').' + #13#10#13#10 +
-        'Setup cannot verify version compatibility. Please uninstall the current version before continuing.',
+        FmtMessage(CustomMessage('InvalidVersionInfo'), [InstalledVer]),
         mbError, MB_OK
       );
     end;
@@ -475,9 +537,7 @@ begin
     if not RunningSilently then
     begin
       MsgBox(
-        'A newer version of {#AppName} (' + InstalledVer + ') is already installed.' + #13#10 +
-        'Downgrading to version ' + CurrentVer + ' is not permitted.' + #13#10#13#10 +
-        'If you wish to install an older version, please uninstall the current version first.',
+        FmtMessage(CustomMessage('DowngradeRejected'), [InstalledVer, CurrentVer]),
         mbError, MB_OK
       );
     end;
@@ -508,15 +568,15 @@ function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoType
 var
   S: String;
 begin
-  S := 'Destination location:' + NewLine +
+  S := CustomMessage('ReadyMemoDestination') + NewLine +
        Space + ExpandConstant('{app}') + NewLine + NewLine +
-       'Configuration and logs:' + NewLine +
+       CustomMessage('ReadyMemoConfigLogs') + NewLine +
        Space + ExpandConstant('{userappdata}\WiraDesk') + NewLine +
-       Space + 'Preserved across updates; clean installs start fresh.' + NewLine + NewLine +
-       'Auto-start task:' + NewLine +
-       Space + '{#TaskName} (optional elevated logon task)' + NewLine +
-       Space + 'Setup does not create or enable auto-start.' + NewLine +
-       Space + 'Auto-start can be enabled later from Settings or the tray icon.';
+       Space + CustomMessage('ReadyMemoPreserved') + NewLine + NewLine +
+       CustomMessage('ReadyMemoAutoStartTask') + NewLine +
+       Space + CustomMessage('ReadyMemoAutoStartTaskName') + NewLine +
+       Space + CustomMessage('ReadyMemoAutoStartNoCreate') + NewLine +
+       Space + CustomMessage('ReadyMemoAutoStartEnableLater');
   Result := S;
 end;
 
@@ -602,7 +662,7 @@ begin
     PState := CheckProcessState('{#DaemonExe}');
     if PState = PROCESS_STATE_ERROR then
     begin
-      ErrorMsg := 'Failed to probe {#AppName} process state during shutdown. Aborting for safety.';
+      ErrorMsg := CustomMessage('ProcessProbeFailed');
       Result := False;
       Exit;
     end;
@@ -633,7 +693,7 @@ begin
     PState := CheckProcessState('{#DaemonExe}');
     if PState = PROCESS_STATE_ERROR then
     begin
-      ErrorMsg := 'Failed to verify {#AppName} daemon process exit. Aborting for safety.';
+      ErrorMsg := CustomMessage('ProcessVerifyFailed');
       Result := False;
       Exit;
     end;
@@ -646,8 +706,7 @@ begin
   PState := CheckProcessState('{#DaemonExe}');
   if (Wnd <> 0) or (PState <> PROCESS_STATE_ABSENT) then
   begin
-    ErrorMsg := 'The {#AppName} background process ({#DaemonExe}) is still running and could not be stopped. ' +
-                'Please close it and retry Setup.';
+    ErrorMsg := FmtMessage(CustomMessage('DaemonStillRunning'), ['{#DaemonExe}']);
     Result := False;
     Exit;
   end;
@@ -656,7 +715,7 @@ begin
   PState := CheckProcessState('{#SettingsExe}');
   if PState = PROCESS_STATE_ERROR then
   begin
-    ErrorMsg := 'Failed to probe Settings process state during shutdown. Aborting for safety.';
+    ErrorMsg := CustomMessage('SettingsProbeFailed');
     Result := False;
     Exit;
   end;
@@ -678,8 +737,7 @@ begin
     PState := CheckProcessState('{#SettingsExe}');
     if PState <> PROCESS_STATE_ABSENT then
     begin
-      ErrorMsg := '{#AppName} Settings ({#SettingsExe}) is still running. ' +
-                  'Please save your changes, close Settings, and retry Setup.';
+      ErrorMsg := FmtMessage(CustomMessage('SettingsStillRunning'), ['{#SettingsExe}']);
       Result := False;
       Exit;
     end;
@@ -747,15 +805,12 @@ begin
 
     if not DirExists(DataDir) then
     begin
-      MsgBox('{#AppName} has been removed.', mbInformation, MB_OK);
+      MsgBox(CustomMessage('RemovedNotice'), mbInformation, MB_OK);
       Exit;
     end;
 
-    if MsgBox('{#AppName} has been removed.' + #13#10 + #13#10 +
-              'Also delete your settings and log?' + #13#10 + #13#10 +
-              DataDir + #13#10 + #13#10 +
-              'Choose No to keep them, which is what you want if you plan to ' +
-              'reinstall.', mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
+    if MsgBox(FmtMessage(CustomMessage('DeletePrompt'), [DataDir]),
+              mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
     begin
       { True/True/True: delete the directory itself, its files, and its subdirectories.
         A failure is deliberately not reported. The program is already gone, the user has
