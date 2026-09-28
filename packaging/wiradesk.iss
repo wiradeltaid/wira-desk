@@ -349,7 +349,7 @@ Type: dirifempty; Name: "{app}"
 ; (capitalised) already match the studio convention in the stock file and needed no override.
 [Messages]
 id.BrowseDialogLabel=Pilih folder dari daftar berikut, lalu klik OK.
-id.SelectDirLabel3=Kami akan memasang [name] ke dalam folder berikut.
+id.SelectDirLabel3=Setup akan memasang [name] ke folder berikut.
 id.SelectDirBrowseLabel=Untuk meneruskan, klik Maju. Bila Anda ingin memilih folder lain, klik Cari.
 id.DirNameTooLong=Nama folder atau alamat terlalu panjang.
 id.InvalidDirName=Nama folder tidak sah.
@@ -363,13 +363,13 @@ id.StatusRegisterFiles=Meregistrasi file...
 
 [CustomMessages]
 en.StartAppNow=Start {#AppName} now
-id.StartAppNow=Mulai {#AppName} sekarang
+id.StartAppNow=Jalankan {#AppName} sekarang
 
 en.InvalidVersionInfo=An existing {#AppName} installation was found, but its version information%nis missing or invalid (%1).%n%nSetup cannot verify version compatibility. Please uninstall the current version before continuing.
-id.InvalidVersionInfo=Instalasi {#AppName} yang sudah ada ditemukan, tetapi informasi versinya%nhilang atau tidak valid (%1).%n%nSetup tidak dapat memverifikasi kompatibilitas versi. Silakan hapus instalan versi saat ini terlebih dahulu sebelum melanjutkan.
+id.InvalidVersionInfo=Instalasi {#AppName} yang sudah ada ditemukan, tetapi informasi versinya%nhilang atau tidak valid (%1).%n%nSetup tidak bisa memeriksa kecocokan versi. Uninstall dulu versi yang terpasang, lalu jalankan Setup lagi.
 
 en.DowngradeRejected=A newer version of {#AppName} (%1) is already installed.%nDowngrading to version %2 is not permitted.%n%nIf you wish to install an older version, please uninstall the current version first.
-id.DowngradeRejected=Versi {#AppName} yang lebih baru (%1) sudah terpasang.%nMenurunkan ke versi %2 tidak diizinkan.%n%nJika Anda ingin memasang versi yang lebih lama, silakan hapus instalan versi saat ini terlebih dahulu.
+id.DowngradeRejected=Versi {#AppName} yang lebih baru (%1) sudah terpasang.%nMemasang versi %2 yang lebih lama tidak diizinkan.%n%nBila Anda ingin memakai versi yang lebih lama, uninstall dulu versi yang terpasang.
 
 en.ReadyMemoDestination=Destination location:
 id.ReadyMemoDestination=Lokasi tujuan:
@@ -378,13 +378,13 @@ en.ReadyMemoConfigLogs=Configuration and logs:
 id.ReadyMemoConfigLogs=Konfigurasi dan log:
 
 en.ReadyMemoPreserved=Preserved across updates; clean installs start fresh.
-id.ReadyMemoPreserved=Dipertahankan saat pembaruan; pemasangan bersih dimulai dari awal.
+id.ReadyMemoPreserved=Tetap disimpan saat update; instalasi baru dimulai dari awal.
 
 en.ReadyMemoAutoStartTask=Auto-start task:
 id.ReadyMemoAutoStartTask=Tugas mulai otomatis:
 
 en.ReadyMemoAutoStartTaskName={#TaskName} (optional elevated logon task)
-id.ReadyMemoAutoStartTaskName={#TaskName} (tugas logon dengan hak elevasi, bersifat opsional)
+id.ReadyMemoAutoStartTaskName={#TaskName} (tugas logon opsional dengan hak administrator)
 
 en.ReadyMemoAutoStartNoCreate=Setup does not create or enable auto-start.
 id.ReadyMemoAutoStartNoCreate=Setup tidak membuat atau mengaktifkan mulai otomatis.
@@ -393,25 +393,25 @@ en.ReadyMemoAutoStartEnableLater=Auto-start can be enabled later from Settings o
 id.ReadyMemoAutoStartEnableLater=Mulai otomatis dapat diaktifkan nanti melalui Settings atau ikon tray.
 
 en.ProcessProbeFailed=Failed to probe {#AppName} process state during shutdown. Aborting for safety.
-id.ProcessProbeFailed=Gagal memeriksa status proses {#AppName} saat penutupan. Dibatalkan demi keamanan.
+id.ProcessProbeFailed=Gagal memeriksa status proses {#AppName} saat menutupnya. Dibatalkan demi keamanan.
 
 en.ProcessVerifyFailed=Failed to verify {#AppName} daemon process exit. Aborting for safety.
 id.ProcessVerifyFailed=Gagal memverifikasi proses daemon {#AppName} telah berhenti. Dibatalkan demi keamanan.
 
 en.DaemonStillRunning=The {#AppName} background process (%1) is still running and could not be stopped. Please close it and retry Setup.
-id.DaemonStillRunning=Proses latar belakang {#AppName} (%1) masih berjalan dan tidak dapat dihentikan. Silakan tutup proses tersebut dan coba lagi Setup.
+id.DaemonStillRunning=Proses latar belakang {#AppName} (%1) masih berjalan dan tidak bisa dihentikan. Tutup proses itu, lalu jalankan Setup lagi.
 
 en.SettingsProbeFailed=Failed to probe Settings process state during shutdown. Aborting for safety.
-id.SettingsProbeFailed=Gagal memeriksa status proses Settings saat penutupan. Dibatalkan demi keamanan.
+id.SettingsProbeFailed=Gagal memeriksa status proses Settings saat menutupnya. Dibatalkan demi keamanan.
 
 en.SettingsStillRunning={#AppName} Settings (%1) is still running. Please save your changes, close Settings, and retry Setup.
-id.SettingsStillRunning=Settings {#AppName} (%1) masih berjalan. Silakan simpan perubahan Anda, tutup Settings, lalu coba lagi Setup.
+id.SettingsStillRunning=Settings {#AppName} (%1) masih terbuka. Simpan perubahan Anda, tutup Settings, lalu jalankan Setup lagi.
 
 en.RemovedNotice={#AppName} has been removed.
-id.RemovedNotice={#AppName} telah dihapus.
+id.RemovedNotice={#AppName} sudah dihapus.
 
 en.DeletePrompt={#AppName} has been removed.%n%nAlso delete your settings and log?%n%n%1%n%nChoose No to keep them, which is what you want if you plan to reinstall.
-id.DeletePrompt={#AppName} telah dihapus.%n%nHapus juga pengaturan dan log Anda?%n%n%1%n%nPilih Tidak untuk mempertahankannya, yang tepat jika Anda berencana memasang ulang.
+id.DeletePrompt={#AppName} sudah dihapus.%n%nHapus juga pengaturan dan log Anda?%n%n%1%n%nPilih Tidak untuk menyimpannya, terutama bila Anda berencana memasang ulang.
 
 [Code]
 const
