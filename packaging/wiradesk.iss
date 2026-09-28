@@ -244,10 +244,11 @@ CloseApplications=no
 ;   SignTool=mysigntool
 ;   SignedUninstaller=yes
 
-; Both entries point at the same LicenseFile above (unset here on purpose): the GPL-3.0
-; licence text is the official English text and is not translated (ops
-; legal/bahasa-naskah-legal.md §6), so Inno falls back to the [Setup] LicenseFile for
-; both languages instead of pairing English with a translated licence body.
+; Both entries point at the same LicenseFile above (unset here on purpose): GPL-3.0 is a
+; standard third-party licence excluded from the studio's translation requirement entirely
+; (ops legal/bahasa-naskah-legal.md §1 "Tidak termasuk", §5), so its official English text is
+; not translated. Inno falls back to the [Setup] LicenseFile for both languages instead of
+; pairing English with a translated licence body.
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "id"; MessagesFile: "languages\Indonesian.isl"
