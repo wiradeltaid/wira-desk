@@ -79,6 +79,6 @@ Windows has no built-in same-app window cycling. PowerToys, a separate download 
 
 **Wira Delta Indonesia** is the studio behind this project. Built and maintained by [@kodesh87](https://github.com/kodesh87).
 
-- **License:** [GPL-3.0-only](LICENSE). Third-party acknowledgements are listed in [NOTICE](NOTICE). Built with [Slint](https://slint.dev).
+- **License:** [GPL-3.0-only](LICENSE). Third-party acknowledgments are listed in [NOTICE](NOTICE). Built with [Slint](https://slint.dev).
 - **Privacy & Security:** No account, no analytics, no crash reporting. Update checks query wiradelta.com. See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
 - **The Name and the Icon:** The GPL grants rights over code, not names or logos. The names **Wira Desk** and **Wira Delta Indonesia**, and the product icon, remain property of Wira Delta Indonesia.
