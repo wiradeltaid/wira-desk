@@ -337,6 +337,29 @@ Filename: "{sys}\schtasks.exe"; Parameters: "/Delete /TN ""{#TaskName}"" /F"; Fl
 ; blocks the deletion, which is the behaviour to want.
 Type: dirifempty; Name: "{app}"
 
+; The stock languages\Indonesian.isl community translation renders folder/file as the native
+; "map"/"berkas"/"direktori" throughout. The studio's Indonesian copy convention (POLA-01,
+; wiradelta-web docs/korpus-dan-pola-copywriting-studio.md) keeps "file" and "folder" as English
+; loanwords on every Indonesian surface, matching every id.-prefixed entry in the CustomMessages
+; section below. Overridden here on the messages the wizard's happy path actually shows -
+; directory selection, its Browse dialog and validation errors, and the install progress status
+; line - rather than by editing the upstream .isl file, so that translation stays reusable
+; verbatim by any other product that wants its own convention. "pintasan" (shortcut) and "Anda"
+; (capitalised) already match the studio convention in the stock file and needed no override.
+[Messages]
+id.BrowseDialogLabel=Pilih folder dari daftar berikut, lalu klik OK.
+id.SelectDirLabel3=Kami akan memasang [name] ke dalam folder berikut.
+id.SelectDirBrowseLabel=Untuk meneruskan, klik Maju. Bila Anda ingin memilih folder lain, klik Cari.
+id.DirNameTooLong=Nama folder atau alamat terlalu panjang.
+id.InvalidDirName=Nama folder tidak sah.
+id.BadDirName32=Nama folder dilarang berisi karakter-karakter berikut:%n%n%1
+id.DirExists=Folder:%n%n%1%n%nsudah ada. Tetap pasang di folder tersebut?
+id.DirDoesntExist=Folder:%n%n%1%n%ntidak ada. Buat folder?
+id.StatusCreateDirs=Membuat folder...
+id.StatusExtractFiles=Mengekstrak file...
+id.StatusDownloadFiles=Mengunduh file...
+id.StatusRegisterFiles=Meregistrasi file...
+
 [CustomMessages]
 en.StartAppNow=Start {#AppName} now
 id.StartAppNow=Mulai {#AppName} sekarang
