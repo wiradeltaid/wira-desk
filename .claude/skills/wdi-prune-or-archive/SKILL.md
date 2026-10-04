@@ -6,6 +6,8 @@ disable-model-invocation: true
 
 # WDI Prune or Archive
 
+> **Typed by the owner, or not at all.** Run this skill only when the person typed `wdi-prune-or-archive` — `/wdi-prune-or-archive` or this host's own syntax for it — in the turn that is running. Reached any other way (a description that looked relevant, another skill, a subagent), stop and name it instead. Hosts that can hold a skill to manual-only already do; on the others, this line is the lock.
+
 Standalone housekeeping skill for closed specifications. Moves completed spec directories to
 `.archive/specs/<spec-folder>/` or prunes completed tickets from disk using `lifecycle.py`, while
 strictly preserving requirement traceability and RTM metadata in `.control/registry/specs.yaml`.
@@ -30,7 +32,7 @@ strictly preserving requirement traceability and RTM metadata in `.control/regis
 
 ### A. Interactive Mode (invoked bare: `/wdi-prune-or-archive`)
 
-1. Find closed candidate specs: inspect `.scratch/` directly or run `python .constitution/method/scripts/lifecycle.py --dry-run`
+1. Find closed candidate specs: inspect `.scratch/` directly or run `uv run .constitution/method/scripts/lifecycle.py --dry-run`
    (or grep `specs.yaml` for `status:\s*closed` — MUST NOT dump the entire historical `specs.yaml` into context).
 2. Find all specs with `status: closed` whose directory currently resides under `.scratch/`:
    - If no closed specs reside in `.scratch/`: report that `.scratch/` is already clean of closed specs

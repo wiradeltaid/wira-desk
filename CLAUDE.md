@@ -48,7 +48,8 @@ free text and both default to English:
 Read those two before writing a document. A technical term the industry writes in English MUST be left in
 English whatever the setting says — an equivalent MUST NOT be invented for it.
 
-**These files are always English, whatever the settings say:** `AGENTS.md`, `CLAUDE.md`, and everything
+**These files are always English, whatever the settings say:** `AGENTS.md`, every rule file that mirrors
+its method block (`CLAUDE.md`, `GEMINI.md`, and the others a selected host reads), and everything
 under `.constitution/`. They are agent instructions, and they travel to every repo through the
 `wdi-method` package. The one exception is `.constitution/project/`, which is this product's own room.
 
@@ -135,7 +136,7 @@ derived from the other: one component MAY be thin on purpose and reviewed the ha
 `.constitution/method/document/delivery-flow-guide.md` owns both;
 `.constitution/method/why/rationale.md` says why they are separate.
 
-## The five gates and the eighteen skills
+## The five gates and the twenty-two skills
 
 | Gate | Decides | Skill |
 |---|---|---|
@@ -145,17 +146,30 @@ derived from the other: one component MAY be thin on purpose and reviewed the ha
 | **G4 Component** | How one component is built — **skipped at `catalog`** | `wdi-component` |
 | **G5 Release** | Whether it is done and proven | `wdi-build` |
 
-Before G1 and at the tail of G2: `wdi-init`, five intents — `setup` · `component` · `mode` · `risk` ·
-`structure`.
+Before G1 and at the tail of G2: `wdi-init`, seven intents — `setup` · `engines` · `component` · `mode` ·
+`risk` · `structure` · `readers`.
 
 Any time: `wdi-decision` · `wdi-question` · `wdi-log` · `wdi-help` · `wdi-explain-to-me` · `wdi-reconcile` · `wdi-review` ·
-`wdi-report` · `wdi-systematic-debugging`.
+`wdi-report` · `wdi-systematic-debugging` · `wdi-upgrade` (right after `wdi-method update`).
 
 When the owner asks for it: `wdi-autopilot` — one mandate the owner accepts, then every skill above runs
 unattended and every decision lands in one ledger. It is never the default next step.
 
+The daily tier, started only when the owner types it: `wdi-daily-what-to-build` · `wdi-daily-autopilot` ·
+`wdi-daily-what-to-test` · `wdi-prune-or-archive`. That is eighteen core skills and four daily ones.
+
 **No BMad skill is invoked directly.** Each has a wrapper, and the wrapper is what checks position,
 verifies the result, and lands the memlog.
+
+**These hold on every host, whatever the host itself allows.** Many hosts cannot hold a skill to
+manual-only, so on those this block is the lock:
+
+- `wdi-daily-what-to-build` · `wdi-daily-autopilot` · `wdi-daily-what-to-test` · `wdi-prune-or-archive` ·
+  `wdi-explain-to-me` MUST run only when the owner typed them in the turn that is running.
+- The thirteen BMad skills retired at G5 (`.constitution/method/document/bmad-skill-register.md`) MUST NOT
+  be invoked by a model at all; a person typing one is the only route.
+- A skill is invoked through this host's own skill mechanism. On a host with no skill tool that is reading
+  the skill's whole `SKILL.md` from this repo — never a paraphrase from memory.
 
 ## What MUST NOT be done
 
@@ -168,7 +182,9 @@ verifies the result, and lands the memlog.
 - The two structure maps in `.control/` MUST NOT be edited by hand — `wdi-init` intent `structure`
   re-derives them.
 - A `DEC-` with status `applied` MUST NOT be edited, except to record its supersession — status moves
-  to `superseded` and names its replacement. A change of mind produces a new `DEC-`.
+  to `superseded` and names its replacement — or to append to `touches` a file its applying commit
+  really changed within what the Decision says, marked on its line as a completion. A change of mind
+  produces a new `DEC-`.
 - A file in `.constitution/method/why/` MUST NOT be cited as the reason to reject a change. It is
   `status: Reference` — it explains, it does not bind, and where it disagrees with a guide the guide
   wins and the disagreement is a defect. This covers `why/` ONLY: a guide in
