@@ -98,3 +98,11 @@ Every `unsafe` block carries a `SAFETY:` comment stating the precondition it rel
   because widening was tried and shipped a problem for months.
 - Edit the `.what/` or `.how/` corpus, or an applied decision record, to make code fit. That
   deviation is reported, and it becomes a decision of its own.
+
+## WDI Engineering Playbook Integration
+
+Proyek ini mengadopsi Single Source of Truth (SSOT) rekayasa terpusat WDI:
+- **Konvensi Inti (`03-essential-conventions.md`):** Tiga lapis penegakan `[L1-Tool]`, `[L2-Guard]`, `[L3-Review]`.
+- **Desain Sistem & UX (`07-ui-architecture-and-design-system.md`):** Standar pola interaksi dan checklist kepatuhan UI WDI.
+- **Desktop Native Slint (`stack/slint.md`):** Binding weak reference `window.as_weak()`, unifikasi `SdModalHeader`, docking toast kontekstual, inversi kontras `text-on-accent`, dan reachability wiring tests (`test_annotation_wiring.rs`).
+

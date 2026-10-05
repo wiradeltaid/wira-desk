@@ -1,6 +1,26 @@
 ---
 status: Accepted
 ratified_by: c803a1d     # the last commit that changed `crates/` — the code this file describes
+playbook:
+  repo: wiradeltaid/ops
+  path: research/wdi-ecosystem-strategy/coding-playbook/
+  local: D:\Developer\wiradeltaid\ops\research\wdi-ecosystem-strategy\coding-playbook\
+  rev: 5903b59
+reads:
+  - 01-principles.md
+  - 02-architecture-and-structure.md
+  - 03-essential-conventions.md
+  - 04-file-size-and-cohesion.md
+  - 06-tooling-and-ratchet.md
+  - 07-ui-architecture-and-design-system.md
+  - stack/rust.md
+  - stack/slint.md
+excludes:
+  - stack/go.md
+  - stack/react-typescript.md
+  - stack/kotlin.md
+  - stack/python.md
+  - 05-realtime-and-sync-protocols.md
 ---
 
 # stack — codebase guide
