@@ -12,8 +12,11 @@
 # Run: cargo deny check
 
 [graph]
-# The only target the product is built for. This is the entire point of the file.
-targets = ["x86_64-pc-windows-msvc"]
+# Primary Windows deployment target and Apple Silicon multi-target verification for wiradesk-core.
+targets = [
+    "x86_64-pc-windows-msvc",
+    "aarch64-apple-darwin",
+]
 all-features = false
 
 [advisories]

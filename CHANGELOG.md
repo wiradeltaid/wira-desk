@@ -20,6 +20,10 @@ owner decides.
 
 ### Added
 
+- Four-Crate Modular Architecture (`crates/core`): Decoupled pure domain logic (geometry planners, cycling selection, switcher layout, command enums, input sink protocol) into platform-agnostic `wiradesk-core` crate under MIT licence with `#![forbid(unsafe_code)]` and zero OS I/O (scheduled for minor bump to 0.4.0).
+- Multi-Target Verification: Verified `wiradesk-core` native compilation for Apple Silicon (`aarch64-apple-darwin`) alongside primary Windows target (`x86_64-pc-windows-msvc`).
+- Developer Certificate of Origin (DCO 1.1): Adopted DCO sign-off policy and strict path-by-path *inbound = outbound* licensing in `CONTRIBUTING.md` (`core` under MIT; `daemon`, `settings`, `shared` under GPL-3.0-only).
+- Publication Hygiene Gate: Extended `scripts/verify-public-export.ps1` with automated checks blocking leakage of private repository names, commercial licensing terms, and commercial pricing patterns into public releases.
 - Bilingual Windows Installer: `packaging/wiradesk.iss` now ships an English/Indonesian language picker, following the Windows display language (`ShowLanguageDialog=auto`, `LanguageDetectionMethod=uilanguage`), matching Snapdown's installer. The GPL-3.0 licence text shown during setup stays in its official English wording for both languages; every other installer string (version guard dialogs, the Ready to Install summary, process-shutdown errors, and uninstall prompts) is translated.
 
 ## [0.3.0] - 2026-09-27
