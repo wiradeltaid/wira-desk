@@ -29,6 +29,21 @@ product_components:
     containers: [settings]
     g4_passed: true
 
+  - id: core
+    mode: deep
+    risk_accepted: medium
+    risk_note: >-
+      Pure sans-IO domain engine; must maintain zero regression against 591+
+      existing Windows unit tests and strictly forbid unsafe code.
+    owns:
+      - geometry-planner
+      - cycling-selection-engine
+      - switcher-layout-model
+      - input-sink-protocol
+      - domain-commands
+    containers: [core]
+    g4_passed: true
+
 platform_owns:
   - app-config
   - ipc-reload-signal
@@ -46,6 +61,12 @@ containers:
     built: true
     crate: settings
     serves: [settings]
+
+  - id: core
+    name: wiradesk-core
+    built: true
+    crate: core
+    serves: [core]
 
 logical_components:
   - id: LC-hook-thread
@@ -89,3 +110,28 @@ logical_components:
     component: settings
     container: settings
     description: Listening-mode keyboard capture for shortcut fields.
+
+  - id: LC-geometry-engine
+    type: service
+    component: core
+    container: core
+    description: Pure geometry layout planners for snap, thirds, stack, and virtual display coordinate spaces.
+
+  - id: LC-cycling-state-machine
+    type: service
+    component: core
+    container: core
+    description: Window facts evaluation, directed cycling, and order selection state machines.
+
+  - id: LC-switcher-layout-model
+    type: service
+    component: core
+    container: core
+    description: Pure layout and selection calculation for window switcher cards.
+
+  - id: LC-input-sink
+    type: service
+    component: core
+    container: core
+    description: Instant shortcut matching, disposition & effect generator without blocking I/O.
+

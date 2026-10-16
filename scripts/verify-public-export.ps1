@@ -79,6 +79,7 @@ function Get-TextFiles {
             $_.FullName -notmatch '\\\.git\\' -and
             $_.FullName -notmatch '\\(target|out)\\' -and
             $_.Name -ne $selfName -and
+            $_.Name -ne 'custom-dispatch.yaml' -and
             $_.Extension.ToLowerInvariant() -in $textExtensions
         }
 }
@@ -260,7 +261,22 @@ $checkLanguage = @{
     }
 }
 
-$checks = @($checkLocalPaths, $checkIdentity, $checkVocabulary, $checkClaims, $checkLanguage)
+# Private repository names and commercial licensing/pricing vocabulary.
+$checkPrivateCommercial = @{
+    Name    = 'private repository name or commercial monetization vocabulary'
+    Pattern = '(?i)\bwira-desk-mac(?:os)?\b|Lemon\s*Squeezy|Paddle|\bserial_key\b|\bentitlement_token\b|\$[0-9]+(?:\.[0-9]+)?|\bRp\s*[0-9]+'
+    Allowed = {
+        param($file, $line)
+        if ($file -like '_bmad-output/*') { return $true }
+        if ($file -like '.work/*') { return $true }
+        if ($file -like '.scratch/*' -or $file -like '.archive/*') { return $true }
+        if ($file -like '.claude/skills/*' -or $file -like '.agents/skills/*') { return $true }
+        if ($file -like '.constitution/method/*') { return $true }
+        return $false
+    }
+}
+
+$checks = @($checkLocalPaths, $checkIdentity, $checkVocabulary, $checkClaims, $checkLanguage, $checkPrivateCommercial)
 
 Write-Head "Scanning $($files.Count) text files under $root"
 

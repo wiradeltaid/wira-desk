@@ -114,11 +114,16 @@ The paradigm maps to the execution units:
 - **Theme:** OS theme detection (`AppsUseLightTheme`) sets `is_dark` on the `Palette` global (`ui/theme.slint`) once at startup, and every component that reads colors from that global stays consistent with the detected OS theme without a per-style override. Theme is not re-read while the window is open — a mid-session OS theme change takes effect only after a restart.
 - **Focus visibility, known gap:** the old `eframe`-era rule promised a widened focus stroke applied uniformly to every control via `ctx.all_styles_mut`. Slint carries no equivalent global focus style, and only one control (`shortcut_row.slint`'s percentage width input) binds `has-focus` to a visible `border-color` change at all — every other interactive element's focus-visible treatment, if any, is Slint's platform default, unaudited here. This is a real gap against FR-20/FR-21's evidence, not a documentation-only fix; filed as `OQ-24` rather than asserted away.
 
-### AD-12 — Cargo Workspace: Three Crates
+### AD-12 — Cargo Workspace: Four Crates (Amended by DEC-046)
 
 - **Binds:** all
-- **Prevents:** Duplicated type definitions (config structs, command enums) between daemon and settings, causing silent divergence.
-- **Rule:** The project is a single Cargo Workspace with three crates: `daemon` (`wiradesk.exe`), `settings` (`wiradesk-settings.exe`), and `shared` (Config TOML types, `u8` command enum, constants, `%APPDATA%` path). Both binaries depend on `shared`.
+- **Prevents:** Duplicated type definitions between binaries and platform-specific entanglement of pure domain logic.
+- **Rule:** The project is a single Cargo Workspace with four crates:
+  1. `core` (`wiradesk-core`): Pure domain logic (geometry planners, cycling selection state machine, switcher layout, command enums, sans-IO, `#![forbid(unsafe_code)]`, licensed under MIT).
+  2. `daemon` (`wiradesk.exe`): Windows background daemon, Win32 FFI hooks, tray, and DWM integration, licensed under GPL-3.0-only.
+  3. `settings` (`wiradesk-settings.exe`): Settings GUI built with Slint, licensed under GPL-3.0-only.
+  4. `shared`: Windows-specific shared utilities (WinHttp updater, DPAPI, installer helpers), licensed under GPL-3.0-only.
+  Both binaries depend on `core` and `shared`. `core` MUST NOT depend on `daemon`, `settings`, or `shared`, and MUST NOT import `windows-sys` or OS I/O.
 
 ### AD-13 — Auto-Start: Windows Task Scheduler
 
@@ -145,7 +150,9 @@ The paradigm maps to the execution units:
 ```mermaid
 graph TD
     A["daemon (wiradesk.exe)"] --> C["shared"]
+    A --> D["core (wiradesk-core)"]
     B["settings (wiradesk-settings.exe)"] --> C["shared"]
+    B --> D["core (wiradesk-core)"]
     A -. "ShellExecute" .-> B
     B -. "WM_APP_RELOAD_CONFIG" .-> A
 ```

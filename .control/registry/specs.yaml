@@ -2149,3 +2149,76 @@ specs:
           - settings::update::tests::describe_http_status_uses_wiradelta_endpoint_for_checks
           - settings::update::tests::describe_install_preserves_download_server_wording
 
+  - id: SPEC-32
+    release: "0.4.0"
+    prd: [wira-desk]
+    size: L
+    status: open
+    spec_folder: .scratch/spec-32-decouple-core-library/
+    spec_reviewed:
+      date: '2026-10-16'
+      sha: 'f951fff'
+      lenses: [structure, edge-case-hunter, adversarial]
+    tickets:
+      - id: SPEC-32-01
+        title: "Governance, AD-12 amendment DEC-046, and DCO 1.1 in CONTRIBUTING.md"
+        spec_folder: .scratch/spec-32-decouple-core-library/
+        component: core
+        satisfies: []
+        blocked_by: []
+        tests:
+          - verification::governance::ad12_amendment_dec046_recorded
+          - verification::governance::core_component_registered_in_components_yaml
+          - verification::governance::contributing_dco_and_inbound_licensing
+      - id: SPEC-32-02
+        title: "Extend verify-public-export.ps1 with private commercial hygiene check"
+        spec_folder: .scratch/spec-32-decouple-core-library/
+        component: core
+        satisfies: []
+        blocked_by: [SPEC-32-01]
+        tests:
+          - scripts::verify_public_export::check_private_commercial_rejects_leakage
+          - scripts::verify_public_export::passes_on_clean_repository
+      - id: SPEC-32-03
+        title: "Initialize crates/core and extract geometry planners and commands"
+        spec_folder: .scratch/spec-32-decouple-core-library/
+        component: core
+        satisfies: []
+        blocked_by: [SPEC-32-02]
+        tests:
+          - wiradesk_core::arrangement::snap::tests::test_half_left_and_right
+          - wiradesk_core::arrangement::thirds::tests::test_thirds_cycle
+          - wiradesk_core::arrangement::stack::tests::test_stack_offset
+          - wiradesk_core::switcher::layout::tests::test_switcher_card_geometry
+          - wiradesk_core::commands::tests::test_command_serialization
+      - id: SPEC-32-04
+        title: "Extract cycling selection algorithms, facts evaluation, and bypass policy"
+        spec_folder: .scratch/spec-32-decouple-core-library/
+        component: core
+        satisfies: []
+        blocked_by: [SPEC-32-03]
+        tests:
+          - wiradesk_core::cycling::eligibility::tests::test_evaluate_facts
+          - wiradesk_core::cycling::selection::tests::test_select_next
+          - wiradesk_core::context::tests::test_bypass_policy_classification
+      - id: SPEC-32-05
+        title: "Decouple shortcut decisions from Win32 hook and wire InputSink"
+        spec_folder: .scratch/spec-32-decouple-core-library/
+        component: core
+        satisfies: []
+        blocked_by: [SPEC-32-04]
+        tests:
+          - wiradesk_core::input::tests::test_shortcut_matching_disposition
+          - wiradesk_core::input::tests::test_modifier_state_evaluation
+          - daemon::hook::tests::test_lifted_ipc_dispatch_preserves_latency
+      - id: SPEC-32-06
+        title: "Multi-target cross-compilation verification and minor bump declaration to 0.4.0"
+        spec_folder: .scratch/spec-32-decouple-core-library/
+        component: core
+        satisfies: []
+        blocked_by: [SPEC-32-05]
+        tests:
+          - wiradesk_core::multitarget::tests::apple_silicon_compilation_clean
+          - workspace::regression::all_591_windows_tests_green
+
+

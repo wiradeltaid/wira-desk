@@ -130,6 +130,22 @@ crates/settings/
 **Flow:** `ui/*.slint` (declared UI, `key-pressed`/button callbacks) → `main.rs` (callback wiring) →
 `app.rs` (model mutation) → `persistence.rs` (validate + atomic save + daemon signal).
 
+### core
+
+`wiradesk-core` — platform-agnostic sans-IO domain engine. `#![forbid(unsafe_code)]`, licensed under MIT.
+
+```text
+crates/core/
+├── Cargo.toml
+└── src/
+    ├── lib.rs                  # ★ public surface, #![forbid(unsafe_code)]
+    ├── arrangement/            # pure geometry layout planning (snap, thirds, stack, monitor)
+    ├── cycling/                # pure window cycling selection algorithms and facts evaluation
+    ├── switcher/               # pure switcher layout calculation
+    ├── commands.rs             # domain command enum and serialization
+    └── input.rs                # InputSink trait, modifier state, shortcut matching
+```
+
 ## Libraries
 
 ### shared

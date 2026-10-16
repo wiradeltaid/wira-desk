@@ -4,7 +4,7 @@ ratified_by: c803a1d     # the last commit that changed `crates/` — the code t
 playbook:
   repo: wiradeltaid/ops
   path: research/wdi-ecosystem-strategy/coding-playbook/
-  local: D:\Developer\wiradeltaid\ops\research\wdi-ecosystem-strategy\coding-playbook\
+  local: ../ops/research/wdi-ecosystem-strategy/coding-playbook/
   rev: 5903b59
 reads:
   - 01-principles.md
@@ -55,19 +55,19 @@ shipped** — `build.ps1` and the release gate both use `--release`.
 
 ## Shape
 
-A single Cargo workspace, three crates, `resolver = "2"`, edition 2021, target
-`x86_64-pc-windows-msvc`:
+A single Cargo workspace, four crates (amended by DEC-046), `resolver = "2"`, edition 2021, target
+`x86_64-pc-windows-msvc` (with `wiradesk-core` cross-compilable to `aarch64-apple-darwin`):
 
-| Crate | Binary | Holds |
-| --- | --- | --- |
-| `daemon` | `wiradesk.exe` | The hook thread, worker, tray, arrangement, health, autostart |
-| `settings` | `wiradesk-settings.exe` | The Slint settings window and the first-run tutorial |
-| `shared` | — | `Config` TOML types, the `u8` command enum, every constant, `%APPDATA%` paths |
+| Crate | Binary | Holds | License |
+| --- | --- | --- | --- |
+| `core` | — (`wiradesk-core`) | Pure domain logic: geometry planners, cycling state machine, switcher layout, command enums, input sink protocol (`#![forbid(unsafe_code)]`, sans-IO) | MIT |
+| `daemon` | `wiradesk.exe` | The hook thread, worker, tray, arrangement adapter, health, autostart | GPL-3.0-only |
+| `settings` | `wiradesk-settings.exe` | The Slint settings window and the first-run tutorial | GPL-3.0-only |
+| `shared` | — | Windows-specific utilities (WinHTTP, DPAPI, installer helpers), `%APPDATA%` paths | GPL-3.0-only |
 
-Both binaries depend on `shared`, and nothing depends on a binary. A type used by both sides belongs
-in `shared` — the reason is not tidiness: `ONBOARDING_FLAG` and the `WM_APP_*` values are a contract
-between two processes, and a typo in one of them must be a compile error rather than a feature that
-silently never fires.
+Both binaries depend on `core` and `shared`. `core` MUST NOT depend on `daemon`, `settings`, or `shared`,
+and MUST NOT import `windows-sys` or execute OS I/O. A type used by both sides that is pure domain logic belongs
+in `core`; Windows-specific contracts (like `WM_APP_*`) belong in `shared`.
 
 ## Dependencies, as pinned
 
