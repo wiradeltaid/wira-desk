@@ -180,12 +180,19 @@ fn accept_injected() -> bool {
 const LLKHF_INJECTED: u32 = 0x10;
 
 const VK_LWIN: u32 = 0x5B;
+#[allow(dead_code)]
 const VK_RWIN: u32 = 0x5C;
+#[allow(dead_code)]
 const VK_LCONTROL: u32 = 0xA2;
+#[allow(dead_code)]
 const VK_RCONTROL: u32 = 0xA3;
+#[allow(dead_code)]
 const VK_LMENU: u32 = 0xA4;
+#[allow(dead_code)]
 const VK_RMENU: u32 = 0xA5;
+#[allow(dead_code)]
 const VK_LSHIFT: u32 = 0xA0;
+#[allow(dead_code)]
 const VK_RSHIFT: u32 = 0xA1;
 #[cfg(any(debug_assertions, test))]
 const VK_BACKTICK: u32 = 0xC0;
@@ -340,6 +347,7 @@ enum KeyHandleResult {
 
 struct KeyHandleOutcome {
     disposition: KeyHandleResult,
+    wake_worker: bool,
     #[allow(dead_code)]
     enqueued: bool,
 }
@@ -350,7 +358,7 @@ fn is_win_vk(vk: u32) -> bool {
 }
 
 fn handle_key_event(rt: &mut HookRuntime, vk: u32, key_down: bool) -> KeyHandleOutcome {
-    handle_key_event_with_bypass_and_time(
+    let outcome = handle_key_event_with_bypass_and_time(
         rt,
         vk,
         key_down,
@@ -360,7 +368,14 @@ fn handle_key_event(rt: &mut HookRuntime, vk: u32, key_down: bool) -> KeyHandleO
         },
         |rt| rt.identity.foreground_pid(),
         tick_ms(),
-    )
+    );
+    if outcome.wake_worker && rt.worker_hwnd != 0 {
+        // SAFETY: `PostMessageW` compares `worker_hwnd` rather than dereferencing it; fails safely if stale.
+        unsafe {
+            let _ = PostMessageW(rt.worker_hwnd, WM_APP_COMMAND_READY, 0, 0);
+        }
+    }
+    outcome
 }
 
 #[allow(dead_code)]
@@ -436,6 +451,7 @@ where
     if rt.bypass_latched {
         return KeyHandleOutcome {
             disposition: KeyHandleResult::PassToNext,
+            wake_worker: false,
             enqueued: false,
         };
     }
@@ -446,33 +462,30 @@ where
         }
 
         if ModifierState::is_modifier_vk(vk) {
+            let mut wake_worker = false;
             if rt.is_switcher_active() {
                 if !rt.mods.has_any_of(&rt.switcher_mods) {
                     rt.switcher_active = false;
                     set_switcher_active(false);
                     rt.switcher_armed = false;
                     let _ = enqueue(Command::SwitcherCommit.as_u8());
-                    // SAFETY: Worker HWND is verified or null check.
-                    unsafe {
-                        let _ = PostMessageW(rt.worker_hwnd, WM_APP_COMMAND_READY, 0, 0);
-                    }
+                    wake_worker = true;
                 }
             } else if rt.switcher_armed && !rt.mods.has_any_of(&rt.switcher_mods) {
                 rt.switcher_armed = false;
                 let _ = enqueue(Command::SwitcherDisarm.as_u8());
-                // SAFETY: Worker HWND is verified or null check.
-                unsafe {
-                    let _ = PostMessageW(rt.worker_hwnd, WM_APP_COMMAND_READY, 0, 0);
-                }
+                wake_worker = true;
             }
             return KeyHandleOutcome {
                 disposition: KeyHandleResult::PassToNext,
+                wake_worker,
                 enqueued: false,
             };
         }
 
         if rt.switcher_armed && vk as u16 == rt.switcher_main_vk {
             let mut enqueued = false;
+            let mut wake_worker = false;
             rt.switcher_armed = false;
             if now < rt.switcher_deadline_ms {
                 let _ = enqueue(Command::SwitcherDisarm.as_u8());
@@ -484,14 +497,12 @@ where
                     #[cfg(debug_assertions)]
                     crate::metrics::ACCEPTED.fetch_add(1, Ordering::Relaxed);
                 }
-                // SAFETY: Worker HWND is verified or null check.
-                unsafe {
-                    let _ = PostMessageW(rt.worker_hwnd, WM_APP_COMMAND_READY, 0, 0);
-                }
+                wake_worker = true;
             }
             rt.swallow_release_vk = 0;
             return KeyHandleOutcome {
                 disposition: KeyHandleResult::Swallow,
+                wake_worker,
                 enqueued,
             };
         }
@@ -500,6 +511,7 @@ where
             rt.swallow_release_vk = 0;
             return KeyHandleOutcome {
                 disposition: KeyHandleResult::Swallow,
+                wake_worker: false,
                 enqueued: false,
             };
         }
@@ -507,12 +519,14 @@ where
         if rt.is_switcher_active() {
             return KeyHandleOutcome {
                 disposition: KeyHandleResult::Swallow,
+                wake_worker: false,
                 enqueued: false,
             };
         }
 
         return KeyHandleOutcome {
             disposition: KeyHandleResult::PassToNext,
+            wake_worker: false,
             enqueued: false,
         };
     }
@@ -520,6 +534,7 @@ where
     if ModifierState::is_modifier_vk(vk) {
         return KeyHandleOutcome {
             disposition: KeyHandleResult::PassToNext,
+            wake_worker: false,
             enqueued: false,
         };
     }
@@ -529,6 +544,7 @@ where
             if rt.switcher_main_key_down {
                 return KeyHandleOutcome {
                     disposition: KeyHandleResult::Swallow,
+                    wake_worker: false,
                     enqueued: false,
                 };
             }
@@ -558,18 +574,16 @@ where
                 rt.switcher_armed = false;
             }
             let _ = enqueue(cmd.as_u8());
-            // SAFETY: Worker HWND is verified or null check.
-            unsafe {
-                let _ = PostMessageW(rt.worker_hwnd, WM_APP_COMMAND_READY, 0, 0);
-            }
             return KeyHandleOutcome {
                 disposition: KeyHandleResult::Swallow,
+                wake_worker: true,
                 enqueued: true,
             };
         }
 
         return KeyHandleOutcome {
             disposition: KeyHandleResult::Swallow,
+            wake_worker: false,
             enqueued: false,
         };
     }
@@ -577,6 +591,7 @@ where
     if rt.switcher_armed && vk as u16 == rt.switcher_main_vk && rt.switcher_main_key_down {
         return KeyHandleOutcome {
             disposition: KeyHandleResult::Swallow,
+            wake_worker: false,
             enqueued: false,
         };
     }
@@ -591,24 +606,12 @@ where
     if rt.mods.any() {
         if let Some(action) = lease_action(rt, lease_foreground_pid) {
             report_recorded_chord(vk, rt.mods);
-            // Deliberately does NOT set `bypass_latched`. That latch exists
-            // to protect a *swallowed* chord's tail (its own key-up, and the
-            // modifier releases) from falling back into normal handling —
-            // Observe swallows nothing, and Record's swallowed key-down has
-            // no matching `swallow_release_vk` to protect either, since we
-            // return before that assignment runs. Latching here instead
-            // blocked every *other* key pressed while the same modifiers
-            // stayed held: hold Ctrl+Alt, tap Left (latches), tap Right
-            // without releasing Ctrl+Alt — the latch's top-of-function guard
-            // passed Right through blind, before this check or
-            // `match_shortcut` ever ran, so it was neither reported nor
-            // executed until every modifier came up. That is the reported
-            // symptom of "sometimes not detected while testing."
             return KeyHandleOutcome {
                 disposition: match action {
                     LeaseAction::Observe => KeyHandleResult::PassToNext,
                     LeaseAction::Record => KeyHandleResult::Swallow,
                 },
+                wake_worker: false,
                 enqueued: false,
             };
         }
@@ -617,6 +620,7 @@ where
     let Some(cmd) = match_shortcut(&rt.chords, rt.mods, vk as u16) else {
         return KeyHandleOutcome {
             disposition: KeyHandleResult::PassToNext,
+            wake_worker: false,
             enqueued: false,
         };
     };
@@ -631,6 +635,7 @@ where
         // swallow state — the chord is not ours.
         return KeyHandleOutcome {
             disposition: KeyHandleResult::PassToNext,
+            wake_worker: false,
             enqueued: false,
         };
     }
@@ -658,14 +663,10 @@ where
             Command::SwitcherArm
         };
         let _ = enqueue(arm_cmd.as_u8());
-        // SAFETY: `PostMessageW` compares `worker_hwnd` rather than dereferencing it;
-        // fails safely if stale.
-        unsafe {
-            let _ = PostMessageW(rt.worker_hwnd, WM_APP_COMMAND_READY, 0, 0);
-        }
         rt.swallow_release_vk = vk as u16;
         return KeyHandleOutcome {
             disposition: KeyHandleResult::Swallow,
+            wake_worker: true,
             enqueued: false,
         };
     }
@@ -677,6 +678,7 @@ where
     }
 
     let mut enqueued = false;
+    let mut wake_worker = false;
     // Throttle and capacity rejections are counted separately so the
     // reconciliation can tell an intentional drop from a failure. Atomic
     // increments only — no allocation, no lock, no logging in the callback.
@@ -691,26 +693,13 @@ where
         rt.last_throttle_ms = now;
         #[cfg(debug_assertions)]
         crate::metrics::ACCEPTED.fetch_add(1, Ordering::Relaxed);
-
-        // SAFETY: `PostMessageW` compares `worker_hwnd` rather than dereferencing it, so a
-        // stale handle makes the call fail instead of faulting — hence `let _ =`. Both
-        // `wParam` and `lParam` are zero, so no pointer and no ownership crosses the thread
-        // boundary; the command itself is already in the ring, and this message is only a
-        // wake-up. A lost post therefore delays a command until the next wake rather than
-        // losing or leaking it.
-        //
-        // `PostMessageW`, never `SendMessageW`, and that choice is what keeps this call
-        // legal here at all: posting returns immediately, while sending would block the
-        // input-processing path until the Worker finished a full cycle — unbounded work
-        // inside the hook callback, which the bounded-callback contract forbids.
-        unsafe {
-            let _ = PostMessageW(rt.worker_hwnd, WM_APP_COMMAND_READY, 0, 0);
-        }
+        wake_worker = true;
     }
 
     rt.swallow_release_vk = vk as u16;
     KeyHandleOutcome {
         disposition: KeyHandleResult::Swallow,
+        wake_worker,
         enqueued,
     }
 }
@@ -778,53 +767,7 @@ fn debug_simulate_shortcut(rt: &mut HookRuntime, scenario: usize) {
     }
 }
 
-/// Collapsed modifier state derived from hook events (never `GetAsyncKeyState`).
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub struct ModifierState {
-    pub win: bool,
-    pub ctrl: bool,
-    pub alt: bool,
-    pub shift: bool,
-}
-
-impl ModifierState {
-    fn apply_vk(&mut self, vk: u32, key_down: bool) {
-        match vk {
-            VK_LWIN | VK_RWIN => self.win = key_down,
-            VK_LCONTROL | VK_RCONTROL => self.ctrl = key_down,
-            VK_LMENU | VK_RMENU => self.alt = key_down,
-            VK_LSHIFT | VK_RSHIFT => self.shift = key_down,
-            _ => {}
-        }
-    }
-
-    /// True while any modifier is still held — i.e. a chord is in progress.
-    pub fn any(&self) -> bool {
-        self.win || self.ctrl || self.alt || self.shift
-    }
-
-    /// Returns true if this state still contains any of the modifiers present in `other`.
-    pub fn has_any_of(&self, other: &ModifierState) -> bool {
-        (other.win && self.win)
-            || (other.ctrl && self.ctrl)
-            || (other.alt && self.alt)
-            || (other.shift && self.shift)
-    }
-
-    fn is_modifier_vk(vk: u32) -> bool {
-        matches!(
-            vk,
-            VK_LWIN
-                | VK_RWIN
-                | VK_LCONTROL
-                | VK_RCONTROL
-                | VK_LMENU
-                | VK_RMENU
-                | VK_LSHIFT
-                | VK_RSHIFT
-        )
-    }
-}
+pub use wiradesk_core::input::ModifierState;
 
 /// Every chord the Hook matches against, as one value.
 ///
