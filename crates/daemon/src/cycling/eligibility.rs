@@ -6,10 +6,7 @@
 //! It has no dependency on physical-monitor, virtual-desktop, VM/RDP,
 //! arrangement, or Settings behavior — those belong to Epics 3, 4, and 5.
 
-use super::{
-    ActiveContext, AppIdentity, Candidate, Eligibility, EligibilityPolicy, ExclusionReason,
-    WindowFacts,
-};
+use super::{ActiveContext, AppIdentity, Candidate, Eligibility, EligibilityPolicy, WindowFacts};
 
 /// Frozen exclusion precedence.
 /// When a window matches several exclusion facts at once, the *first* matching
@@ -37,41 +34,7 @@ impl EligibilityPolicy for WindowEligibility {
 /// [`ActiveContext`]: the policy has no business knowing the foreground handle,
 /// which keeps selection concerns out of this module.
 pub fn evaluate_facts(active_identity: &AppIdentity, facts: &WindowFacts) -> Eligibility {
-    // A hung application produces a separate `Ghost` window. Excluding the
-    // ghost is what lets the *real* window stay eligible without any
-    // responsiveness probe.
-    if facts.is_ghost() {
-        return Eligibility::Excluded(ExclusionReason::GhostWindow);
-    }
-    if facts.is_shell_surface() {
-        return Eligibility::Excluded(ExclusionReason::ShellSurface);
-    }
-    if facts.is_helper_surface() {
-        return Eligibility::Excluded(ExclusionReason::HelperSurface);
-    }
-    if !facts.visible {
-        return Eligibility::Excluded(ExclusionReason::Hidden);
-    }
-    // `visible` is not enough on its own. A cloaked window keeps `WS_VISIBLE`
-    // set and answers `IsWindowVisible` with `true`; the compositor simply never
-    // draws it. Activating one moves focus to nothing the user can see, which is
-    // exactly the blank stop reported while cycling File Explorer.
-    if facts.cloaked {
-        return Eligibility::Excluded(ExclusionReason::Cloaked);
-    }
-    if facts.iconic {
-        return Eligibility::Excluded(ExclusionReason::Iconic);
-    }
-    if facts.tool_window {
-        return Eligibility::Excluded(ExclusionReason::ToolWindow);
-    }
-    if !facts.identity.is_available() {
-        return Eligibility::Excluded(ExclusionReason::UnavailableIdentity);
-    }
-    if !facts.identity.same_application(active_identity) {
-        return Eligibility::Excluded(ExclusionReason::DifferentApplication);
-    }
-    Eligibility::Eligible
+    wiradesk_core::cycling::evaluate_facts(active_identity, facts)
 }
 
 #[cfg(test)]

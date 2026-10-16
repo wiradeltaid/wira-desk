@@ -2,6 +2,8 @@
 
 pub mod arrangement;
 pub mod commands;
+pub mod context;
+pub mod cycling;
 pub mod switcher;
 pub mod update;
 pub mod window;

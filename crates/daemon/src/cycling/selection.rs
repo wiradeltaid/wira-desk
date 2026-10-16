@@ -3,7 +3,7 @@
 //! cursor between commands, so a window closing or opening between shortcuts
 //! can never desynchronize it.
 
-use super::{cycle_order, ActiveContext, Candidate, SelectionResult, WindowId};
+use super::{ActiveContext, Candidate, SelectionResult, WindowId};
 
 /// Build the full attempt order: every eligible window except the active one,
 /// starting immediately after the active window and wrapping **at most once**.
@@ -14,10 +14,7 @@ pub fn attempt_order(
     eligible: &[WindowId],
     active: &ActiveContext,
 ) -> Vec<WindowId> {
-    cycle_order(candidates, active)
-        .into_iter()
-        .filter(|w| *w != active.foreground && eligible.contains(w))
-        .collect()
+    wiradesk_core::cycling::selection::attempt_order(candidates, eligible, active)
 }
 
 /// Choose the next target, or [`SelectionResult::NoCandidate`] for a no-op.
@@ -26,10 +23,7 @@ pub fn select_next(
     eligible: &[WindowId],
     active: &ActiveContext,
 ) -> SelectionResult {
-    match attempt_order(candidates, eligible, active).first() {
-        Some(target) => SelectionResult::Target(*target),
-        None => SelectionResult::NoCandidate,
-    }
+    wiradesk_core::cycling::selection::select_next(candidates, eligible, active)
 }
 
 /// Advance past targets already tried in this pass.
@@ -41,13 +35,7 @@ pub fn select_after(
     active: &ActiveContext,
     tried: &[WindowId],
 ) -> SelectionResult {
-    match attempt_order(candidates, eligible, active)
-        .into_iter()
-        .find(|w| !tried.contains(w))
-    {
-        Some(target) => SelectionResult::Target(target),
-        None => SelectionResult::NoCandidate,
-    }
+    wiradesk_core::cycling::selection::select_after(candidates, eligible, active, tried)
 }
 
 #[cfg(test)]
