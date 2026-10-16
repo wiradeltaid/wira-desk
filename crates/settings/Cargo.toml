@@ -13,6 +13,7 @@ name = "wiradesk-settings"
 path = "src/main.rs"
 
 [dependencies]
+wiradesk-core = { path = "../core" }
 shared = { path = "../shared" }
 # Already in the lock file via Slint, so this adds a declaration rather than a new
 # dependency. Declared on `settings` and not `shared`, because the daemon depends on

@@ -1,0 +1,16 @@
+[package]
+name = "wiradesk-core"
+version.workspace = true
+edition = "2021"
+description = "Platform-agnostic sans-IO domain engine for Wira Desk"
+license = "MIT"
+repository = "https://github.com/wiradeltaid/wira-desk"
+publish = false
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "1.1"
+
+[lints]
+workspace = true

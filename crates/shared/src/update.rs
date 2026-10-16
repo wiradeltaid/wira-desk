@@ -21,7 +21,7 @@
 //! both this updater and the download page on the website, so the two cannot disagree about
 //! what the current version is.
 
-use serde::Deserialize;
+pub use wiradesk_core::update::*;
 
 /// The repository this build belongs to, taken from `Cargo.toml`.
 ///
@@ -32,17 +32,7 @@ use serde::Deserialize;
 /// the first version of this module for exactly that.
 pub const REPOSITORY: &str = env!("CARGO_PKG_REPOSITORY");
 
-/// Split `https://host/path` into its host and path. `None` for anything else.
-///
-/// Hand-parsed and narrow on purpose: a permissive URL parser here would be a parser whose
-/// edge cases decide where an executable is downloaded from.
-pub fn split_https(url: &str) -> Option<(&str, &str)> {
-    let rest = url.strip_prefix("https://")?;
-    Some(match rest.split_once('/') {
-        Some((host, path)) => (host, path),
-        None => (rest, ""),
-    })
-}
+// Split `https://host/path` into its host and path is re-exported from `wiradesk_core::update::split_https`.
 
 /// Read only in debug builds, and only by `latest_json_url` below.
 #[cfg(debug_assertions)]
@@ -67,169 +57,6 @@ pub fn latest_json_url() -> String {
         return url;
     }
     UPDATE_DESCRIPTOR_URL.to_owned()
-}
-
-/// Ceiling for the descriptor. It is a few hundred bytes; anything approaching this is
-/// either not our file or not worth reading.
-pub const DESCRIPTOR_LIMIT: u64 = 64 * 1024;
-
-/// A release, as described by `latest.json`.
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-pub struct Release {
-    pub version: String,
-    #[serde(default)]
-    pub released: String,
-    pub setup_url: String,
-    pub setup_sha256: String,
-    #[serde(default)]
-    pub notes_url: String,
-}
-
-/// Why a release descriptor was refused.
-///
-/// Each variant is a distinct thing that can be wrong, rather than one catch-all error,
-/// because the updater has to say something true to the user and "update failed" is not it.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Rejected {
-    /// The descriptor could not be parsed at all.
-    Unreadable,
-    /// A version string was not three numeric fields.
-    BadVersion(String),
-    /// `setup_sha256` was not 64 hexadecimal characters.
-    BadChecksum,
-    /// `setup_url` was not an HTTPS URL on the expected repository.
-    BadUrl,
-    // There is deliberately no "not newer" variant. `decide` answers that case with
-    // `Decision::UpToDate`, which is not a refusal -- being current is the normal outcome,
-    // not an error. A variant existed here at first and `-D warnings` caught it as never
-    // constructed once the blanket dead-code allow came off, which is the lint doing exactly
-    // the job it is set to `deny` for: a variant the logic cannot produce is a lie told by
-    // the type, and every `match` on it grows an arm that can never run.
-}
-
-/// The outcome of asking whether to offer an update.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Decision {
-    /// Nothing to do; the running version is current or ahead.
-    UpToDate,
-    /// A newer, validated release is available.
-    Available(Release),
-    /// The descriptor was refused. Nothing is downloaded.
-    Refused(Rejected),
-}
-
-/// Three numeric fields, compared field by field.
-///
-/// A hand-rolled comparison rather than a semver crate: the only versions this ever sees are
-/// produced by `[workspace.package] version` and written into `latest.json` by the release
-/// workflow, both of which are three plain integers. Accepting more than that would mean
-/// accepting version strings the product cannot itself produce.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-struct Version(u64, u64, u64);
-
-fn parse_version(raw: &str) -> Option<Version> {
-    let trimmed = raw.trim().trim_start_matches('v');
-    let mut parts = trimmed.split('.');
-    let mut next = || -> Option<u64> {
-        let field = parts.next()?;
-        if field.is_empty() || !field.bytes().all(|b| b.is_ascii_digit()) {
-            return None;
-        }
-        field.parse().ok()
-    };
-    let v = Version(next()?, next()?, next()?);
-    // A fourth field means this is not the shape we produce, and guessing what the extra
-    // number means is how a comparison quietly becomes wrong.
-    if parts.next().is_some() {
-        return None;
-    }
-    Some(v)
-}
-
-fn checksum_looks_like_sha256(raw: &str) -> bool {
-    raw.len() == 64 && raw.bytes().all(|b| b.is_ascii_hexdigit())
-}
-
-/// The one prefix a download URL may begin with: this repository's release downloads.
-fn required_download_prefix() -> Option<String> {
-    let (_, repo_path) = split_https(REPOSITORY)?;
-    Some(format!(
-        "/{}/releases/download/",
-        repo_path.trim_matches('/')
-    ))
-}
-
-/// `true` when the URL is HTTPS and points into this project's own release downloads.
-///
-/// **This is a guard, not tidiness.** `latest.json` arrives over HTTPS, so its contents are
-/// as trustworthy as the connection — but `setup_url` inside it is a download instruction,
-/// and a descriptor tampered with anywhere (a compromised release, a mistaken edit, a host
-/// migration done wrong) could point it at a server of someone else's choosing. Pinning the
-/// host and the repository path means the worst a bad descriptor achieves is failing, rather
-/// than fetching an executable nobody vetted.
-fn url_is_acceptable(raw: &str) -> bool {
-    let Some((repo_host, _)) = split_https(REPOSITORY) else {
-        return false;
-    };
-    let Some(prefix) = required_download_prefix() else {
-        return false;
-    };
-    let Some((authority, path)) = split_https(raw) else {
-        return false;
-    };
-
-    // An exact host match, never a suffix or prefix one: `evil-github.com` ends with the
-    // right letters and `github.com.evil.tld` begins with them. Comparing the whole
-    // authority also rejects userinfo, since `github.com@evil.tld` is not equal to the host
-    // even though it reads like it starts with it, and rejects a port for the same reason.
-    if authority != repo_host {
-        return false;
-    }
-
-    let path = format!("/{path}");
-    // Any dot-segment means this is not the shape the release workflow emits, so it is
-    // refused outright rather than normalised — normalising is where path guards go wrong.
-    if path.contains("/../") || path.ends_with("/..") {
-        return false;
-    }
-    // Longer than the prefix, so the bare prefix with no file after it does not pass.
-    path.starts_with(&prefix) && path.len() > prefix.len()
-}
-
-/// Validate a descriptor and decide against the running version.
-///
-/// `running` is normally `env!("CARGO_PKG_VERSION")`; it is a parameter so the decision is
-/// testable without rebuilding at a different version.
-pub fn decide(running: &str, descriptor: &str) -> Decision {
-    let release: Release = match serde_json::from_str(descriptor) {
-        Ok(r) => r,
-        Err(_) => return Decision::Refused(Rejected::Unreadable),
-    };
-
-    let Some(running_v) = parse_version(running) else {
-        return Decision::Refused(Rejected::BadVersion(running.to_owned()));
-    };
-    let Some(offered_v) = parse_version(&release.version) else {
-        return Decision::Refused(Rejected::BadVersion(release.version.clone()));
-    };
-
-    if !checksum_looks_like_sha256(&release.setup_sha256) {
-        return Decision::Refused(Rejected::BadChecksum);
-    }
-    if !url_is_acceptable(&release.setup_url) {
-        return Decision::Refused(Rejected::BadUrl);
-    }
-
-    // STRICTLY greater, never merely different. Accepting a different version would accept
-    // an older one, which is how a replayed descriptor pushes a build whose flaw is already
-    // fixed — and the offered installer would be correctly signed and correctly hashed,
-    // because it really is a release of this product. Ordering is the only thing that
-    // catches it.
-    if offered_v > running_v {
-        Decision::Available(release)
-    } else {
-        Decision::UpToDate
-    }
 }
 
 #[cfg(test)]

@@ -13,6 +13,7 @@ name = "wiradesk"
 path = "src/main.rs"
 
 [dependencies]
+wiradesk-core = { path = "../core" }
 shared = { path = "../shared" }
 windows-sys = { version = "0.52", features = [
     "Win32_Foundation",

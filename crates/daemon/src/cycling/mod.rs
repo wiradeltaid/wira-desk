@@ -23,9 +23,7 @@ pub mod eligibility;
 pub mod selection;
 pub mod source;
 
-/// Opaque window handle. Kept as a plain integer so fixtures need no Win32.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct WindowId(pub isize);
+pub use wiradesk_core::WindowId;
 
 /// Window classes that carry a frozen eligibility decision.
 pub const CLASS_GHOST: &str = "Ghost";
