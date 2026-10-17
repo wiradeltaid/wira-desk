@@ -10,7 +10,7 @@
 | Component | Test Case | Expected Outcome | Result |
 |---|---|---|---|
 | **System Tray** | Daemon elevation launch | Tray icon displays normal green state; zero Tier-2/Tier-3 warnings on startup | PASS |
-| **Geometry Snapping** | Halves, Thirds, Maximize (`Ctrl+Alt+Shift+<Keys>`) | Active window repositions and resizes accurately against work area bounds | PASS |
+| **Geometry Snapping** | Halves (`Ctrl+Alt+Arrows`), Percent (`Ctrl+Alt+Shift+Arrows`), Thirds (`Ctrl+Alt+1/2/3`), Maximize (`Ctrl+Alt+Enter`) | Active window repositions and resizes accurately against work area bounds | PASS |
 | **Same-App Cycling** | Focus rotation (`Win+` `) across 3+ windows | Least-recently-used cycling traverses all windows without ping-pong oscillation | PASS |
 | **Visual Switcher** | Chord hold delay threshold | Visual overlay opens, renders card chrome and previews, supports arrow and mouse navigation | PASS |
 | **Settings GUI** | Open from tray, edit preference, Save | `WM_APP_RELOAD_CONFIG` sent, daemon receives reload and applies new snapshot without restarting | PASS |
