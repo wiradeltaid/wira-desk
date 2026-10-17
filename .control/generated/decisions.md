@@ -4,7 +4,7 @@
 
 Decisions are no longer looked up through the memlog — the memlog goes back to being just a pass log.
 
-**45 decisions** — accepted: 2 · applied: 43.
+**46 decisions** — accepted: 3 · applied: 43.
 
 | id | Title | Status | Type | Touches | File |
 | --- | --- | --- | --- | --- | --- |
@@ -53,3 +53,4 @@ Decisions are no longer looked up through the memlog — the memlog goes back to
 | `DEC-043` | Autopilot mandate for SPEC-29 delivery | `applied` | mandate | `.control/decisions/DEC-043-autopilot-mandate-for-spec-29-delivery.md`, `.control/memlog/autopilot-DEC-043.md`, `.control/registry/decisions.yaml`, `.control/registry/specs.yaml`, `.scratch/spec-29-snap-custom-top-default-to-33/SPEC.md`, `.scratch/spec-29-snap-custom-top-default-to-33/issues/01-update-default-snap-custom-top-percentage-to-33.md`, `crates/shared/src/config.rs`, `crates/shared/src/constants.rs`, `crates/settings/src/persistence.rs`, `README.md`, `docs/CONFIGURATION.md`, `.control/registry/requirements-wira-desk.yaml`, `.what/window-management/04-usecases/UC-9-snap-window-custom-percentage.md`, `3p.md`, `docs/3p.md` | `decisions/DEC-043-autopilot-mandate-for-spec-29-delivery.md` |
 | `DEC-044` | Autopilot mandate for SPEC-30 delivery | `applied` | mandate | `.control/decisions/DEC-044-autopilot-mandate-for-spec-30-delivery.md`, `.control/memlog/autopilot-DEC-044.md`, `.control/registry/decisions.yaml`, `.control/registry/specs.yaml`, `.scratch/spec-30-wira-desk-0-3-0-release-and-endpoint-handover/SPEC.md` | `decisions/DEC-044-autopilot-mandate-for-spec-30-delivery.md` |
 | `DEC-045` | Autopilot mandate for SPEC-31 delivery | `applied` | mandate | `.control/decisions/DEC-045-autopilot-mandate-for-spec-31-delivery.md`, `.control/memlog/autopilot-DEC-045.md`, `.control/registry/decisions.yaml`, `.control/registry/specs.yaml`, `.scratch/spec-31-about-tab-layout-and-error-message/SPEC.md`, `.scratch/spec-31-about-tab-layout-and-error-message/issues/01-about-pane-layout-and-duplicate-link-removal.md`, `.scratch/spec-31-about-tab-layout-and-error-message/issues/02-update-check-error-message-differentiation.md` | `decisions/DEC-045-autopilot-mandate-for-spec-31-delivery.md` |
+| `DEC-046` | AD-12 amended from Three Crates to Four Crates: Decoupling Platform-Agnostic Core into crates/core | `accepted` | — | `.control/decisions/DEC-046-workspace-four-crates-and-core-decoupling.md`, `.control/registry/decisions.yaml`, `.control/registry/components.yaml`, `.control/registry/specs.yaml`, `.how/_platform/ARCHITECTURE-SPINE.md`, `.constitution/project/codebase-stack-guide.md`, `CONTRIBUTING.md`, `Cargo.toml` | `decisions/DEC-046-workspace-four-crates-and-core-decoupling.md` |

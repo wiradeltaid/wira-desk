@@ -40,4 +40,4 @@ Decoupling pure mathematics and domain selection algorithms from OS-specific hoo
 All existing code in `crates/daemon` and `crates/shared` slated for extraction into `crates/core` was authored exclusively by the project maintainer and sole copyright holder (Wira Sihombing, covering all 506 commits to date, with non-code Dependabot updates touching only lockfiles). The sole copyright holder hereby exercises explicit authority and consent to relicense the extracted domain logic modules under the MIT license without copyleft contamination.
 
 ## Cost
-Refactoring workspace boundaries across 6 phased tracer-bullet tickets (SPEC-32-01 to SPEC-32-06).
+Refactoring workspace boundaries across modular Phase 1 specifications (SPEC-32, SPEC-33, and SPEC-34).

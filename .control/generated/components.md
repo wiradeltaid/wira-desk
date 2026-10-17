@@ -4,6 +4,15 @@
 
 ```yaml
 product_components:
+- id: core
+  name: null
+  containers:
+  - core
+  logical_components:
+  - LC-cycling-state-machine
+  - LC-geometry-engine
+  - LC-input-sink
+  - LC-switcher-layout-model
 - id: settings
   name: null
   containers:
@@ -32,9 +41,24 @@ logical_components:
   component: settings
   area: null
   owner: null
+- id: LC-cycling-state-machine
+  type: service
+  component: core
+  area: null
+  owner: null
+- id: LC-geometry-engine
+  type: service
+  component: core
+  area: null
+  owner: null
 - id: LC-hook-thread
   type: service
   component: window-management
+  area: null
+  owner: null
+- id: LC-input-sink
+  type: service
+  component: core
   area: null
   owner: null
 - id: LC-settings-shell
@@ -45,6 +69,11 @@ logical_components:
 - id: LC-shortcut-capturer
   type: control
   component: settings
+  area: null
+  owner: null
+- id: LC-switcher-layout-model
+  type: service
+  component: core
   area: null
   owner: null
 - id: LC-tray-controller

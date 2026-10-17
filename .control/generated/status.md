@@ -134,6 +134,21 @@ work_progress:
   tickets_done: 2
   tickets_total: 2
   work_progress: 100%
+- spec: SPEC-32
+  status: closed
+  tickets_done: 3
+  tickets_total: 3
+  work_progress: 100%
+- spec: SPEC-33
+  status: open
+  tickets_done: 0
+  tickets_total: 4
+  work_progress: 0%
+- spec: SPEC-34
+  status: open
+  tickets_done: 0
+  tickets_total: 2
+  work_progress: 0%
 - spec: SPEC-4
   status: closed
   tickets_done: 5
@@ -189,6 +204,8 @@ validators_red: []
 validators_skipped:
   custom-room-declared: the `.constitution/project/` room is empty, and that is a valid state — a generic
     rule MUST NOT be moved here just to give the room content
+  review-trace: 'advisory — trace stale, re-run before the next gate or spec close: .how/_platform/ARCHITECTURE-SPINE.md
+    (changed at e7d1728, reviewed at 2b19bee)'
 open_questions:
   blocking: 0
   assumptions: 32
@@ -199,7 +216,7 @@ open_questions:
     run: 1
     frozen: 0
     unstated: 23
-  blocking_budget: 6
+  blocking_budget: 9
   blocking_over_budget: false
   assumptions_budget_per_gate: 15
 mandates:
