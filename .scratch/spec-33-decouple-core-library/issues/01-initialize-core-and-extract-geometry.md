@@ -2,7 +2,7 @@
 id: SPEC-33-01
 title: Initialize crates/core and extract geometry planners and commands
 spec: SPEC-33
-status: open
+status: closed
 depends_on: []
 ---
 
