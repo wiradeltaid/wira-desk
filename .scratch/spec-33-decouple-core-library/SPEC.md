@@ -1,7 +1,7 @@
 ---
 id: SPEC-33
 title: Decouple Platform-Agnostic Core Library and InputSink Protocol
-status: open
+status: closed
 size: M
 release: "0.4.0"
 created: '2026-10-17'

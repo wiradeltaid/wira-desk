@@ -2191,7 +2191,7 @@ specs:
     release: "0.4.0"
     prd: [wira-desk]
     size: M
-    status: open
+    status: closed
     depends_on: [SPEC-32]
     spec_folder: .scratch/spec-33-decouple-core-library/
     spec_reviewed:
