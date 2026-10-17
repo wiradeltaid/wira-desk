@@ -19,6 +19,55 @@ $env:WIRADESK_SKIP_MANIFEST = '1'
 cargo test --workspace
 ```
 
+## Licensing and sign-off
+
+Wira Desk takes contributions under the Developer Certificate of Origin (DCO) 1.1, not a
+Contributor License Agreement. You keep the copyright in what you write. Your sign-off
+states that you have the right to submit it under the licence of the path it lands in.
+
+### Your contribution takes the licence of its path
+
+The workspace carries two licences. Each change is licensed under the licence of the path
+it lands in; a pull request that touches both sides is licensed path by path.
+
+| Path | Package | Licence |
+| --- | --- | --- |
+| `crates/core/` | `wiradesk-core` | MIT |
+| `crates/daemon/` | `daemon` (binary `wiradesk`) | GPL-3.0-only |
+| `crates/settings/` | `settings` (binary `wiradesk-settings`) | GPL-3.0-only |
+| `crates/shared/` | `shared` | GPL-3.0-only |
+| Everything else, unless a file states otherwise | — | GPL-3.0-only |
+
+Where the DCO says "the open source license indicated in the file", it means the `license`
+field in the crate's `Cargo.toml` and the `LICENSE` file beside it; outside `crates/`, the
+root `LICENSE`.
+
+`crates/core` is MIT so it can be used in projects under any licence, including proprietary
+ones. Code submitted there must be your own work, or come from a source under an
+MIT-compatible permissive licence with that source's notice kept. It must not be copied or
+adapted from GPL-licensed code, including the GPL crates in this repository. Moving code
+from `crates/daemon`, `crates/settings`, or `crates/shared` into `crates/core` relicenses
+it, and only the maintainers can make that move.
+
+### Signing off
+
+Sign every commit with `git commit -s`. Git builds the trailer from your `user.name` and
+`user.email`:
+
+```text
+Signed-off-by: Your Name <you@example.com>
+```
+
+Use a name you are known by and an email that reaches you; anonymous sign-offs cannot be
+accepted. The email should match the commit author, since that is what the check compares.
+
+If you forgot, `git commit --amend -s` fixes the last commit and
+`git rebase --signoff main` fixes every commit on your branch; then update the pull request
+with `git push --force-with-lease`.
+
+The sign-off certifies the DCO 1.1, reproduced verbatim in [`DCO`](DCO) and published at
+<https://developercertificate.org>.
+
 ## What CI enforces
 
 Four gates, all of which must pass:

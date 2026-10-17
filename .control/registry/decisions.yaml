@@ -1239,6 +1239,23 @@ decisions:
       build_target_dir: target
       ledger: .control/memlog/autopilot-DEC-045.md
 
+  - id: DEC-046
+    title: "AD-12 amended from Three Crates to Four Crates: Decoupling Platform-Agnostic Core into crates/core"
+    status: accepted
+    accepted_by: "Wira, 2026-10-16"
+    file: decisions/DEC-046-workspace-four-crates-and-core-decoupling.md
+    created: '2026-10-16'
+    touches:
+      - .control/decisions/DEC-046-workspace-four-crates-and-core-decoupling.md
+      - .control/registry/decisions.yaml
+      - .control/registry/components.yaml
+      - .control/registry/specs.yaml
+      - .how/_platform/ARCHITECTURE-SPINE.md
+      - .constitution/project/codebase-stack-guide.md
+      - CONTRIBUTING.md
+      - Cargo.toml
+
+
 
 
 
