@@ -20,6 +20,10 @@ owner decides.
 
 ### Added
 
+- Platform-Agnostic Core Domain Engine (`wiradesk-core`): Decoupled pure domain logic out of Windows FFI into an independent workspace crate under MIT license with `#![forbid(unsafe_code)]`, establishing a sans-IO domain engine for headless testing and multi-target compilation.
+- Multi-Target Compilation Support: Verified cross-compilation of `wiradesk-core` for Apple Silicon (`aarch64-apple-darwin`), Intel macOS (`x86_64-apple-darwin`), and Windows (`x86_64-pc-windows-msvc`), supported by multi-target `deny.toml` dependency checking.
+- Sans-IO Input Matching Protocol: Introduced `InputSink` protocol, `Disposition`, and `Effect` in `wiradesk-core`, lifting all 8 `PostMessageW(WM_APP_COMMAND_READY)` invocations out of internal decision paths to outer shell wrappers.
+- Four-Crate Workspace Architecture: Reorganized codebase into four decoupled crates (`crates/core`, `crates/daemon`, `crates/settings`, `crates/shared`) with full backward-compatible facades and 100% test parity (808 workspace unit tests passing).
 - Bilingual Windows Installer: `packaging/wiradesk.iss` now ships an English/Indonesian language picker, following the Windows display language (`ShowLanguageDialog=auto`, `LanguageDetectionMethod=uilanguage`), matching Snapdown's installer. The GPL-3.0 licence text shown during setup stays in its official English wording for both languages; every other installer string (version guard dialogs, the Ready to Install summary, process-shutdown errors, and uninstall prompts) is translated.
 
 ## [0.3.0] - 2026-09-27

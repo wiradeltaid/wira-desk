@@ -179,7 +179,9 @@ fn accept_injected() -> bool {
 
 const LLKHF_INJECTED: u32 = 0x10;
 
+#[cfg(any(debug_assertions, test))]
 const VK_LWIN: u32 = 0x5B;
+#[cfg(any(debug_assertions, test))]
 const VK_RWIN: u32 = 0x5C;
 #[cfg(any(debug_assertions, test))]
 const VK_LCONTROL: u32 = 0xA2;

@@ -9,11 +9,11 @@ date: 2026-10-17
 ## Resume
 
 Iteration: 5
-Run branch: autopilot/DEC-047
-Stopped at: Iteration 5 completed — SPEC-34-01 delivered and verified green under mandate DEC-047
+Run branch: autopilot/DEC-047 (Draft PR #55)
+Stopped at: Done — All specifications in scope (SPEC-33, SPEC-34) delivered, verified, and closed under mandate DEC-047
 Blocked: —
 Parked: —
-Next: Execute SPEC-34-02 (Full workspace regression, runtime smoke test checklist, export hygiene, and version bump)
+Next: Owner review and PR merge into main
 
 ## Decisions
 
@@ -28,3 +28,4 @@ Next: Execute SPEC-34-02 (Full workspace regression, runtime smoke test checklis
 | Iteration 3 | SPEC-33-03 delivery | Extracted cycling selection and facts into wiradesk_core::cycling, and spatial/bypass policies into wiradesk_core::context | Keeping cycling algorithms embedded in Win32 daemon | Headless multi-target testing blocked | crates/core/src/cycling/, crates/core/src/context/, crates/daemon/src/cycling/, crates/daemon/src/context/, 3p.md, docs/3p.md |
 | Iteration 4 | SPEC-33-04 & SPEC-33 close | Created wiradesk_core::input with InputSink, lifted all 8 PostMessageW sites out of decision paths, closed SPEC-33 | Leaving IPC side-effects embedded in decision functions | Non-deterministic testability & platform coupling | crates/core/src/input.rs, crates/daemon/src/hook.rs, .scratch/spec-33-decouple-core-library/, specs.yaml, 3p.md, docs/3p.md |
 | Iteration 5 | SPEC-34-01 delivery | Configured deny.toml with multi-target policy (Windows + Apple Silicon) and verified clean cargo check on aarch64-apple-darwin | Windows-only target graph restriction | Downstream cross-compilation blindspots | deny.toml, .scratch/spec-34-multitarget-and-core-release/, 3p.md, docs/3p.md |
+| Iteration 5 | SPEC-34-02 & DEC-047 close | Executed full regression suite (808 tests green), verified smoke test, documented 0.4.0 in CHANGELOG, and applied mandate DEC-047 | Leaving mandate open after full delivery | Stale autonomous loop firings | CHANGELOG.md, .scratch/spec-34-multitarget-and-core-release/, specs.yaml, decisions.yaml, 3p.md, docs/3p.md |

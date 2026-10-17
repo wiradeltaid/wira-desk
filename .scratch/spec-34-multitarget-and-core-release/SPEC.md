@@ -1,7 +1,7 @@
 ---
 id: SPEC-34
 title: Multi-Target Verification and Core Release 0.4.0 Readiness
-status: open
+status: closed
 size: S
 release: "0.4.0"
 created: '2026-10-17'
