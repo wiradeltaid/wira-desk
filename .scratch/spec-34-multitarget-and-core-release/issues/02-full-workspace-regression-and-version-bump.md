@@ -2,7 +2,7 @@
 id: SPEC-34-02
 title: Execute full workspace regression pass and declare minor bump to 0.4.0
 spec: SPEC-34
-status: open
+status: closed
 depends_on: [SPEC-34-01]
 ---
 

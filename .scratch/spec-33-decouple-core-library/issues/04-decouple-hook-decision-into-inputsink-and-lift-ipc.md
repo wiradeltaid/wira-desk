@@ -2,7 +2,7 @@
 id: SPEC-33-04
 title: Decouple hook decisions into InputSink and lift all IPC dispatching
 spec: SPEC-33
-status: open
+status: closed
 depends_on: [SPEC-33-03]
 ---
 

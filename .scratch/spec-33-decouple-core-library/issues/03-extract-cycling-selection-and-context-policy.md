@@ -2,7 +2,7 @@
 id: SPEC-33-03
 title: Extract cycling selection algorithms, facts evaluation, and spatial/bypass policy
 spec: SPEC-33
-status: open
+status: closed
 depends_on: [SPEC-33-02]
 ---
 

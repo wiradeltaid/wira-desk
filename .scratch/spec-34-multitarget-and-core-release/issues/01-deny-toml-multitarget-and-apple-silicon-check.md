@@ -2,7 +2,7 @@
 id: SPEC-34-01
 title: Update deny.toml to multi-target and verify Apple Silicon compilation
 spec: SPEC-34
-status: open
+status: closed
 depends_on: []
 ---
 

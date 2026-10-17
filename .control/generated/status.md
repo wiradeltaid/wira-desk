@@ -140,15 +140,15 @@ work_progress:
   tickets_total: 3
   work_progress: 100%
 - spec: SPEC-33
-  status: open
-  tickets_done: 0
+  status: closed
+  tickets_done: 4
   tickets_total: 4
-  work_progress: 0%
+  work_progress: 100%
 - spec: SPEC-34
-  status: open
-  tickets_done: 0
+  status: closed
+  tickets_done: 2
   tickets_total: 2
-  work_progress: 0%
+  work_progress: 100%
 - spec: SPEC-4
   status: closed
   tickets_done: 5
