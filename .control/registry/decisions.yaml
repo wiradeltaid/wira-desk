@@ -1255,6 +1255,38 @@ decisions:
       - CONTRIBUTING.md
       - Cargo.toml
 
+  - id: DEC-047
+    title: Autopilot mandate for SPEC-33 and SPEC-34 delivery
+    type: mandate
+    status: accepted
+    accepted_by: 'Wira, 2026-10-17'
+    file: decisions/DEC-047-autopilot-mandate-for-spec-33-and-spec-34-delivery.md
+    created: '2026-10-17'
+    touches:
+      - .control/decisions/DEC-047-autopilot-mandate-for-spec-33-and-spec-34-delivery.md
+      - .control/memlog/autopilot-DEC-047.md
+      - .control/registry/decisions.yaml
+      - .control/registry/specs.yaml
+      - .scratch/spec-33-decouple-core-library/SPEC.md
+      - .scratch/spec-33-decouple-core-library/issues/01-initialize-core-and-extract-geometry.md
+      - .scratch/spec-33-decouple-core-library/issues/02-extract-switcher-layout-and-update-decision.md
+      - .scratch/spec-33-decouple-core-library/issues/03-extract-cycling-selection-and-context-policy.md
+      - .scratch/spec-33-decouple-core-library/issues/04-decouple-hook-decision-into-inputsink-and-lift-ipc.md
+      - .scratch/spec-34-multitarget-and-core-release/SPEC.md
+      - .scratch/spec-34-multitarget-and-core-release/issues/01-deny-toml-multitarget-and-apple-silicon-check.md
+      - .scratch/spec-34-multitarget-and-core-release/issues/02-full-workspace-regression-and-version-bump.md
+    mandate:
+      from_gate: G5
+      scope: all
+      parked: [ad-n]
+      smoke_test: agent
+      loop: 10m
+      expires: '2026-10-24'
+      run_branch: autopilot/DEC-047
+      worktree: .
+      build_target_dir: target
+      ledger: .control/memlog/autopilot-DEC-047.md
+
 
 
 
