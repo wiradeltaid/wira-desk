@@ -4,9 +4,9 @@
 
 #![allow(dead_code)]
 
-pub use wiradesk_core::arrangement::*;
 #[cfg(test)]
 pub use wiradesk_core::arrangement::fixtures;
+pub use wiradesk_core::arrangement::*;
 #[cfg(test)]
 pub use wiradesk_core::WindowId;
 

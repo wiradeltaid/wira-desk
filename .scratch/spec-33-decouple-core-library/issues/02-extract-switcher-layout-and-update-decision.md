@@ -2,7 +2,7 @@
 id: SPEC-33-02
 title: Extract switcher layout calculations and clean split of update decision
 spec: SPEC-33
-status: open
+status: closed
 depends_on: [SPEC-33-01]
 ---
 
