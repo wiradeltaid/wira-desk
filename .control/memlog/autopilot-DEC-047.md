@@ -8,12 +8,12 @@ date: 2026-10-17
 
 ## Resume
 
-Iteration: 2
+Iteration: 3
 Run branch: autopilot/DEC-047
-Stopped at: Iteration 2 completed — SPEC-33-02 delivered and verified green under mandate DEC-047
+Stopped at: Iteration 3 completed — SPEC-33-03 delivered and verified green under mandate DEC-047
 Blocked: —
 Parked: —
-Next: Execute SPEC-33-03 (Extract cycling selection algorithms, facts evaluation, and spatial/bypass policy)
+Next: Execute SPEC-33-04 (Decouple hook decisions into InputSink and lift all IPC dispatching)
 
 ## Decisions
 
@@ -25,3 +25,4 @@ Next: Execute SPEC-33-03 (Extract cycling selection algorithms, facts evaluation
 | Preflight | Deep analyst | Set deep_analyst to none (coordinator self-review for docs/architecture) | Shelling out separate analyst | Extra cycle latency | decisions.yaml |
 | Iteration 1 | SPEC-33-01 delivery | Initialized crates/core (wiradesk-core) under MIT, extracted pure geometry planners and command enum, wired facades in daemon and shared | Monolithic crates/daemon coupling | High platform-coupling latency | crates/core/, crates/daemon/src/arrangement/, crates/shared/src/commands.rs, 3p.md, docs/3p.md |
 | Iteration 2 | SPEC-33-02 delivery | Extracted switcher layout and selection into wiradesk_core::switcher, and pure update descriptor decisions into wiradesk_core::update | Leaving update descriptor parsing coupled with WinHttp | Sans-IO purity compromised | crates/core/src/switcher/, crates/core/src/update.rs, crates/daemon/src/switcher/, crates/shared/src/update.rs, 3p.md, docs/3p.md |
+| Iteration 3 | SPEC-33-03 delivery | Extracted cycling selection and facts into wiradesk_core::cycling, and spatial/bypass policies into wiradesk_core::context | Keeping cycling algorithms embedded in Win32 daemon | Headless multi-target testing blocked | crates/core/src/cycling/, crates/core/src/context/, crates/daemon/src/cycling/, crates/daemon/src/context/, 3p.md, docs/3p.md |

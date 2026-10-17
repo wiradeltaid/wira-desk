@@ -1,54 +1,8 @@
-//! Stateless next-target selection. Owns no Win32 calls.
-//! Selection is a pure function of the snapshot it is handed. It keeps no
-//! cursor between commands, so a window closing or opening between shortcuts
-//! can never desynchronize it.
+//! Stateless next-target selection.
+//! Backward-compatible facade re-exporting from `wiradesk_core::cycling::selection`.
 
-use super::{cycle_order, ActiveContext, Candidate, SelectionResult, WindowId};
-
-/// Build the full attempt order: every eligible window except the active one,
-/// starting immediately after the active window and wrapping **at most once**.
-/// The active window is filtered out rather than skipped mid-loop, which is
-/// what bounds the pass — the sequence itself can never revisit it.
-pub fn attempt_order(
-    candidates: &[Candidate],
-    eligible: &[WindowId],
-    active: &ActiveContext,
-) -> Vec<WindowId> {
-    cycle_order(candidates, active)
-        .into_iter()
-        .filter(|w| *w != active.foreground && eligible.contains(w))
-        .collect()
-}
-
-/// Choose the next target, or [`SelectionResult::NoCandidate`] for a no-op.
-pub fn select_next(
-    candidates: &[Candidate],
-    eligible: &[WindowId],
-    active: &ActiveContext,
-) -> SelectionResult {
-    match attempt_order(candidates, eligible, active).first() {
-        Some(target) => SelectionResult::Target(*target),
-        None => SelectionResult::NoCandidate,
-    }
-}
-
-/// Advance past targets already tried in this pass.
-/// Used by the driver after an activation failure so each candidate is
-/// attempted no more than once.
-pub fn select_after(
-    candidates: &[Candidate],
-    eligible: &[WindowId],
-    active: &ActiveContext,
-    tried: &[WindowId],
-) -> SelectionResult {
-    match attempt_order(candidates, eligible, active)
-        .into_iter()
-        .find(|w| !tried.contains(w))
-    {
-        Some(target) => SelectionResult::Target(target),
-        None => SelectionResult::NoCandidate,
-    }
-}
+#[allow(unused_imports)]
+pub use wiradesk_core::cycling::selection::*;
 
 #[cfg(test)]
 mod tests {
@@ -88,7 +42,6 @@ mod tests {
         let eligible = all_windows(&candidates);
         let order = attempt_order(&candidates, &eligible, &active(2));
         assert_eq!(order, vec![WindowId(1), WindowId(3)]);
-        // Two other windows, two entries — no repetition from a second lap.
         assert_eq!(order.len(), 2);
     }
 
@@ -122,7 +75,6 @@ mod tests {
     #[test]
     fn ineligible_windows_are_not_targets() {
         let candidates = ordered(vec![normal(1), normal(2), normal(3)]);
-        // Only window 3 is eligible.
         let eligible = vec![WindowId(3)];
         assert_eq!(
             select_next(&candidates, &eligible, &active(1)),
@@ -154,7 +106,6 @@ mod tests {
 
     #[test]
     fn selection_keeps_no_cursor_between_calls() {
-        // Same inputs must yield the same answer; there is no cached position.
         let candidates = ordered(vec![normal(1), normal(2), normal(3)]);
         let eligible = all_windows(&candidates);
         let first = select_next(&candidates, &eligible, &active(1));
@@ -230,8 +181,6 @@ mod tests {
 
     #[test]
     fn hung_target_receives_the_same_single_attempt() {
-        // A hung window is indistinguishable here, so it gets exactly the one
-        // bounded attempt a responsive window would get — no probe, no wait.
         let source = StaticSource(ordered(vec![normal(1), normal(2)]));
         let mut activator = ScriptedActivator::always(ActivationOutcome::Activated);
         let outcome = run_cycle(&source, &ReferencePolicy, &mut activator, &active(1));

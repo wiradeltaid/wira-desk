@@ -29,188 +29,46 @@ use shared::config::VmBypassConfig;
 
 use crate::cycling::WindowId;
 
-/// Opaque physical-monitor handle (`HMONITOR`), kept as a plain integer so
-/// fixtures need no Win32.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct MonitorId(pub isize);
-
-// ── Spatial eligibility ─────────────────────────────────────────────────────
-
-/// Origin facts resolved **once** per cycle operation.
-/// `None` means the lookup failed. It is not "no monitor" — it is "unknown",
-/// and the contract treats unknown as ineligible.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SpatialContext {
-    pub origin_monitor: Option<MonitorId>,
-}
-
-/// Per-candidate spatial facts, captured live for the current command.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SpatialFacts {
-    pub candidate_monitor: Option<MonitorId>,
-    /// `None` when the virtual-desktop query failed or COM was unavailable.
-    pub on_current_virtual_desktop: Option<bool>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SpatialRejection {
-    DifferentMonitor,
-    NotOnCurrentVirtualDesktop,
-    MonitorUnavailable,
-    VirtualDesktopUnavailable,
-}
-
-/// Scope of spatial evaluation: blind cycling vs. visual switcher (DEC-026 §B-7).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SpatialScope {
-    /// Lock evaluation to the active monitor. Used by blind cycling (FR-1, FR-2).
-    SameMonitor,
-    /// Enumerate candidates across all physical monitors on the current virtual desktop.
-    /// Used by visual switcher overlay (DEC-026).
-    AnyMonitorOnCurrentDesktop,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SpatialDecision {
-    Eligible,
-    Ineligible(SpatialRejection),
-}
-
-impl SpatialDecision {
-    pub fn is_eligible(&self) -> bool {
-        matches!(self, SpatialDecision::Eligible)
-    }
-}
-
-/// Decide spatial eligibility. **Fails closed on any uncertainty.**
-pub fn evaluate_spatial(
-    scope: SpatialScope,
-    ctx: &SpatialContext,
-    facts: &SpatialFacts,
-) -> SpatialDecision {
-    match scope {
-        SpatialScope::SameMonitor => {
-            let Some(origin) = ctx.origin_monitor else {
-                return SpatialDecision::Ineligible(SpatialRejection::MonitorUnavailable);
-            };
-            let Some(candidate) = facts.candidate_monitor else {
-                return SpatialDecision::Ineligible(SpatialRejection::MonitorUnavailable);
-            };
-            if origin != candidate {
-                return SpatialDecision::Ineligible(SpatialRejection::DifferentMonitor);
-            }
-        }
-        SpatialScope::AnyMonitorOnCurrentDesktop => {
-            // DEC-026 §B-7: origin_monitor lookup is not consulted at all and its failure
-            // is not an exclusion. All physical monitors on current virtual desktop are admitted.
-        }
-    }
-    match facts.on_current_virtual_desktop {
-        None => SpatialDecision::Ineligible(SpatialRejection::VirtualDesktopUnavailable),
-        Some(false) => SpatialDecision::Ineligible(SpatialRejection::NotOnCurrentVirtualDesktop),
-        Some(true) => SpatialDecision::Eligible,
-    }
-}
+pub use wiradesk_core::context::*;
 
 // ── Foreground bypass classification ────────────────────────────────────────
 
-/// What we know about the foreground window when a shortcut arrives.
-/// Either field may be `None` when its lookup failed.
+/// Immutable, pre-normalized bypass policy owned by the Hook Thread.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct ForegroundIdentity {
-    /// Executable basename, not normalized — the policy compares
-    /// case-insensitively so no allocation is needed at evaluation time.
-    pub process: Option<String>,
-    pub class: Option<String>,
-}
+pub struct BypassPolicy(pub wiradesk_core::context::BypassPolicy);
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BypassReason {
-    ProcessMatch,
-    ClassMatch,
-    /// Foreground could not be identified well enough to confirm a non-match.
-    IdentityUnavailable,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BypassDecision {
-    /// Let the physical key combination through untouched.
-    Passthrough(BypassReason),
-    /// Confirmed non-match — Wira Desk may handle the shortcut.
-    ContinueWiraDeskMatching,
-}
-
-impl BypassDecision {
-    pub fn is_passthrough(&self) -> bool {
-        matches!(self, BypassDecision::Passthrough(_))
+impl std::ops::Deref for BypassPolicy {
+    type Target = wiradesk_core::context::BypassPolicy;
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
-/// Immutable, pre-normalized bypass policy owned by the Hook Thread.
-/// Built **outside** the callback via [`BypassPolicy::from_config`], which is
-/// where every allocation and lowercase conversion happens. [`Self::classify`]
-/// then performs no parsing, allocation, file I/O, logging, or lock
-/// acquisition, which is what keeps the callback bounded.
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct BypassPolicy {
-    processes: Vec<String>,
-    classes: Vec<String>,
+impl std::ops::DerefMut for BypassPolicy {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
 }
 
 impl BypassPolicy {
-    /// Normalize configuration into runtime policy data. Call once, off the
-    /// callback path.
     pub fn from_config(cfg: &VmBypassConfig) -> Self {
-        BypassPolicy {
-            processes: normalize_identifiers(&cfg.bypass_processes),
-            classes: normalize_identifiers(&cfg.bypass_classes),
-        }
-    }
-
-    pub fn processes(&self) -> &[String] {
-        &self.processes
-    }
-
-    pub fn classes(&self) -> &[String] {
-        &self.classes
-    }
-
-    /// Classify the foreground. **Fails open on uncertainty.**
-    /// `ContinueWiraDeskMatching` is returned only when both identifiers are
-    /// known and neither matches — a *confirmed* non-match. The name is the
-    /// vocabulary; the contract was corrected here, in its owning
-    /// story, rather than aliased downstream.
-    /// If either lookup failed we cannot
-    /// confirm anything, so the key passes through rather than risking a
-    /// swallowed keystroke inside a guest session.
-    pub fn classify(&self, identity: &ForegroundIdentity) -> BypassDecision {
-        if let Some(process) = identity.process.as_deref() {
-            if contains_ignore_case(&self.processes, process) {
-                return BypassDecision::Passthrough(BypassReason::ProcessMatch);
-            }
-        }
-        if let Some(class) = identity.class.as_deref() {
-            if contains_ignore_case(&self.classes, class) {
-                return BypassDecision::Passthrough(BypassReason::ClassMatch);
-            }
-        }
-        if identity.process.is_none() || identity.class.is_none() {
-            return BypassDecision::Passthrough(BypassReason::IdentityUnavailable);
-        }
-        BypassDecision::ContinueWiraDeskMatching
+        Self(wiradesk_core::context::BypassPolicy::new(
+            &cfg.bypass_processes,
+            &cfg.bypass_classes,
+        ))
     }
 }
 
-fn normalize_identifiers(raw: &[String]) -> Vec<String> {
-    raw.iter()
-        .map(|s| s.trim().to_ascii_lowercase())
-        .filter(|s| !s.is_empty())
-        .collect()
+impl From<wiradesk_core::context::BypassPolicy> for BypassPolicy {
+    fn from(inner: wiradesk_core::context::BypassPolicy) -> Self {
+        Self(inner)
+    }
 }
 
-/// Allocation-free membership test against pre-normalized entries.
-fn contains_ignore_case(haystack: &[String], needle: &str) -> bool {
-    haystack.iter().any(|e| e.eq_ignore_ascii_case(needle))
+impl From<BypassPolicy> for wiradesk_core::context::BypassPolicy {
+    fn from(outer: BypassPolicy) -> Self {
+        outer.0
+    }
 }
 
 // ── Lane seams (implemented by Stories 3.2 and 3.3) ─────────────────────────
