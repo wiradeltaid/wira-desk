@@ -8,12 +8,12 @@ date: 2026-10-17
 
 ## Resume
 
-Iteration: 4
+Iteration: 5
 Run branch: autopilot/DEC-047
-Stopped at: Iteration 4 completed — SPEC-33-04 delivered and SPEC-33 closed under mandate DEC-047
+Stopped at: Iteration 5 completed — SPEC-34-01 delivered and verified green under mandate DEC-047
 Blocked: —
 Parked: —
-Next: Execute SPEC-34 (Multi-Target Compilation, CI Matrix, and Core Crate Release) starting with SPEC-34-01
+Next: Execute SPEC-34-02 (Full workspace regression, runtime smoke test checklist, export hygiene, and version bump)
 
 ## Decisions
 
@@ -27,3 +27,4 @@ Next: Execute SPEC-34 (Multi-Target Compilation, CI Matrix, and Core Crate Relea
 | Iteration 2 | SPEC-33-02 delivery | Extracted switcher layout and selection into wiradesk_core::switcher, and pure update descriptor decisions into wiradesk_core::update | Leaving update descriptor parsing coupled with WinHttp | Sans-IO purity compromised | crates/core/src/switcher/, crates/core/src/update.rs, crates/daemon/src/switcher/, crates/shared/src/update.rs, 3p.md, docs/3p.md |
 | Iteration 3 | SPEC-33-03 delivery | Extracted cycling selection and facts into wiradesk_core::cycling, and spatial/bypass policies into wiradesk_core::context | Keeping cycling algorithms embedded in Win32 daemon | Headless multi-target testing blocked | crates/core/src/cycling/, crates/core/src/context/, crates/daemon/src/cycling/, crates/daemon/src/context/, 3p.md, docs/3p.md |
 | Iteration 4 | SPEC-33-04 & SPEC-33 close | Created wiradesk_core::input with InputSink, lifted all 8 PostMessageW sites out of decision paths, closed SPEC-33 | Leaving IPC side-effects embedded in decision functions | Non-deterministic testability & platform coupling | crates/core/src/input.rs, crates/daemon/src/hook.rs, .scratch/spec-33-decouple-core-library/, specs.yaml, 3p.md, docs/3p.md |
+| Iteration 5 | SPEC-34-01 delivery | Configured deny.toml with multi-target policy (Windows + Apple Silicon) and verified clean cargo check on aarch64-apple-darwin | Windows-only target graph restriction | Downstream cross-compilation blindspots | deny.toml, .scratch/spec-34-multitarget-and-core-release/, 3p.md, docs/3p.md |
