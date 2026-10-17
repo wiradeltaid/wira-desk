@@ -21,7 +21,7 @@ This specification governs the architectural decoupling of Wira Desk from a 3-cr
 2. **Strict Sans-IO Boundary:** `crates/core` MUST NOT perform filesystem, registry, network, or direct OS clock calls, and MUST NOT import `windows-sys` or native window handles (`HWND`).
 3. **Dual-Target Verification:** `crates/core` MUST cross-compile cleanly for Apple Silicon:
    `cargo check -p wiradesk-core --target aarch64-apple-darwin`
-4. **License Boundary:** `crates/core` is licensed under MIT. `daemon` and `settings` remain `GPL-3.0-only`.
+4. **License Boundary:** `crates/core` is licensed under MIT. `daemon`, `settings`, and `shared` remain `GPL-3.0-only`.
 5. **DCO & Inbound Licensing:** `CONTRIBUTING.md` is updated with Developer Certificate of Origin 1.1 (`Signed-off-by`).
 
 ## Tracer-Bullet Tickets

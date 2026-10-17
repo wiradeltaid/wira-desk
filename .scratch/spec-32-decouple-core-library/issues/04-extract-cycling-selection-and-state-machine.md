@@ -13,8 +13,10 @@ depends_on: [SPEC-32-03]
    - `cycling/eligibility.rs` (`evaluate_facts`).
    - `cycling/selection.rs` (`select_next`, `attempt_order`).
    - `cycling/mod.rs` (`cycle_order_directed`, `WindowFacts`).
+   - (`cycling/{activation, source}.rs` and timer management `SetTimer`/`KillTimer` in `worker.rs` remain strictly in `crates/daemon`).
 2. Extract spatial evaluation and bypass policy:
    - `context/mod.rs` (`evaluate_spatial`, `BypassPolicy::classify`).
+   - (`context/{spatial, virtual_desktop, vm_bypass}.rs` adapters with Win32 FFI remain in `crates/daemon`).
 3. Maintain Windows class name constants (`Shell_TrayWnd`, `Progman`) as default parameters in the Windows adapter to preserve exact Windows cycling semantics.
 4. Rewire `crates/daemon/src/worker.rs` to consume cycling algorithms from `wiradesk-core`.
 

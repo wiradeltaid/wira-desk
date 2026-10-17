@@ -13,11 +13,11 @@ depends_on: [SPEC-32-02]
    - `Cargo.toml`: `name = "wiradesk-core"`, `license = "MIT"`, `publish = false`.
    - `<core>/src/lib.rs` with `#![forbid(unsafe_code)]`.
 2. Extract pure domain modules from `crates/daemon` and `crates/shared`:
-   - Geometry planners: `arrangement/mod.rs`, `arrangement/snap.rs`, `arrangement/thirds.rs`, `arrangement/stack.rs`, `arrangement/monitor.rs`.
-   - Switcher layout model: `switcher/layout.rs`, `switcher/selection.rs`.
+   - Geometry planners: `arrangement/mod.rs`, `arrangement/snap.rs`, `arrangement/thirds.rs`, `arrangement/stack.rs`, `arrangement/monitor.rs` (`arrangement/win32.rs` remains strictly in `crates/daemon`).
+   - Switcher layout model: `switcher/layout.rs`, `switcher/selection.rs` (`switcher/overlay.rs` and `thumbnail.rs` remain in `daemon`).
    - Command enum: `commands.rs`.
-   - Update descriptor decision: `update::decide`.
-3. Rewire `crates/daemon` and `crates/settings` to import extracted geometry from `wiradesk-core`.
+   - Update descriptor decision: clean split of `update::decide` and `split_https` to `core`, leaving `windows-sys` WinHttp and `std::env::var` in `shared`.
+3. Rewire `crates/daemon` and `crates/settings` to import extracted geometry from `wiradesk-core` via zero-regression compatibility facades.
 
 ## Verification
 - `$env:WIRADESK_SKIP_MANIFEST = '1'; cargo test --workspace` passes 100% green without any regression.

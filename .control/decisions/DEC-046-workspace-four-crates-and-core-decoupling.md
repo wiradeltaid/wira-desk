@@ -36,5 +36,8 @@ Over time, ~4.400 lines of pure domain logic (geometry planners for halves/third
 ## Why
 Decoupling pure mathematics and domain selection algorithms from OS-specific hooks enforces clean hexagonal architecture (*sans-IO*), enables headless testing across multiple compilation targets (including `aarch64-apple-darwin`), and ensures zero regression for the existing Windows application.
 
+## Relicense Authority
+All existing code in `crates/daemon` and `crates/shared` slated for extraction into `crates/core` was authored exclusively by the project maintainer and sole copyright holder (Wira Sihombing, covering all 506 commits to date, with non-code Dependabot updates touching only lockfiles). The sole copyright holder hereby exercises explicit authority and consent to relicense the extracted domain logic modules under the MIT license without copyleft contamination.
+
 ## Cost
 Refactoring workspace boundaries across 6 phased tracer-bullet tickets (SPEC-32-01 to SPEC-32-06).

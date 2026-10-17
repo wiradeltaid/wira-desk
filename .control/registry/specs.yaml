@@ -2156,8 +2156,8 @@ specs:
     status: open
     spec_folder: .scratch/spec-32-decouple-core-library/
     spec_reviewed:
-      date: '2026-10-16'
-      sha: 'f951fff'
+      date: '2026-10-17'
+      sha: 'e7d1728'
       lenses: [structure, edge-case-hunter, adversarial]
     tickets:
       - id: SPEC-32-01
