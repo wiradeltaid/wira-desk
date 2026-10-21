@@ -204,7 +204,7 @@ UninstallDisplayIcon={app}\{#DaemonExe}
 UninstallDisplayName={#AppName}
 WizardStyle=modern
 ; Side image on the Welcome and Finished pages. Four DPI sizes (100/150/200/250%) of the
-; modern-style 202x386; Inno picks the closest. Built in ops brand-identity/sampul/src/installer.py.
+; modern-style 202x386; Inno picks the closest. Built in ops ssot/brand-identity/sampul/src/installer.py.
 WizardImageFile={#STAGE_DIR}\installer-wizard.png,{#STAGE_DIR}\installer-wizard-150.png,{#STAGE_DIR}\installer-wizard-200.png,{#STAGE_DIR}\installer-wizard-250.png
 WizardSmallImageFile={#STAGE_DIR}\installer-logo.png
 Compression=lzma2/max
@@ -246,7 +246,7 @@ CloseApplications=no
 
 ; Both entries point at the same LicenseFile above (unset here on purpose): GPL-3.0 is a
 ; standard third-party licence excluded from the studio's translation requirement entirely
-; (ops legal/bahasa-naskah-legal.md §1 "Tidak termasuk", §5), so its official English text is
+; (ops ssot/legal/bahasa-naskah-legal.md §1 "Tidak termasuk", §5), so its official English text is
 ; not translated. Inno falls back to the [Setup] LicenseFile for both languages instead of
 ; pairing English with a translated licence body.
 [Languages]

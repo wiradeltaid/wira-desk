@@ -3,8 +3,8 @@ status: Accepted
 ratified_by: c803a1d     # the last commit that changed `crates/` — the code this file describes
 playbook:
   repo: wiradeltaid/ops
-  path: research/wdi-ecosystem-strategy/coding-playbook/
-  local: ../ops/research/wdi-ecosystem-strategy/coding-playbook/
+  path: research/wdi-ecosystem-strategy/playbooks/coding/
+  local: ../ops/research/wdi-ecosystem-strategy/playbooks/coding/
   rev: 5903b59
 reads:
   - 01-principles.md
