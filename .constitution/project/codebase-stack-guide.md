@@ -1,6 +1,6 @@
 ---
 status: Accepted
-ratified_by: c803a1d     # the last commit that changed `crates/` — the code this file describes
+ratified_by: 8195140     # the last commit that changed `crates/` — the code this file describes
 playbook:
   repo: wiradeltaid/ops
   path: research/wdi-ecosystem-strategy/playbooks/coding/
@@ -55,19 +55,22 @@ shipped** — `build.ps1` and the release gate both use `--release`.
 
 ## Shape
 
-A single Cargo workspace, four crates (amended by DEC-046), `resolver = "2"`, edition 2021, target
-`x86_64-pc-windows-msvc` (with `wiradesk-core` cross-compilable to `aarch64-apple-darwin`):
+A single Cargo workspace, three crates, `resolver = "2"`, edition 2021, target
+`x86_64-pc-windows-msvc`:
 
 | Crate | Binary | Holds | License |
 | --- | --- | --- | --- |
-| `core` | — (`wiradesk-core`) | Pure domain logic: geometry planners, cycling state machine, switcher layout, command enums, input sink protocol (`#![forbid(unsafe_code)]`, sans-IO) | MIT |
 | `daemon` | `wiradesk.exe` | The hook thread, worker, tray, arrangement adapter, health, autostart | GPL-3.0-only |
 | `settings` | `wiradesk-settings.exe` | The Slint settings window and the first-run tutorial | GPL-3.0-only |
 | `shared` | — | Windows-specific utilities (WinHTTP, DPAPI, installer helpers), `%APPDATA%` paths | GPL-3.0-only |
 
-Both binaries depend on `core` and `shared`. `core` MUST NOT depend on `daemon`, `settings`, or `shared`,
-and MUST NOT import `windows-sys` or execute OS I/O. A type used by both sides that is pure domain logic belongs
-in `core`; Windows-specific contracts (like `WM_APP_*`) belong in `shared`.
+Pure domain logic (geometry planners, cycling state machine, switcher layout, command enums, input sink
+protocol) comes from `wiradesk-core`, an MIT crate in its own repository
+(`https://github.com/wiradeltaid/wira-desk-core`), pinned by tag in `crates/daemon/Cargo.toml` and
+`crates/shared/Cargo.toml`; `deny.toml` allows that git source. Code MUST move into it only under that
+repository's scope rule (its `CONTRIBUTING.md`), through a pull request there and a new tag pinned here.
+Both binaries depend on `shared`, and `daemon` and `shared` depend on `wiradesk-core`. A type used by both
+binaries that is Windows-specific (like `WM_APP_*`) belongs in `shared`.
 
 ## Dependencies, as pinned
 
@@ -78,6 +81,7 @@ in `core`; Windows-specific contracts (like `WM_APP_*`) belong in `shared`.
 | `winit` | 0.30 | `settings` only, and it MUST match the version `i-slint-backend-winit` 1.17 resolves to; the window handle the titlebar and elevation path need is reached through it |
 | `toml` | 1.1 | Moved from 0.8 by #5 |
 | `serde` | 1.0 | `derive`. `settings` also carries `serde_json` for the update check |
+| `wiradesk-core` | `v0.1.1` (git tag) | `daemon` and `shared` only, from `https://github.com/wiradeltaid/wira-desk-core.git`. Pinned by tag, never by branch. `v0.1.0` MUST NOT be pinned: its `update::REPOSITORY` names the wrong repository, so the updater would refuse every release |
 
 Slint is declared with `default-features = false`, so **every** feature above is load-bearing and
 none is a leftover. `accessibility` is the one to understand before touching this list: without it the

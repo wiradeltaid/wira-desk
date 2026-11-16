@@ -73,6 +73,7 @@ Windows tidak punya fitur bawaan untuk berpindah antarjendela dari aplikasi yang
 
 - **Konfigurasi:** Pengaturan tersimpan di `%APPDATA%\WiraDesk\config.toml`. Lihat [docs/CONFIGURATION.md](docs/CONFIGURATION.md) untuk rujukan TOML lengkap.
 - **Pengembangan:** Dibangun dengan Rust dan MSVC. Lihat [DEVELOPMENT.md](DEVELOPMENT.md) untuk panduan kompilasi, pengujian, dan kode unsafe.
+- **Inti bersama:** Geometri snapping, same-app cycling, dan model perintah berada di [wira-desk-core](https://github.com/wiradeltaid/wira-desk-core), crate terpisah berlisensi MIT yang dipakai bersama oleh aplikasi Windows dan macOS.
 - **Kontribusi:** Kontribusi kode sangat terbuka — lihat [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---

@@ -73,6 +73,7 @@ Windows에는 같은 앱의 창끼리만 전환하는 기본 기능이 없습니
 
 - **설정:** 환경설정 파일은 `%APPDATA%\WiraDesk\config.toml`에 위치합니다. 전체 설명은 [docs/CONFIGURATION.md](docs/CONFIGURATION.md)를 참조하십시오.
 - **개발:** Rust 및 MSVC 환경에서 빌드되었습니다. 빌드, 테스트 및 unsafe 코드 가이드라인은 [DEVELOPMENT.md](DEVELOPMENT.md)를 참조하십시오.
+- **공유 코어:** 스냅 배치 계산, 동일 앱 창 전환, 명령 모델은 [wira-desk-core](https://github.com/wiradeltaid/wira-desk-core)에 있습니다. Windows 앱과 macOS 앱이 함께 사용하는 MIT 라이선스의 별도 crate입니다.
 - **기여:** 오픈소스 기여를 진심으로 환영합니다 — [CONTRIBUTING.md](CONTRIBUTING.md)를 참조하십시오.
 
 ---

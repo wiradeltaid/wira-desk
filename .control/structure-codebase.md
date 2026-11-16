@@ -1,168 +1,150 @@
 ---
 type: structure
 scope: codebase
-verified: '2026-08-30'
-commit: '50d616d'
+verified: '2026-11-16'
+commit: '8195140'
 ---
 
 # Codebase Structure
 
-Written and refreshed by `wdi-init` intent `structure`. Rules live in
-`.constitution/method/structure-guide.md`.
-
 ## Verified
 
-2026-08-30 — read from the tree on disk at commit `50d616d`, honouring `.gitignore`
-(`target/`, `stage/`, `dist/`, `nsis/`, `out/` excluded).
+2026-11-16, read from the tracked tree (`git ls-files`) at commit `8195140`, so everything
+`.gitignore` excludes (`target/`, `stage/`, `dist/`, `nsis/`, `out/`, `.what-rendered/`,
+`.how-rendered/`) is left out.
 
 ## Top level
 
 ```text
 wira-desk/
-├── crates/                    # [container]/[lib] the Cargo workspace — see Containers / Libraries
-├── assets/                    # [docs] logo, icon, and favicon source images
-├── docs/                      # [docs] engineering rationale, threat model, packaging choice
-├── packaging/                 # [tooling] Inno Setup installer script (wiradesk.iss)
-├── scripts/                   # [tooling] PowerShell build/verify scripts run by CI or by hand
-├── .github/                   # [tooling] CI workflows (ci.yml, release.yml) and dependabot
-├── _bmad/                     # [tooling] BMad skill installation for this repo
-├── _bmad-output/              # [generated] BMad skill run output — specs, planning artifacts, prior-knowledge
-├── .claude/                   # [tooling] Claude Code skills and project config
-├── .agents/                   # [tooling] mirror of .claude/ for non-Claude agent CLIs
-├── .constitution/             # [docs] WDI Method rules — see structure-document.md
-├── .control/                  # [docs] registries, decisions, structure maps, memlog — see structure-document.md
-├── .what/                     # [docs] promises corpus — see structure-document.md
-├── .how/                      # [docs] mechanism corpus — see structure-document.md
-└── .work/                     # [docs] scratch, emptied when a task closes
+├── crates/                    # [container]/[lib] the Cargo workspace: daemon, settings, shared
+├── assets/                    # [docs] logo, icon, favicon, and installer wizard source images
+├── docs/                      # [docs] configuration reference, threat model, packaging and distribution notes, research
+├── packaging/                 # [tooling] Inno Setup script, installer language file, Scoop bucket and WinGet manifests
+├── scripts/                   # [tooling] PowerShell build, release, and runtime verification scripts
+├── .github/                   # [tooling] CI workflows (ci.yml, release.yml), dependabot, issue and PR templates
+├── .githooks/                 # [tooling] pre-push hook, enabled with core.hooksPath
+├── .cargo/                    # [tooling] Cargo build configuration (config.toml)
+├── _bmad/                     # [tooling] BMad installation and team overrides
+├── _bmad-output/              # [generated] BMad and WDI skill run workspace
+├── .claude/                   # [tooling] Claude Code skills and settings
+├── .agents/                   # [tooling] agent instructions for non-Claude CLIs (AGENTS.md)
+├── .constitution/             # [docs] WDI Method rules and product rules, see structure-document.md
+├── .control/                  # [docs] registries, decisions, questions, structure maps, memlog, see structure-document.md
+├── .what/                     # [docs] promises corpus, see structure-document.md
+├── .how/                      # [docs] mechanism corpus, see structure-document.md
+├── .scratch/                  # [docs] active spec workspaces and tickets, see structure-document.md
+├── .archive/                  # [docs] closed spec workspaces, see structure-document.md
+└── .work/                     # [docs] committed working area for skill runs and briefs
 ```
 
 ## Containers
 
 ### daemon
 
-`wiradesk.exe` — the elevated background tray daemon. Ships as a single binary with an embedded
+`wiradesk.exe`, the elevated background tray daemon. Ships as a single binary with an embedded
 manifest requesting `requireAdministrator`.
 
 ```text
 crates/daemon/
 ├── src/
 │   ├── main.rs                # ★ ENTRY + composition root: elevation check, thread spawn, message loop
-│   ├── hook.rs                 # WH_KEYBOARD_LL hook thread, throttle, chord matching
-│   ├── worker.rs                # Z-order traversal, focus activation, arrangement dispatch
-│   ├── ring.rs                   # ★ lock-free hook→worker command channel
-│   ├── arrangement/               # convention: one file per placement concern
-│   │   ├── mod.rs                    # public planning API, consumed by worker.rs
-│   │   ├── snap.rs                     # half-screen and maximize geometry
-│   │   ├── monitor.rs                   # next-monitor selection and proportional remapping
-│   │   ├── stack.rs                      # overlapping-cascade geometry
-│   │   └── win32.rs                       # ★ SetWindowPos application, border clamp (DEC-010)
-│   ├── cycling/                    # convention: one file per stage of same-app cycling
-│   │   ├── mod.rs
-│   │   ├── source.rs
-│   │   ├── eligibility.rs
-│   │   ├── selection.rs
-│   │   └── activation.rs
-│   ├── context/                    # convention: spatial/desktop/VM eligibility gates
-│   │   ├── mod.rs
-│   │   ├── spatial.rs
-│   │   ├── virtual_desktop.rs
-│   │   └── vm_bypass.rs
-│   ├── tray.rs                    # tray icon state machine, context menu, TaskbarCreated
-│   ├── menu.rs                     # tray context menu construction, Settings launch (ShellExecute)
-│   ├── icon.rs                      # runtime HICON rasterization from icon_data.rs
-│   ├── icon_data.rs                  # ★ [generated by hand, see below] 32x32 BGRA tray icon geometry
-│   ├── health.rs                    # hook heartbeat, Tier-2/3 escalation
-│   ├── autostart.rs                  # Task Scheduler ONLOGON registration
-│   ├── acl.rs                         # install-directory DACL check (AD-7 Tier-2 warning)
-│   ├── updatecheck.rs                  # daily update-availability check state machine
-│   ├── config.rs                        # reload on WM_APP_RELOAD_CONFIG
-│   ├── log.rs                            # append-only rotating diagnostic log
-│   ├── metrics.rs                         # latency percentile tracking (debug-only seams)
-│   ├── legacy.rs                           # WinTick→WiraDesk one-time migration glue
-│   ├── error.rs                             # Tier-1 fatal MessageBox
+│   ├── hook.rs                # WH_KEYBOARD_LL / WH_MOUSE_LL hook thread, throttle, chord matching
+│   ├── ring.rs                # ★ lock-free hook→worker command channel
+│   ├── worker.rs              # ★ command drain: composes cycling, context, arrangement, switcher
+│   ├── arrangement/           # convention: one file per placement concern
+│   │   ├── mod.rs             # planning API; models and planners re-exported from wiradesk-core
+│   │   ├── snap.rs, thirds.rs, stack.rs, monitor.rs   # facades over wiradesk_core::arrangement
+│   │   └── win32.rs           # ★ SetWindowPos application, border clamp
+│   ├── cycling/               # convention: one file per stage of same-app cycling
+│   │   ├── mod.rs             # cycling contract; vocabulary re-exported from wiradesk-core
+│   │   ├── source.rs          # live Z-order and executable-identity discovery
+│   │   ├── eligibility.rs, selection.rs   # facades over wiradesk_core::cycling
+│   │   └── activation.rs      # bounded window activation
+│   ├── context/               # convention: spatial, desktop, and VM/RDP eligibility gates
+│   │   ├── mod.rs             # context-safety contract; policy re-exported from wiradesk-core
+│   │   └── spatial.rs, virtual_desktop.rs, vm_bypass.rs
+│   ├── switcher/              # same-app visual switcher overlay
+│   │   ├── mod.rs             # switcher controller
+│   │   ├── layout.rs, selection.rs   # facades over wiradesk_core::switcher
+│   │   ├── overlay.rs         # GDI + DWM overlay window
+│   │   └── thumbnail.rs       # DWM thumbnail handles
+│   ├── tray.rs                # tray icon, hidden host window, main message loop
+│   ├── menu.rs                # tray context menu, Settings launch (ShellExecute)
+│   ├── icon.rs                # runtime HICON rasterization from icon_data.rs
+│   ├── icon_data.rs           # [generated, see below] tray icon geometry
+│   ├── health.rs              # hook heartbeat timer
+│   ├── autostart.rs           # Task Scheduler ONLOGON registration
+│   ├── acl.rs                 # install-location DACL check
+│   ├── updatecheck.rs         # daily update check
+│   ├── config.rs              # reload on WM_APP_RELOAD_CONFIG
+│   ├── log.rs                 # Tier 2 warning log
+│   ├── metrics.rs             # convergence measurement seam, debug builds only
+│   ├── error.rs               # Tier 1 fatal MessageBox
 │   └── util.rs
-├── wiradesk.rc                # resource script: icon, version info, manifest reference
-├── wiradesk.manifest           # requireAdministrator
-└── build.rs                    # ★ embeds wiradesk.rc; WIRADESK_SKIP_MANIFEST test seam
+├── wiradesk.rc, wiradesk.ico  # resource script and icon
+├── wiradesk.manifest          # requireAdministrator
+└── build.rs                   # ★ embeds wiradesk.rc; WIRADESK_SKIP_MANIFEST test seam
 ```
 
-**Flow:** `hook.rs` (WH_KEYBOARD_LL callback) → `ring.rs` (lock-free channel) → `worker.rs` →
-`cycling/` or `arrangement/` (planning) → Win32 APIs (application).
+**Flow:** `hook.rs` (hook callback) → `ring.rs` → `worker.rs` → `cycling/`, `context/`,
+`arrangement/`, `switcher/` (planning, pure parts from `wiradesk-core`) → Win32 APIs (application).
 
 ### settings
 
-`wiradesk-settings.exe` — the on-demand, episodic configuration GUI. Launched by the daemon via
+`wiradesk-settings.exe`, the on-demand configuration GUI. Launched by the daemon via
 `ShellExecute`; carries no elevation manifest of its own.
 
 ```text
 crates/settings/
 ├── src/
-│   ├── main.rs                 # ★ ENTRY + composition root: builds MainWindow, wires every callback
-│   ├── app.rs                   # ★ SettingsModel, CaptureState, focus order — the application state
-│   ├── persistence.rs             # shortcut validation, atomic config save, daemon reload signal
-│   ├── daemon_watch.rs              # FindWindowW-based daemon presence check, startup decision
-│   ├── hookbridge.rs                  # hidden receiver window for the daemon's WM_APP_RECORDED_CHORD
-│   ├── theme.rs                        # OS theme + Segoe UI font detection
-│   ├── update.rs                        # in-app update check/download/verify (background thread)
-│   ├── sha256.rs                         # installer checksum verification
-│   └── ui/                                # Slint UI, compiled by slint-build
-│       ├── main_window.slint                # ★ root Window, frameless shell, pane routing
-│       ├── theme.slint                        # ★ Palette global — dark/light tokens
-│       ├── onboarding.slint                    # first-run tutorial modal
-│       ├── components/                          # convention: shared widgets
-│       │   ├── titlebar.slint
-│       │   ├── sidebar.slint
-│       │   ├── card.slint
-│       │   ├── toggle_switch.slint
-│       │   ├── shortcut_row.slint
-│       │   ├── key_check.slint
-│       │   └── scroll_hint.slint
-│       └── panes/                                # convention: one file per Settings tab
-│           ├── general_pane.slint
-│           ├── shortcuts_pane.slint
-│           ├── layout_pane.slint
-│           ├── vm_exceptions_pane.slint
-│           └── about_pane.slint
-├── wiradesk-settings.rc        # resource script: shares ../daemon/wiradesk.ico, no manifest
-└── build.rs                    # ★ embeds the .rc, compiles ui/main_window.slint via slint-build
+│   ├── main.rs                # ★ ENTRY + composition root: builds MainWindow, wires every callback
+│   ├── app.rs                 # ★ settings model, shortcut capture, first-run tutorial state
+│   ├── persistence.rs         # validation, atomic config save, daemon reload signal
+│   ├── daemon_watch.rs        # binds Settings' lifetime to the daemon's
+│   ├── hookbridge.rs          # hidden receiver window for WM_APP_RECORDED_CHORD
+│   ├── theme.rs               # OS theme and typography
+│   ├── update.rs              # update download, verify, launch
+│   ├── sha256.rs              # installer checksum over CNG
+│   ├── urls.rs                # embedded wiradelta.com URLs
+│   └── *_slint_snapshot.rs    # convention: Slint snapshot and interaction tests, one per UI surface
+├── ui/                        # Slint markup, compiled by slint-build
+│   ├── main_window.slint      # ★ root window, frameless shell, pane routing
+│   ├── theme.slint            # ★ Palette global, dark/light tokens
+│   ├── onboarding.slint       # first-run tutorial
+│   ├── components/            # convention: shared widgets, one per file
+│   └── panes/                 # convention: one file per Settings tab (<tab>_pane.slint)
+├── wiradesk-settings.rc, wiradesk-settings.ico
+└── build.rs                   # ★ embeds the .rc, compiles ui/main_window.slint via slint-build
 ```
 
-**Flow:** `ui/*.slint` (declared UI, `key-pressed`/button callbacks) → `main.rs` (callback wiring) →
-`app.rs` (model mutation) → `persistence.rs` (validate + atomic save + daemon signal).
+**Flow:** `ui/*.slint` (callbacks) → `main.rs` (wiring) → `app.rs` (model) → `persistence.rs`
+(validate, atomic save, daemon signal).
 
 ### core
 
-`wiradesk-core` — platform-agnostic sans-IO domain engine. `#![forbid(unsafe_code)]`, licensed under MIT.
-
-```text
-crates/core/
-├── Cargo.toml
-└── src/
-    ├── lib.rs                  # ★ public surface, #![forbid(unsafe_code)]
-    ├── arrangement/            # pure geometry layout planning (snap, thirds, stack, monitor)
-    ├── cycling/                # pure window cycling selection algorithms and facts evaluation
-    ├── switcher/               # pure switcher layout calculation
-    ├── commands.rs             # domain command enum and serialization
-    └── input.rs                # InputSink trait, modifier state, shortcut matching
-```
+No code of this container is in this repository. `wiradesk-core` lives in
+`wiradeltaid/wira-desk-core` and is pinned by tag in `crates/daemon/Cargo.toml` and
+`crates/shared/Cargo.toml`. The heading stays only because `components.yaml` still registers `core`
+as `built: true` without `repo:`; see the drift reported with this refresh.
 
 ## Libraries
 
 ### shared
 
-Config schema, IPC constants, and migration logic common to both binaries.
+Config schema, IPC constants, shortcut parsing, and Windows utilities common to both binaries.
 
 ```text
 crates/shared/
 └── src/
-    ├── lib.rs           # ★ public surface
-    ├── config.rs         # Config TOML schema, defaults, atomic save
-    ├── constants.rs        # ★ WM_APP_* message ids, window class/title strings, paths
-    ├── commands.rs          # the u8 arrangement command enum (extended, never renumbered)
-    ├── shortcut.rs            # chord parsing, canonicalization, reserved-chord catalogue
-    ├── https.rs                # minimal WinHTTP client, used by the updater
-    ├── update.rs                 # update descriptor fetch/decide (shared by daemon and settings)
-    └── migrate.rs                  # legacy %APPDATA%\WinTick\ one-time migration
+    ├── lib.rs                 # ★ public surface
+    ├── config.rs              # config.toml schema, defaults, atomic save
+    ├── constants.rs           # ★ WM_APP_* message ids, window class/title strings, paths
+    ├── commands.rs            # u8 command enum; facade over wiradesk_core::commands
+    ├── shortcut.rs            # chord parsing, canonicalization, reserved chords
+    ├── https.rs               # WinHTTP GET with a size ceiling, used by the updater
+    ├── update.rs              # update endpoint wiring; decision re-exported from wiradesk-core
+    └── binary.rs              # PE import inspection
 ```
 
 **Consumed by:** `daemon`, `settings`
@@ -171,8 +153,8 @@ crates/shared/
 
 | Path | Generated by |
 | --- | --- |
+| `crates/daemon/src/icon_data.rs` | hand-run image-processing pass over `assets/*` at logo-update time, not a build step |
 | `.control/generated/` | `.constitution/method/scripts/validate.py --generate` |
-| `crates/daemon/src/icon_data.rs` | hand-run image-processing pass over `assets/*` at logo-update time, not a build step — kept here because a hand edit to its pixel array would otherwise look like ordinary source |
 
 ---
 

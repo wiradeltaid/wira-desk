@@ -73,6 +73,7 @@ Windows bietet kein integriertes Wechseln zwischen den Fenstern derselben App. P
 
 - **Konfiguration:** Die Einstellungen liegen unter `%APPDATA%\WiraDesk\config.toml`. Eine vollständige Referenz finden Sie in [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
 - **Entwicklung:** Erstellt mit Rust und MSVC. Richtlinien zu Build, Tests und unsafe Code finden Sie in [DEVELOPMENT.md](DEVELOPMENT.md).
+- **Gemeinsamer Kern:** Snapping-Geometrie, Same-App-Fensterwechsel und das Befehlsmodell liegen in [wira-desk-core](https://github.com/wiradeltaid/wira-desk-core), einem separaten MIT-lizenzierten Crate, das die Windows- und die macOS-App gemeinsam nutzen.
 - **Mitwirkung:** Beiträge zum Open-Source-Projekt sind herzlich willkommen — siehe [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
