@@ -158,12 +158,8 @@ impl SwitcherController {
         }
         let selected_index = self.overlay.selected_index();
         let mut res = Vec::with_capacity(self.candidates.len());
-        for i in selected_index..self.candidates.len() {
-            res.push(self.candidates[i]);
-        }
-        for i in 0..selected_index {
-            res.push(self.candidates[i]);
-        }
+        res.extend_from_slice(&self.candidates[selected_index..]);
+        res.extend_from_slice(&self.candidates[..selected_index]);
         res
     }
 
