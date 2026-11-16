@@ -73,6 +73,7 @@ Windows には、同じアプリのウィンドウだけを切り替える標準
 
 - **設定:** 設定ファイルは `%APPDATA%\WiraDesk\config.toml` に配置されます。完全なリファレンスは [docs/CONFIGURATION.md](docs/CONFIGURATION.md) をご覧ください。
 - **開発:** Rust および MSVC でビルドされています。ビルド、テスト、unsafe コード指針は [DEVELOPMENT.md](DEVELOPMENT.md) を参照してください。
+- **共通コア:** スナップの配置計算、同一アプリ内ウィンドウ切り替え、コマンドモデルは [wira-desk-core](https://github.com/wiradeltaid/wira-desk-core) にあります。Windows 版と macOS 版で共有する、MIT ライセンスの独立した crate です。
 - **貢献:** オープンソースへのコントリビューションを歓迎します — [CONTRIBUTING.md](CONTRIBUTING.md) をご覧ください。
 
 ---

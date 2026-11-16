@@ -73,6 +73,7 @@ Windows no incluye una forma nativa de alternar entre las ventanas de una misma 
 
 - **Configuración:** Los ajustes residen en `%APPDATA%\WiraDesk\config.toml`. Consulte [docs/CONFIGURATION.md](docs/CONFIGURATION.md) para la referencia completa de TOML.
 - **Desarrollo:** Desarrollado con Rust y MSVC. Consulte [DEVELOPMENT.md](DEVELOPMENT.md) para directrices de compilación, pruebas y código unsafe.
+- **Núcleo compartido:** La geometría de ajuste (snapping), el ciclo de ventanas de la misma aplicación y el modelo de comandos están en [wira-desk-core](https://github.com/wiradeltaid/wira-desk-core), un crate independiente con licencia MIT que comparten las aplicaciones de Windows y macOS.
 - **Contribución:** Las contribuciones al código son bienvenidas: consulte [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---

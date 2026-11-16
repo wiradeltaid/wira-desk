@@ -73,6 +73,7 @@ Windows n'offre pas de moyen intégré pour passer d'une fenêtre à l'autre d'u
 
 - **Configuration :** Les paramètres sont stockés dans `%APPDATA%\WiraDesk\config.toml`. Consultez [docs/CONFIGURATION.md](docs/CONFIGURATION.md) pour la référence TOML complète.
 - **Développement :** Développé avec Rust et MSVC. Consultez [DEVELOPMENT.md](DEVELOPMENT.md) pour les instructions de compilation, de test et les règles de code unsafe.
+- **Noyau partagé :** La géométrie d'ancrage (snapping), le cycle entre fenêtres d'une même application et le modèle de commandes se trouvent dans [wira-desk-core](https://github.com/wiradeltaid/wira-desk-core), un crate distinct sous licence MIT partagé par les applications Windows et macOS.
 - **Contribution :** Les contributions open source sont les bienvenues — voir [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---

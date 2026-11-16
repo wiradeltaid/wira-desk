@@ -1,98 +1,118 @@
 ---
 type: structure
 scope: document
-verified: '2026-08-30'
-commit: '50d616d'
+verified: '2026-11-16'
+commit: '8195140'
 ---
 
 # Document Structure
 
-Written and refreshed by `wdi-init` intent `structure`. Rules live in
-`.constitution/method/structure-guide.md`.
-
 ## Verified
 
-2026-08-30 — read from the tree on disk at commit `50d616d`.
+2026-11-16, read from the tracked tree (`git ls-files`) at commit `8195140`. `.what-rendered/` and
+`.how-rendered/` are git-ignored and left out.
 
 ## Top level
 
 ```text
-wira-desk/
-├── .constitution/              # WDI Method rules — see below
-├── .control/                   # Registries, decisions, questions, structure maps, memlog — see below
-├── .what/                      # Promises corpus — see Product Components table below
-├── .how/                       # Mechanism corpus — see Product Components table below
-├── _bmad-output/                # BMad skill archive: specs, planning artifacts, prior-knowledge
-├── docs/                         # Engineering rationale, threat model, packaging choice (predates the method)
-└── .work/                         # Scratch, emptied when a task closes
+.constitution/                # how we work — populated: method package plus this product's room
+.control/                     # what currently holds — populated: registries, 47 decisions, questions, memlog
+.what/                        # what was promised — populated: brief, PRD, business rules, two PCs
+.how/                         # how it is built — populated: platform portrait, two PCs
+_bmad-output/                 # work in progress, not curated — README.md only
+.scratch/                     # active spec workspaces — spec-29 to spec-34
+.archive/                     # closed spec workspaces — specs/
+.work/                        # committed working area — skill runs and coding briefs
+docs/                         # predates the method — configuration, threat model, packaging, research, engines config
 ```
 
-## Product Components
+## Per layer
 
-Both registered in `.control/registry/components.yaml`; both have content on both sides of the
-placement test.
-
-| PC | `.what/<pc>/` | `.how/<pc>/` |
-| --- | --- | --- |
-| `window-management` | `SRS-window-management.md`, `02-rules/`, `03-domain/` (domain-model, state-machines), `04-usecases/` (UC-1, UC-2, UC-3, UC-7), `05-scenarios/` (SCN-01..03) | `SDD-window-management.md`, `02-contracts/`, `04-components/`, `05-model/`, `06-flows/` — no `01-ux/` (no screens of its own) |
-| `settings` | `SRS-settings.md`, `02-rules/`, `03-domain/` (domain-model, state-machines), `04-usecases/` (EXPERIENCE, UC-4, UC-5, UC-6), `05-scenarios/` (SCN-01..03) | `SDD-settings.md`, `01-ux/` (DESIGN.md), `02-contracts/`, `04-components/`, `05-model/`, `06-flows/` |
-
-## `.constitution/`
+### `.constitution/`
 
 ```text
 .constitution/
-├── method/                    # WDI Method package — overwritten wholesale by `wdi-method update`
-│   ├── document/                 # guides, templates, the BMad skill register
-│   ├── scripts/                    # validate.py, inventory.py, memlog.py (via _bmad/scripts)
-│   └── why/                          # status: Reference — explains, never binds
-└── project/                    # This product's own room — update never overwrites it
-    ├── codebase-stack-guide.md, codebase-conventions-guide.md, codebase-brownfield-guide.md   # all status: Draft
-    └── inventory-readers.py       # not yet written
+├── method/                   # WDI Method package, overwritten by `wdi-method update`
+│   ├── constitution.md, repo-guide.md, structure-guide.md, branch-guide.md, ci-guide.md,
+│   │   language-guide.md, method-glossary.md, README.md
+│   ├── document/             # artifact guides and the BMad skill register
+│   │   └── templates/        # templates the skills write from
+│   ├── scripts/              # ★ validate.py, inventory.py, lifecycle.py, timeline.py
+│   └── why/                  # status: Reference, explains and never binds
+└── project/                  # this product's room, never overwritten by update
+    ├── constitution.md
+    ├── codebase-stack-guide.md, codebase-conventions-guide.md, codebase-brownfield-guide.md   # status: Accepted
+    └── inventory-readers.py  # written for this repo's stack
 ```
 
-## `.control/`
+### `.control/`
 
 ```text
 .control/
-├── registry/                  # components.yaml, index.yaml, waves.yaml, risks.yaml, defects.yaml
-├── decisions/                  # DEC-001 .. DEC-010, all status: applied
-├── questions/                   # blocking.md, assumptions.md, external.md, answered.md
-├── memlog/                       # one .md per Product Component, plus spine.md
-├── meetings/                      # minutes
-├── generated/                      # validate.py --generate output — never hand-written
+├── registry/                 # ★ components.yaml, index.yaml, specs.yaml, decisions.yaml, goals.yaml,
+│                             #   usecases.yaml, requirements-wira-desk.yaml, risks.yaml, defects.yaml
+├── decisions/                # DEC-001 to DEC-047: 43 applied, 4 accepted
+├── questions/                # blocking.md, assumptions.md, external.md, answered.md
+├── memlog/                   # one file per PC plus brief, prd, spine, ux; autopilot-DEC-<n>.md per mandate; dated session and upgrade logs
+├── meetings/                 # empty
+├── test-targets/             # desktop.md, mobile.md, web.md
+├── generated/                # validate.py --generate output, never hand-written
 ├── product-glossary.md
 ├── project-non-technical-log.md
+├── wdi-method.yaml
+├── custom-dispatch.yaml.example
 ├── structure-codebase.md
 └── structure-document.md
 ```
 
-## `.what/` and `.how/` — product level
+### `.what/` and `.how/`, product level
 
 ```text
 .what/
-├── _product-brief/             # brief.md — G1
-├── _prd/wira-desk/               # prd.md — G2
-└── business-rules.md              # G3 cross-component rules
+├── _product-brief/           # ★ brief.md, addendum.md (G1)
+├── _prd/wira-desk/           # ★ prd.md, addendum.md (G2)
+└── business-rules.md         # cross-component rules (G3)
 
 .how/
-└── _platform/                  # ARCHITECTURE-SPINE.md, c4-l1/l2/l3, cross-cutting.md,
-                                  # design-system.md, the three inventories (db/api/screen)
+└── _platform/                # ★ ARCHITECTURE-SPINE.md, c4-l1-system-context.md, c4-l2-containers.md,
+                              #   cross-cutting.md, design-system.md, inventory-db/api/screen.md
 ```
 
-## `_bmad-output/`
+### `.scratch/` and `.archive/`
 
 ```text
-_bmad-output/
-├── brainstorming/              # exploration output — homeless by rule, never promoted
-├── planning-artifacts/          # architecture/, prds/, ux-designs/ — pre-method-era archive
-├── prior-knowledge/               # harvest-queue.md — the brownfield-harvest landing map
-├── implementation-artifacts/        # per-story validation reports
-└── specs/                             # one folder per wave: SPEC.md (+ stories/ for w1 and w4 only —
-                                        # spec-first-run-tutorial and spec-settings-window have none;
-                                        # reported by wdi-reconcile as V18 drift, not fixed here)
+.scratch/
+└── spec-<n>-<slug>/          # SPEC.md, issues/<nn>-<slug>.md, smoke/ when a smoke test ran
+
+.archive/
+└── specs/<spec-id>-<slug>/   # the same shape, for closed specs (w1, w4, spec-1 to spec-28)
 ```
+
+## Product Components
+
+| Product Component | `.what/<pc>/` | `.how/<pc>/` | Slots split out |
+| --- | --- | --- | --- |
+| `window-management` | `SRS-window-management.md` | `SDD-window-management.md` | `.what`: `02-rules/`, `03-domain/`, `04-usecases/` (UC-1, 2, 3, 7, 9, 10, 12, 13), `05-scenarios/` (SCN-01 to 04). `.how`: `02-contracts/`, `04-components/`, `05-model/`, `06-flows/`; no `01-ux/` |
+| `settings` | `SRS-settings.md` | `SDD-settings.md` | `.what`: `02-rules/`, `03-domain/`, `04-usecases/` (EXPERIENCE, UC-4, 5, 6, 8, 11, 14), `05-scenarios/` (SCN-01 to 03). `.how`: `01-ux/` (DESIGN.md), `02-contracts/`, `04-components/`, `05-model/`, `06-flows/` |
+
+## Registries and generated
+
+| File | State |
+| --- | --- |
+| `.control/registry/*.yaml` | all nine carry entries |
+| `.control/generated/` | produced: components, dag, decisions, estimate, report, risks, rtm, status, timeline |
+
+## Findings
+
+- `core` is registered in `components.yaml` as a Product Component (`mode: deep`) and as a container,
+  but has no folder in `.what/` or `.how/`, and its code left this repository for
+  `wiradeltaid/wira-desk-core`.
+- `.how/_platform/ARCHITECTURE-SPINE.md` AD-12 and its dependency diagram still describe a four-crate
+  workspace with `core` inside it.
+- `.constitution/method/scripts/__pycache__/validate.cpython-314.pyc` is tracked although
+  `.gitignore` excludes `__pycache__/`.
+- `docs/` predates the method and is inventory to sort; `docs/agents/` is the engines' config.
 
 ---
 
-★ = key file: entry point, wiring root, the single place a rule is enforced, or a file that must be
-opened before behaviour in its folder can be changed.
+★ = key document: single-copy, referenced from elsewhere, or the first thing a reader must find.

@@ -73,6 +73,7 @@ O Windows não tem um recurso nativo para alternar entre as janelas de um mesmo 
 
 - **Configuração:** As configurações ficam em `%APPDATA%\WiraDesk\config.toml`. Consulte [docs/CONFIGURATION.md](docs/CONFIGURATION.md) para a referência TOML completa.
 - **Desenvolvimento:** Desenvolvido com Rust e MSVC. Consulte [DEVELOPMENT.md](DEVELOPMENT.md) para diretrizes de compilação, testes e código unsafe.
+- **Núcleo compartilhado:** A geometria de encaixe (snapping), a alternância entre janelas do mesmo app e o modelo de comandos ficam em [wira-desk-core](https://github.com/wiradeltaid/wira-desk-core), um crate separado sob licença MIT compartilhado pelos apps para Windows e macOS.
 - **Contribuição:** Contribuições ao código são muito bem-vindas — veja [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---

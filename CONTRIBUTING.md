@@ -27,27 +27,33 @@ states that you have the right to submit it under the licence of the path it lan
 
 ### Your contribution takes the licence of its path
 
-The workspace carries two licences. Each change is licensed under the licence of the path
-it lands in; a pull request that touches both sides is licensed path by path.
+Each change is licensed under the licence of the path it lands in. Every path in this
+repository is GPL-3.0-only:
 
 | Path | Package | Licence |
 | --- | --- | --- |
-| `crates/core/` | `wiradesk-core` | MIT |
 | `crates/daemon/` | `daemon` (binary `wiradesk`) | GPL-3.0-only |
 | `crates/settings/` | `settings` (binary `wiradesk-settings`) | GPL-3.0-only |
 | `crates/shared/` | `shared` | GPL-3.0-only |
 | Everything else, unless a file states otherwise | — | GPL-3.0-only |
 
 Where the DCO says "the open source license indicated in the file", it means the `license`
-field in the crate's `Cargo.toml` and the `LICENSE` file beside it; outside `crates/`, the
-root `LICENSE`.
+field in the crate's `Cargo.toml`, whose full text is the root `LICENSE`; outside `crates/`,
+the root `LICENSE`.
 
-`crates/core` is MIT so it can be used in projects under any licence, including proprietary
-ones. Code submitted there must be your own work, or come from a source under an
-MIT-compatible permissive licence with that source's notice kept. It must not be copied or
-adapted from GPL-licensed code, including the GPL crates in this repository. Moving code
-from `crates/daemon`, `crates/settings`, or `crates/shared` into `crates/core` relicenses
-it, and only the maintainers can make that move.
+### The shared core is a separate repository
+
+The platform-independent logic (snapping geometry, same-app cycling, and the command model)
+is the `wiradesk-core` crate in [wira-desk-core](https://github.com/wiradeltaid/wira-desk-core),
+licensed MIT so it can be used in projects under any licence, including proprietary ones. This
+workspace pins it by tag in `crates/daemon/Cargo.toml` and `crates/shared/Cargo.toml`.
+Code goes there only when both Wira Desk apps need it and it behaves the same on both.
+
+Contributions to the core go to that repository, under its
+[CONTRIBUTING.md](https://github.com/wiradeltaid/wira-desk-core/blob/main/CONTRIBUTING.md).
+GPL-licensed code from this repository must not be copied or adapted into the core. Moving
+code from `crates/daemon`, `crates/settings`, or `crates/shared` into the core relicenses it
+under MIT, and only the maintainers can make that move.
 
 ### Signing off
 
@@ -104,7 +110,7 @@ reads the stale copy is the one that misbehaves.
 track progress for code and documentation respectively - read the relevant one before starting
 and add an entry when finished.
 
-When updating `README.md`, any localized front-page mirrors in `docs/` must be updated in the same commit to prevent documentation drift. Technical and reference documents (`DEVELOPMENT.md`, `docs/CONFIGURATION.md`, `CHANGELOG.md`, `SECURITY.md`) remain authoritative in English only.
+When updating `README.md`, the localized front-page mirrors (`README.<locale>.md` at the root) must be updated in the same commit to prevent documentation drift. Technical and reference documents (`DEVELOPMENT.md`, `docs/CONFIGURATION.md`, `CHANGELOG.md`, `SECURITY.md`) remain authoritative in English only.
 
 ## Planning with BMAD and WDI Method
 

@@ -71,6 +71,7 @@ Windows has no built-in same-app window cycling. PowerToys, a separate download 
 
 - **Configuration:** Settings live under `%APPDATA%\WiraDesk\config.toml`. See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for the complete TOML reference.
 - **Development:** Built with Rust and MSVC. See [DEVELOPMENT.md](DEVELOPMENT.md) for build, testing, and unsafe code guidelines.
+- **Shared core:** Snapping geometry, same-app cycling, and the command model live in [wira-desk-core](https://github.com/wiradeltaid/wira-desk-core), a separate MIT-licensed crate shared by the Windows and macOS apps.
 - **Contributing:** Contributions are welcome - see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---

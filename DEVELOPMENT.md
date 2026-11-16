@@ -23,6 +23,8 @@ Wira Desk is structured as a Cargo workspace with three crates:
 | `crates/settings` | Standalone GUI companion app built with Slint (software renderer, static CRT linking) for configuring shortcuts, snapping percentages, and mouse button mappings. |
 | `crates/shared` | Common domain models, TOML configuration serialization, shortcut chord parsing, and Windows API wrappers. |
 
+The platform-independent domain logic (snapping geometry, same-app cycling, the command model) is not in this workspace. It comes from the `wiradesk-core` crate in [wira-desk-core](https://github.com/wiradeltaid/wira-desk-core), a git dependency pinned by tag in `crates/daemon/Cargo.toml` and `crates/shared/Cargo.toml`. To work on both at once, point the workspace at a local checkout with a Cargo `[patch]`, as that repository's README shows. Where core changes go is in [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ---
 
 ## 3. Building from Source

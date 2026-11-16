@@ -73,6 +73,7 @@ Windows 没有内置的同一应用窗口切换功能。PowerToys 是 Microsoft 
 
 - **配置说明：** 设置文件位于 `%APPDATA%\WiraDesk\config.toml`。完整 TOML 配置项说明见 [docs/CONFIGURATION.md](docs/CONFIGURATION.md)。
 - **编译开发：** 基于 Rust 与 MSVC 构建。构建、测试与 unsafe 代码规范见 [DEVELOPMENT.md](DEVELOPMENT.md)。
+- **共享核心：** 窗口吸附几何计算、同应用窗口切换与命令模型位于 [wira-desk-core](https://github.com/wiradeltaid/wira-desk-core)，这是一个独立的 MIT 许可 crate，由 Windows 版与 macOS 版应用共用。
 - **参与贡献：** 欢迎开源贡献 —— 详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ---

@@ -73,6 +73,7 @@ Get-FileHash .\WiraDesk-*-x64-setup.exe -Algorithm SHA256
 
 - **Конфигурация:** Файл настроек хранится по пути `%APPDATA%\WiraDesk\config.toml`. Полное описание формата TOML см. в [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
 - **Разработка:** Проект создан на Rust и MSVC. Руководство по сборке, тестированию и написанию unsafe-кода доступно в [DEVELOPMENT.md](DEVELOPMENT.md).
+- **Общее ядро:** Геометрия привязки окон, переключение между окнами одного приложения и модель команд находятся в [wira-desk-core](https://github.com/wiradeltaid/wira-desk-core), отдельном crate под лицензией MIT, общем для приложений под Windows и macOS.
 - **Участие в проекте:** Мы приветствуем вклад в разработку открытого исходного кода — см. [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
