@@ -5715,8 +5715,8 @@ dependencies = [
 
 [[package]]
 name = "wiradesk-core"
-version = "0.1.0"
-source = "git+https://github.com/wiradeltaid/wira-desk-core.git?tag=v0.1.0#118165c14095010c0022424b1669f0183c54b37a"
+version = "0.1.1"
+source = "git+https://github.com/wiradeltaid/wira-desk-core.git?tag=v0.1.1#a6a9f97c4d31e16464229cadc02a262f4e7aa082"
 dependencies = [
  "serde",
  "serde_json",

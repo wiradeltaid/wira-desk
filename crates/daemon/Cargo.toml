@@ -14,7 +14,7 @@ path = "src/main.rs"
 
 [dependencies]
 shared = { path = "../shared" }
-wiradesk-core = { git = "https://github.com/wiradeltaid/wira-desk-core.git", tag = "v0.1.0" }
+wiradesk-core = { git = "https://github.com/wiradeltaid/wira-desk-core.git", tag = "v0.1.1" }
 windows-sys = { version = "0.52", features = [
     "Win32_Foundation",
     "Win32_UI_WindowsAndMessaging",
