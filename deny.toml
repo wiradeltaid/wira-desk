@@ -77,6 +77,7 @@ ignore = [
     # `cargo-deny` reads the whole graph and has no switch to exclude build-dependencies,
     # so this must be an accepted entry rather than a scoping fix.
     { id = "RUSTSEC-2024-0436", reason = "paste unmaintained; proc-macro reached only through slint-build/slint-macros, so it runs at compile time and is never linked. Resolver 2 keeps the build-dependency feature set separate." },
+    { id = "RUSTSEC-2026-0441", reason = "pin-utils unmaintained, no upgrade exists; reached only through spin_on under slint-build and slint-macros, so it runs at compile time and is never linked. No known vulnerability." },
 ]
 
 [licenses]
